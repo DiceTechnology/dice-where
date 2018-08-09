@@ -24,9 +24,9 @@ public class IPDatabase {
 	public Optional<IPInformation> get(IP ip) {
 		Map.Entry<IP, byte[]> ipEntry = this.db.floorEntry(ip);
 		return Optional.ofNullable(ipEntry)
-				.map(e -> {
+				.map(entry -> {
 					try {
-						IPInformationProto.IpInformationProto ipInformationProto = IPInformationProto.IpInformationProto.parseFrom(e.getValue());
+						IPInformationProto.IpInformationProto ipInformationProto = IPInformationProto.IpInformationProto.parseFrom(entry.getValue());
 						IPInformation ipInformation = new IPInformation(
 								ipInformationProto.getCountryCodeAlpha2(),
 								ipInformationProto.getGeonameId(),
@@ -44,9 +44,9 @@ public class IPDatabase {
 
 						return ipInformation;
 
-					} catch (InvalidProtocolBufferException e1) {
-						e1.printStackTrace();
-						throw new RuntimeException(e1);
+					} catch (InvalidProtocolBufferException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 				});
 	}
