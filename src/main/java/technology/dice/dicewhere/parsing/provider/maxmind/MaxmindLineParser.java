@@ -32,10 +32,16 @@ public class MaxmindLineParser implements LineParser {
 			String range = this.removeQuotes(fieldsIterator.next());
 			String geonameId = fieldsIterator.next();
 			String geonameIdRepresented = fieldsIterator.next();
-			fieldsIterator.next();
-			fieldsIterator.next();
-			fieldsIterator.next();
-			String postcode = fieldsIterator.next();
+			if (fieldsIterator.hasNext()) {
+				fieldsIterator.next();
+			}
+			if (fieldsIterator.hasNext()) {
+				fieldsIterator.next();
+			}
+			if (fieldsIterator.hasNext()) {
+				fieldsIterator.next();
+			}
+			String postcode = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
 			MaxmindLocation loc = this.locationDictionary.get(geonameId);
 			if (loc == null) {
 				loc = this.locationDictionary.get(geonameIdRepresented);
@@ -73,4 +79,5 @@ public class MaxmindLineParser implements LineParser {
 			throw new LineParsingException(e, rawLine);
 		}
 	}
+}
 }
