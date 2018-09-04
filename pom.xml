@@ -10,7 +10,7 @@
 
 	<properties>
 		<guava.version>21.0</guava.version>
-		<ipaddres.version>4.2.0</ipaddres.version>
+		<ipaddress.version>4.2.0</ipaddress.version>
 		<mapdb.version>3.0.7</mapdb.version>
 		<protobuf.version>3.6.0</protobuf.version>
 		<junit.version>4.12</junit.version>
@@ -133,7 +133,7 @@
 		<dependency>
 			<groupId>com.github.seancfoley</groupId>
 			<artifactId>ipaddress</artifactId>
-			<version>${ipaddres.version}</version>
+			<version>${ipaddress.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mapdb</groupId>
