@@ -1,7 +1,6 @@
 package technology.dice.dicewhere.api.api;
 
-import org.jetbrains.annotations.NotNull;
-
+import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -13,12 +12,12 @@ import java.util.Objects;
 public class IP implements Comparable<IP>, Serializable {
 	private final byte[] bytes;
 
-	public IP(@NotNull byte[] bytes) {
+	public IP(@Nonnull byte[] bytes) {
 		Objects.requireNonNull(bytes);
 		this.bytes = bytes;
 	}
 
-	public IP(@NotNull InetAddress ip) {
+	public IP(@Nonnull InetAddress ip) {
 		this(Objects.requireNonNull(ip).getAddress());
 	}
 

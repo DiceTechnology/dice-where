@@ -1,8 +1,7 @@
 package technology.dice.dicewhere.api.api;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,14 +31,14 @@ public class IPInformation implements Serializable {
 	 * @param endOfRange            the last IP of the range of IPs located in this location
 	 * @param originalLine          the database line that got processed into this location object
 	 */
-	public IPInformation(@NotNull String countryCodeAlpha2,
+	public IPInformation(@Nonnull String countryCodeAlpha2,
 						 @Nullable String geonameId,
 						 @Nullable String city,
 						 @Nullable String leastSpecificDivision,
 						 @Nullable String mostSpecificDivision,
 						 @Nullable String postcode,
-						 @NotNull IP startOfRange,
-						 @NotNull IP endOfRange,
+						 @Nonnull IP startOfRange,
+						 @Nonnull IP endOfRange,
 						 @Nullable String originalLine
 	) {
 		this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
