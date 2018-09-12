@@ -1,30 +1,31 @@
 package technology.dice.dicewhere.api.api;
 
-import javax.annotation.Nullable;
+import technology.dice.dicewhere.utils.StringUtils;
+
 import javax.annotation.Nonnull;
-import java.io.Serializable;
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 
-public class IPInformation implements Serializable {
-	private final Optional<String> originalLine;
+public class IPInformation {
+	private final String originalLine;
 	private final String countryCodeAlpha2;
-	private final Optional<String> geonameId;
-	private final Optional<String> city;
-	private final Optional<String> leastSpecificDivision;
-	private final Optional<String> mostSpecificDivision;
-	private final Optional<String> postcode;
+	private final String geonameId;
+	private final String city;
+	private final String leastSpecificDivision;
+	private final String mostSpecificDivision;
+	private final String postcode;
 	private final IP startOfRange;
 	private final IP endOfRange;
 
 	/**
 	 * @param countryCodeAlpha2     the country of this location
 	 * @param geonameId             the geoname identifier of this location (https://www.geonames.org/) This field will be Optional.empty() if an empty string is passed
-	 * @param city					the city of this location. This field will be Optional.empty() if an empty string is passed
+	 * @param city                  the city of this location. This field will be Optional.empty() if an empty string is passed
 	 * @param leastSpecificDivision the least specific administrative division of this location. This field will be Optional.empty() if an empty string is passed
 	 * @param mostSpecificDivision  the most specific administrative division of this location. This field will be Optional.empty() if an empty string is passed
 	 * @param postcode              the postcode of this location. This field will be Optional.empty() if an empty string is passed
-	 * @param startOfRange			the first IP of the range of IPs located in this location
+	 * @param startOfRange          the first IP of the range of IPs located in this location
 	 * @param endOfRange            the last IP of the range of IPs located in this location
 	 * @param originalLine          the database line that got processed into this location object
 	 */
@@ -39,14 +40,14 @@ public class IPInformation implements Serializable {
 						 @Nullable String originalLine
 	) {
 		this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
-		this.geonameId = Optional.ofNullable("".equals(geonameId) ? null : geonameId);
-		this.city = Optional.ofNullable("".equals(city) ? null : city);
-		this.leastSpecificDivision = Optional.ofNullable("".equals(leastSpecificDivision) ? null : leastSpecificDivision);
-		this.mostSpecificDivision = Optional.ofNullable("".equals(mostSpecificDivision) ? null : mostSpecificDivision);
-		this.postcode = Optional.ofNullable("".equals(postcode) ? null : postcode);
+		this.geonameId = geonameId;
+		this.city = city;
+		this.leastSpecificDivision = leastSpecificDivision;
+		this.mostSpecificDivision = mostSpecificDivision;
+		this.postcode = postcode;
 		this.startOfRange = Objects.requireNonNull(startOfRange);
 		this.endOfRange = Objects.requireNonNull(endOfRange);
-		this.originalLine = Optional.ofNullable(originalLine);
+		this.originalLine = originalLine;
 	}
 
 	public String getCountryCodeAlpha2() {
@@ -54,23 +55,23 @@ public class IPInformation implements Serializable {
 	}
 
 	public Optional<String> getGeonameId() {
-		return geonameId;
+		return StringUtils.nonEmptyString(geonameId);
 	}
 
 	public Optional<String> getCity() {
-		return city;
+		return StringUtils.nonEmptyString(city);
 	}
 
 	public Optional<String> getLeastSpecificDivision() {
-		return leastSpecificDivision;
+		return StringUtils.nonEmptyString(leastSpecificDivision);
 	}
 
 	public Optional<String> getMostSpecificDivision() {
-		return mostSpecificDivision;
+		return StringUtils.nonEmptyString(mostSpecificDivision);
 	}
 
 	public Optional<String> getPostcode() {
-		return postcode;
+		return StringUtils.nonEmptyString(postcode);
 	}
 
 	public IP getStartOfRange() {
@@ -82,7 +83,7 @@ public class IPInformation implements Serializable {
 	}
 
 	public Optional<String> getOriginalLine() {
-		return originalLine;
+		return StringUtils.nonEmptyString(originalLine);
 	}
 
 	@Override
@@ -94,15 +95,15 @@ public class IPInformation implements Serializable {
 			return false;
 		}
 		IPInformation that = (IPInformation) o;
-		return Objects.equals(originalLine, that.originalLine) &&
-				Objects.equals(countryCodeAlpha2, that.countryCodeAlpha2) &&
-				Objects.equals(geonameId, that.geonameId) &&
-				Objects.equals(city, that.city) &&
-				Objects.equals(leastSpecificDivision, that.leastSpecificDivision) &&
-				Objects.equals(mostSpecificDivision, that.mostSpecificDivision) &&
-				Objects.equals(postcode, that.postcode) &&
-				Objects.equals(startOfRange, that.startOfRange) &&
-				Objects.equals(endOfRange, that.endOfRange);
+		return Objects.equals(getOriginalLine(), that.getOriginalLine()) &&
+				Objects.equals(getCountryCodeAlpha2(), that.getCountryCodeAlpha2()) &&
+				Objects.equals(getGeonameId(), that.getGeonameId()) &&
+				Objects.equals(getCity(), that.getCity()) &&
+				Objects.equals(getLeastSpecificDivision(), that.getLeastSpecificDivision()) &&
+				Objects.equals(getMostSpecificDivision(), that.getMostSpecificDivision()) &&
+				Objects.equals(getPostcode(), that.getPostcode()) &&
+				Objects.equals(getStartOfRange(), that.getStartOfRange()) &&
+				Objects.equals(getEndOfRange(), that.getEndOfRange());
 	}
 
 	@Override
@@ -110,4 +111,18 @@ public class IPInformation implements Serializable {
 		return Objects.hash(originalLine, countryCodeAlpha2, geonameId, city, leastSpecificDivision, mostSpecificDivision, postcode, startOfRange, endOfRange);
 	}
 
+	@Override
+	public String toString() {
+		return "IPInformation{" +
+				"originalLine='" + originalLine + '\'' +
+				", countryCodeAlpha2='" + countryCodeAlpha2 + '\'' +
+				", geonameId='" + geonameId + '\'' +
+				", city='" + city + '\'' +
+				", leastSpecificDivision='" + leastSpecificDivision + '\'' +
+				", mostSpecificDivision='" + mostSpecificDivision + '\'' +
+				", postcode='" + postcode + '\'' +
+				", startOfRange=" + startOfRange +
+				", endOfRange=" + endOfRange +
+				'}';
+	}
 }
