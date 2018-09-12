@@ -36,33 +36,29 @@ public class DbIpLineParser implements LineParser {
 				fieldsIterator.next();
 			}
 			String geoname = fieldsIterator.hasNext() ? fieldsIterator.next() : null;
-			try {
-				InetAddress e = InetAddresses.forString(rangeEndString);
-				InetAddress s = InetAddresses.forString(rangeStartString);
-				IP startIp = new IP(s);
-				IP endIp = new IP(e);
-				ParsedLine result = new ParsedLine(
-						startIp,
-						endIp,
-						new IPInformation(
-								StringUtils.removeQuotes(countryCode),
-								StringUtils.removeQuotes(geoname),
-								StringUtils.removeQuotes(city),
-								StringUtils.removeQuotes(leastSpecificDivision),
-								StringUtils.removeQuotes(mostSpecificDivision),
-								StringUtils.removeQuotes(postCode),
-								startIp,
-								endIp,
-								retainOriginalLine ? line.getLine() : null
-						),
-						line
-				);
-				return result;
-			} catch (IllegalArgumentException e) {
-				throw new LineParsingException(e, line);
-			}
+			InetAddress e = InetAddresses.forString(rangeEndString);
+			InetAddress s = InetAddresses.forString(rangeStartString);
+			IP startIp = new IP(s);
+			IP endIp = new IP(e);
+			ParsedLine result = new ParsedLine(
+					startIp,
+					endIp,
+					new IPInformation(
+							StringUtils.removeQuotes(countryCode),
+							StringUtils.removeQuotes(geoname),
+							StringUtils.removeQuotes(city),
+							StringUtils.removeQuotes(leastSpecificDivision),
+							StringUtils.removeQuotes(mostSpecificDivision),
+							StringUtils.removeQuotes(postCode),
+							startIp,
+							endIp,
+							retainOriginalLine ? line.getLine() : null
+					),
+					line
+			);
+			return result;
 
-		} catch (NoSuchElementException e) {
+		} catch (NoSuchElementException | IllegalArgumentException e) {
 			throw new LineParsingException(e, line);
 		}
 	}
