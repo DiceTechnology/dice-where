@@ -1,16 +1,15 @@
 package technology.dice.dicewhere.reading.provider.maxmind;
 
 import com.google.common.base.Splitter;
+import technology.dice.dicewhere.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MaxmindLocationsParser {
-	Pattern quotesRemover = Pattern.compile("\"", Pattern.LITERAL);
 	private final Splitter splitter = Splitter.on(",");
 
 	public Map<String, MaxmindLocation> locations(BufferedReader reader) {
@@ -38,11 +37,11 @@ public class MaxmindLocationsParser {
 						String mostSpecificDivision = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
 						String city = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
 						return new MaxmindLocation(
-								quotesRemover.matcher(geonameId).replaceAll(""),
-								quotesRemover.matcher(countryCode).replaceAll(""),
-								quotesRemover.matcher(mostSpecificDivision).replaceAll(""),
-								quotesRemover.matcher(leastSpecificDivision).replaceAll(""),
-								quotesRemover.matcher(city).replaceAll("")
+								StringUtils.removeQuotes(geonameId),
+								StringUtils.removeQuotes(countryCode),
+								StringUtils.removeQuotes(mostSpecificDivision),
+								StringUtils.removeQuotes(leastSpecificDivision),
+								StringUtils.removeQuotes(city)
 						);
 					})
 					.collect(Collectors.toMap(

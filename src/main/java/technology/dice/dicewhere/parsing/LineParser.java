@@ -3,13 +3,11 @@ package technology.dice.dicewhere.parsing;
 
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.reading.RawLine;
+import technology.dice.dicewhere.utils.StringUtils;
 
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 public interface LineParser {
-	Pattern quotesRemover = Pattern.compile("\"", Pattern.LITERAL);
-
 	ParsedLine parse(RawLine rawLine, boolean retainOriginalLine) throws LineParsingException;
 
 	default ParsedLine parse(RawLine rawLine) throws LineParsingException {
@@ -17,6 +15,6 @@ public interface LineParser {
 	}
 
 	default String removeQuotes(String countryCode) {
-		return quotesRemover.matcher(Objects.requireNonNull(countryCode)).replaceAll("");
+		return StringUtils.removeQuotes(Objects.requireNonNull(countryCode));
 	}
 }
