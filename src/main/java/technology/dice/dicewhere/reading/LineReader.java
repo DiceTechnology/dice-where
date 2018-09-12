@@ -79,7 +79,7 @@ public abstract class LineReader {
 
 	protected BufferedReader bufferedReaderforPath(Path path, int bufferSize) throws IOException {
 		BufferedReader br;
-		if (this.isZipFile(path)) {
+		if (isZipFile(path)) {
 
 			ZipFile zipFile = new ZipFile(path.toFile());
 			Enumeration<InputStream> zipEntries = Collections.enumeration(
@@ -96,7 +96,7 @@ public abstract class LineReader {
 
 			SequenceInputStream sequenceInputStream = new SequenceInputStream(zipEntries);
 			br = new BufferedReader(new InputStreamReader(sequenceInputStream, "UTF-8"));
-		} else if (this.isGZipped(path)) {
+		} else if (isGZipped(path)) {
 			InputStream is = new GZIPInputStream(new FileInputStream(path.toFile()));
 			br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 		} else {
@@ -113,7 +113,7 @@ public abstract class LineReader {
 		LineProcessor processor = new LineProcessor(
 				parserExecutorService,
 				serializedLinesBuffer,
-				this.parser(),
+				parser(),
 				retainOriginalLine,
 				new LineprocessorListenerForProvider(provider(), processListener));
 		DatabaseBuilder databaseBuilder = new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener);
@@ -127,7 +127,7 @@ public abstract class LineReader {
 		databaseBuilderT.start();
 
 		final long[] n = {0};
-		try (Stream<String> lines = this.lines()) {
+		try (Stream<String> lines = lines()) {
 			lines.forEach(line -> {
 				n[0]++;
 				processor.addLine(new RawLine(line, n[0]));

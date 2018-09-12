@@ -20,22 +20,22 @@ public class MaxmindDbReader extends LineReader {
 
 
 	public MaxmindDbReader(Path locationNames, Path ipV4CSV, Path ipV6CSV) throws IOException {
-		this.ipV4CSVPath = ipV4CSV;
-		this.ipV6CSVPath = ipV6CSV;
+		ipV4CSVPath = ipV4CSV;
+		ipV6CSVPath = ipV6CSV;
 		MaxmindLocationsParser locationsParser = new MaxmindLocationsParser();
-		Map<String, MaxmindLocation> locations = locationsParser.locations(this.bufferedReaderforPath(locationNames, BUFFER_SIZE));
-		this.parser = new MaxmindLineParser(locations);
+		Map<String, MaxmindLocation> locations = locationsParser.locations(bufferedReaderforPath(locationNames, BUFFER_SIZE));
+		parser = new MaxmindLineParser(locations);
 	}
 
 	@Override
 	public LineParser parser() {
-		return this.parser;
+		return parser;
 	}
 
 	@Override
 	protected Stream<String> lines() throws IOException {
-		BufferedReader ipV4ChannelBufferedReader = this.bufferedReaderforPath(this.ipV4CSVPath, BUFFER_SIZE);
-		BufferedReader ipV6ChannelBufferedReader = this.bufferedReaderforPath(this.ipV6CSVPath, BUFFER_SIZE);
+		BufferedReader ipV4ChannelBufferedReader = bufferedReaderforPath(ipV4CSVPath, BUFFER_SIZE);
+		BufferedReader ipV6ChannelBufferedReader = bufferedReaderforPath(ipV6CSVPath, BUFFER_SIZE);
 
 		return Stream.concat(
 				ipV4ChannelBufferedReader.lines().skip(1),

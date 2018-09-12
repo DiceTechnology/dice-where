@@ -45,43 +45,43 @@ public class DatabaseBuilder implements Runnable {
 	}
 
 	public void dontExpectMore() {
-		this.expectingMore = false;
+		expectingMore = false;
 	}
 
 	public int reimainingLines() {
-		return this.source.size();
+		return source.size();
 	}
 
 	public int processedLines() {
-		return this.processedLines;
+		return processedLines;
 	}
 
 	@Override
 	public void run() {
-		while (this.expectingMore || this.source.size() > 0) {
+		while (expectingMore || source.size() > 0) {
 			SerializedLine beingProcessed = null;
-			ArrayList<SerializedLine> availableForAdding = new ArrayList(this.source.size());
+			ArrayList<SerializedLine> availableForAdding = new ArrayList(source.size());
 			try {
-				Queues.drain(source, availableForAdding, this.source.size(), 1, TimeUnit.NANOSECONDS);
+				Queues.drain(source, availableForAdding, source.size(), 1, TimeUnit.NANOSECONDS);
 				for (SerializedLine currentLine : availableForAdding) {
 					try {
 						beingProcessed = currentLine;
 						sink.put(currentLine.getStartIp(), currentLine.getInfo());
-						this.processedLines++;
-						this.listener.lineAdded(this.provider, currentLine);
+						processedLines++;
+						listener.lineAdded(provider, currentLine);
 
 					} catch (DBException.NotSorted e) {
-						this.listener.lineOutOfOrder(this.provider, beingProcessed, e);
+						listener.lineOutOfOrder(provider, beingProcessed, e);
 					}
 				}
 			} catch (InterruptedException e) {
-				this.listener.builderInterrupted(this.provider, e);
+				listener.builderInterrupted(provider, e);
 			}
 		}
 
 	}
 
 	public IPDatabase build() {
-		return new IPDatabase(this.sink.create());
+		return new IPDatabase(sink.create());
 	}
 }

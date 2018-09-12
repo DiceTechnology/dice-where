@@ -29,7 +29,7 @@ public class MaxmindLineParser implements LineParser {
 		try {
 			Iterable<String> fieldsIterable = splitter.split(rawLine.getLine());
 			Iterator<String> fieldsIterator = fieldsIterable.iterator();
-			String range = this.removeQuotes(fieldsIterator.next());
+			String range = removeQuotes(fieldsIterator.next());
 			String geonameId = fieldsIterator.next();
 			String geonameIdRepresented = fieldsIterator.next();
 			if (fieldsIterator.hasNext()) {
@@ -42,9 +42,9 @@ public class MaxmindLineParser implements LineParser {
 				fieldsIterator.next();
 			}
 			String postcode = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
-			MaxmindLocation loc = this.locationDictionary.get(geonameId);
+			MaxmindLocation loc = locationDictionary.get(geonameId);
 			if (loc == null) {
-				loc = this.locationDictionary.get(geonameIdRepresented);
+				loc = locationDictionary.get(geonameIdRepresented);
 			}
 			if (loc == null) {
 				loc = MaxmindLocation.UNKNOWN;
@@ -62,12 +62,12 @@ public class MaxmindLineParser implements LineParser {
 					new IP(rangeStart.getBytes()),
 					new IP(rangeEnd.getBytes()),
 					new IPInformation(
-							this.removeQuotes(loc.getCountryCodeAlpha2()),
-							this.removeQuotes(geonameId),
-							this.removeQuotes(loc.getCity()),
-							this.removeQuotes(loc.getLeastSpecificDivision()),
-							this.removeQuotes(loc.getMostSpecificDivision()),
-							this.removeQuotes(postcode),
+							removeQuotes(loc.getCountryCodeAlpha2()),
+							removeQuotes(geonameId),
+							removeQuotes(loc.getCity()),
+							removeQuotes(loc.getLeastSpecificDivision()),
+							removeQuotes(loc.getMostSpecificDivision()),
+							removeQuotes(postcode),
 							new IP(rangeStart.getBytes()),
 							new IP(rangeEnd.getBytes()),
 							retainOriginalLine ? rawLine.getLine() : null

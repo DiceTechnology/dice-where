@@ -18,34 +18,34 @@ public class LineprocessorListenerForProvider {
 	}
 
 	public void enqueueError(RawLine rawLine, Exception e) {
-		this.listener.enqueueError(this.provider, rawLine, e);
+		listener.enqueueError(provider, rawLine, e);
 	}
 
 	public void parseError(RawLine rawLine, LineParsingException e) {
-		this.listener.parseError(this.provider, rawLine, e);
+		listener.parseError(provider, rawLine, e);
 	}
 
 	public void serializeError(ParsedLine parsedLine, Exception e) {
-		this.listener.serializeError(this.provider, parsedLine, e);
+		listener.serializeError(provider, parsedLine, e);
 	}
 
 	public void dequeueError(SerializedLine serializedLine, Exception e) {
-		this.listener.dequeueError(this.provider, serializedLine, e);
+		listener.dequeueError(provider, serializedLine, e);
 	}
 
 	public void processorInterrupted(InterruptedException e) {
-		this.listener.processorInterrupted(this.provider, e);
+		listener.processorInterrupted(provider, e);
 	}
 
 	public void lineProcessed(SerializedLine serializedLine, long timeElapsed) {
-		this.listener.lineProcessed(this.provider, serializedLine, timeElapsed);
+		listener.lineProcessed(provider, serializedLine, timeElapsed);
 	}
 
 	public void lineParsed(ParsedLine parsed, long timeElapsed) {
-		this.listener.lineParsed(this.provider, parsed, timeElapsed);
+		listener.lineParsed(provider, parsed, timeElapsed);
 	}
 
 	void finished(long totalLines, long timeElapsed) {
-		this.listener.finished(this.provider, totalLines, timeElapsed);
+		listener.finished(provider, totalLines, timeElapsed);
 	}
 }

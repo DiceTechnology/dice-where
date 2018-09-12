@@ -30,9 +30,9 @@ public class FileLineSubsetBuilder {
 	}
 
 	public void writeTo(Path target) throws IOException {
-		for (Path path : this.paths) {
+		for (Path path : paths) {
 			long nrLines = Files.lines(path).count();
-			long outputEvery = (nrLines / this.linesFromEach);
+			long outputEvery = (nrLines / linesFromEach);
 			BufferedReader reader = new BufferedReader(new FileReader(path.toFile()));
 			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(target.toFile())));
 			String line;

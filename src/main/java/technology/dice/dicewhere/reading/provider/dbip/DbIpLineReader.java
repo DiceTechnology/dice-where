@@ -20,7 +20,7 @@ public class DbIpLineReader extends LineReader {
 
 	@Override
 	protected Stream<String> lines() throws IOException {
-		return this.bufferedReaderforPath(this.csv, BUFFER_SIZE).lines();
+		return bufferedReaderforPath(csv, BUFFER_SIZE).lines();
 	}
 
 	@Override
@@ -30,6 +30,6 @@ public class DbIpLineReader extends LineReader {
 
 	@Override
 	public LineParser parser() {
-		return this.lineParser;
+		return lineParser;
 	}
 }

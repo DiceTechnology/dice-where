@@ -11,7 +11,7 @@ public interface LineParser {
 	ParsedLine parse(RawLine rawLine, boolean retainOriginalLine) throws LineParsingException;
 
 	default ParsedLine parse(RawLine rawLine) throws LineParsingException {
-		return this.parse(rawLine, false);
+		return parse(rawLine, false);
 	}
 
 	default String removeQuotes(String countryCode) {

@@ -19,7 +19,7 @@ public class IPDatabase {
 	}
 
 	public Optional<IPInformation> get(IP ip) {
-		Map.Entry<IP, byte[]> ipEntry = this.db.floorEntry(ip);
+		Map.Entry<IP, byte[]> ipEntry = db.floorEntry(ip);
 		return Optional.ofNullable(ipEntry)
 				.map(entry -> {
 					try {

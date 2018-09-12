@@ -31,37 +31,37 @@ public class IPResolver {
 
 	public CompletionStage<Optional<IPInformation>> resolveAsync(IP ip, DatabaseProvider provider) {
 		return CompletableFuture.supplyAsync(
-				() -> this.databases.get(provider).get(ip)
+				() -> databases.get(provider).get(ip)
 		);
 	}
 
 	public CompletionStage<Optional<IPInformation>> resolveAsync(IP ip, DatabaseProvider provider, ExecutorService executorService) {
 		return CompletableFuture.supplyAsync(
-				() -> this.databases.get(provider).get(ip)
+				() -> databases.get(provider).get(ip)
 				, executorService);
 	}
 
 	public Optional<IPInformation> resolve(IP ip, DatabaseProvider provider) {
-		if (!this.databases.containsKey(provider)) {
+		if (!databases.containsKey(provider)) {
 			throw new ProviderNotAvailableException(String.format("Provider %s not available", provider.name()), provider);
 		}
-		return this.databases.get(provider).get(ip);
+		return databases.get(provider).get(ip);
 	}
 
 	public CompletionStage<Optional<IPInformation>> resolveAsync(String ip, DatabaseProvider provider) throws UnknownHostException {
-		return this.resolveAsync(new IP(InetAddress.getByName(ip)), provider);
+		return resolveAsync(new IP(InetAddress.getByName(ip)), provider);
 	}
 
 	public CompletionStage<Optional<IPInformation>> resolveAsync(String ip, DatabaseProvider provider, ExecutorService executorService) throws UnknownHostException {
-		return this.resolveAsync(new IP(InetAddress.getByName(ip)), provider, executorService);
+		return resolveAsync(new IP(InetAddress.getByName(ip)), provider, executorService);
 	}
 
 	public Optional<IPInformation> resolve(String ip, DatabaseProvider provider) throws UnknownHostException {
-		return this.resolve(new IP(InetAddress.getByName(ip)), provider);
+		return resolve(new IP(InetAddress.getByName(ip)), provider);
 	}
 
 	public Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolveAsync(IP ip) {
-		Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolution = this.databases
+		Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolution = databases
 				.entrySet()
 				.stream()
 				.collect(Collectors.toMap(
@@ -84,7 +84,7 @@ public class IPResolver {
 	}
 
 	public Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolveAsync(IP ip, ExecutorService executorService) {
-		Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolution = this.databases
+		Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolution = databases
 				.entrySet()
 				.stream()
 				.collect(Collectors.toMap(
@@ -95,7 +95,7 @@ public class IPResolver {
 	}
 
 	public Map<DatabaseProvider, Optional<IPInformation>> resolve(IP ip) {
-		Map<DatabaseProvider, Optional<IPInformation>> resolution = this.databases
+		Map<DatabaseProvider, Optional<IPInformation>> resolution = databases
 				.entrySet()
 				.stream()
 				.collect(Collectors.toMap(
@@ -116,48 +116,48 @@ public class IPResolver {
 		};
 
 		public Builder() {
-			this.providers = new HashMap<>();
+			providers = new HashMap<>();
 		}
 
 		public Builder withProvider(LineReader lineReader) {
-			if (this.providers.containsKey(lineReader.provider())) {
+			if (providers.containsKey(lineReader.provider())) {
 				throw new DuplicateProviderException(String.format("Provider %s has already been added", lineReader.provider().name()));
 			}
-			this.providers.put(lineReader.provider(), lineReader);
+			providers.put(lineReader.provider(), lineReader);
 			return this;
 		}
 
 		public Builder retainOriginalLine(boolean retain) {
-			this.retainOriginalLine = retain;
+			retainOriginalLine = retain;
 			return this;
 		}
 
 		public Builder withReaderListener(LineReaderListener readerListener) {
-			this.readerListener = Objects.requireNonNull(readerListener);
+			readerListener = Objects.requireNonNull(readerListener);
 			return this;
 		}
 
 		public Builder withProcessorListener(LineProcessorListener processorListener) {
-			this.processorListener = Objects.requireNonNull(processorListener);
+			processorListener = Objects.requireNonNull(processorListener);
 			return this;
 		}
 
 		public Builder withBuilderListener(DatabaseBuilderListener builderListener) {
-			this.builderListener = Objects.requireNonNull(builderListener);
+			builderListener = Objects.requireNonNull(builderListener);
 			return this;
 		}
 
 		public IPResolver build() throws IOException {
-			this.checkSanity();
-			Map<DatabaseProvider, IPDatabase> databases = new HashMap<>(this.providers.size());
-			for (LineReader reader : this.providers.values()) {
-				databases.put(reader.provider(), reader.read(this.retainOriginalLine, this.readerListener, this.processorListener, this.builderListener));
+			checkSanity();
+			Map<DatabaseProvider, IPDatabase> databases = new HashMap<>(providers.size());
+			for (LineReader reader : providers.values()) {
+				databases.put(reader.provider(), reader.read(retainOriginalLine, readerListener, processorListener, builderListener));
 			}
 			return new IPResolver(databases);
 		}
 
 		private void checkSanity() {
-			if (this.providers.size() <= 0) {
+			if (providers.size() <= 0) {
 				throw new NoProvidersException("Must build with at least one provider");
 			}
 		}

@@ -23,11 +23,11 @@ public class IP implements Comparable<IP>, Serializable {
 	}
 
 	public boolean isLowerThan(IP other) {
-		return this.compareTo(other) < 0;
+		return compareTo(other) < 0;
 	}
 
 	public boolean isGreaterThan(IP other) {
-		return this.compareTo(other) > 0;
+		return compareTo(other) > 0;
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class IP implements Comparable<IP>, Serializable {
 
 	@Override
 	public int compareTo(IP o) {
-		byte[] myBytes = this.getBytes();
+		byte[] myBytes = getBytes();
 		byte[] theirBytes = o.getBytes();
 
 		// ipv4 before ipv6

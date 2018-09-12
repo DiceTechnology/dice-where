@@ -40,18 +40,18 @@ public class LineProcessor implements Runnable {
 	}
 
 	public int reimainingLines() {
-		return this.lines.size();
+		return lines.size();
 	}
 
 	public void dontExpectMore() {
-		this.expectingMore = false;
+		expectingMore = false;
 	}
 
 	public void addLine(RawLine rawLine) {
 		try {
-			this.lines.put(rawLine);
+			lines.put(rawLine);
 		} catch (InterruptedException e) {
-			this.progressListener.enqueueError(rawLine, e);
+			progressListener.enqueueError(rawLine, e);
 		}
 	}
 
@@ -60,7 +60,7 @@ public class LineProcessor implements Runnable {
 		long started = System.currentTimeMillis();
 		AtomicLong totalLines = new AtomicLong();
 		CompletableFuture<ArrayList<SerializedLine>>[] workerList = new CompletableFuture[WORKER_COUNT];
-		while (this.expectingMore || this.lines.size() > 0) {
+		while (expectingMore || lines.size() > 0) {
 			try {
 				for (int i = 0; i < WORKER_COUNT; i++) {
 					Collection<RawLine> batch = new ArrayList<>(WORKER_BATCH_SIZE);
@@ -68,10 +68,10 @@ public class LineProcessor implements Runnable {
 					workerList[i] = CompletableFuture.supplyAsync(() -> batch.stream().map(rawLine -> {
 								try {
 									ParsedLine parsed = parser.parse(rawLine, retainOriginalLine);
-									this.progressListener.lineParsed(parsed, System.currentTimeMillis() - started);
+									progressListener.lineParsed(parsed, System.currentTimeMillis() - started);
 									return parsed;
 								} catch (LineParsingException e) {
-									this.progressListener.parseError(rawLine, e);
+									progressListener.parseError(rawLine, e);
 									return null;
 								}
 							})
@@ -98,7 +98,7 @@ public class LineProcessor implements Runnable {
 													parsedLine);
 											return serializedLine;
 										} catch (Exception e) {
-											this.progressListener.serializeError(parsedLine, e);
+											progressListener.serializeError(parsedLine, e);
 											return null;
 										}
 									})
@@ -113,18 +113,18 @@ public class LineProcessor implements Runnable {
 								try {
 									destination.put(serializedLine);
 									totalLines.getAndIncrement();
-									this.progressListener.lineProcessed(serializedLine, System.currentTimeMillis() - started);
+									progressListener.lineProcessed(serializedLine, System.currentTimeMillis() - started);
 								} catch (InterruptedException e) {
-									this.progressListener.dequeueError(serializedLine, e);
+									progressListener.dequeueError(serializedLine, e);
 								}
 							}
 					);
 				}
 			} catch (InterruptedException e) {
-				this.progressListener.processorInterrupted(e);
+				progressListener.processorInterrupted(e);
 			}
 
 		}
-		this.progressListener.finished(totalLines.get(), System.currentTimeMillis() - started);
+		progressListener.finished(totalLines.get(), System.currentTimeMillis() - started);
 	}
 }

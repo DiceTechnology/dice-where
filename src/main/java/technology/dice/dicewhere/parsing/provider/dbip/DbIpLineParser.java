@@ -21,8 +21,8 @@ public class DbIpLineParser implements LineParser {
 		try {
 			Iterable<String> fieldsIterable = splitter.split(line.getLine());
 			Iterator<String> fieldsIterator = fieldsIterable.iterator();
-			String rangeStartString = this.removeQuotes(fieldsIterator.next());
-			String rangeEndString = this.removeQuotes(fieldsIterator.next());
+			String rangeStartString = removeQuotes(fieldsIterator.next());
+			String rangeEndString = removeQuotes(fieldsIterator.next());
 			String countryCode = fieldsIterator.next();
 			String leastSpecificDivision = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
 			String mostSpecificDivision = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
@@ -44,12 +44,12 @@ public class DbIpLineParser implements LineParser {
 						startIp,
 						endIp,
 						new IPInformation(
-								this.removeQuotes(countryCode),
-								this.removeQuotes(geoname),
-								this.removeQuotes(city),
-								this.removeQuotes(leastSpecificDivision),
-								this.removeQuotes(mostSpecificDivision),
-								this.removeQuotes(postCode),
+								removeQuotes(countryCode),
+								removeQuotes(geoname),
+								removeQuotes(city),
+								removeQuotes(leastSpecificDivision),
+								removeQuotes(mostSpecificDivision),
+								removeQuotes(postCode),
 								startIp,
 								endIp,
 								retainOriginalLine ? line.getLine() : null
