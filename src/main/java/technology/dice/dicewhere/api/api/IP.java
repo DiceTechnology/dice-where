@@ -44,9 +44,10 @@ public class IP implements Comparable<IP>, Serializable {
 	}
 
 	@Override
-	public int compareTo(IP o) {
+	public int compareTo(@Nonnull IP other) {
+		Objects.requireNonNull(other);
 		byte[] myBytes = getBytes();
-		byte[] theirBytes = o.getBytes();
+		byte[] theirBytes = other.getBytes();
 
 		// ipv4 before ipv6
 		if (myBytes.length < theirBytes.length) return -1;
