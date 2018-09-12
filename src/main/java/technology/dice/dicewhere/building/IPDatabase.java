@@ -42,7 +42,6 @@ public class IPDatabase {
 						return ipInformation;
 
 					} catch (InvalidProtocolBufferException e) {
-						e.printStackTrace();
 						throw new RuntimeException(e);
 					}
 				});
