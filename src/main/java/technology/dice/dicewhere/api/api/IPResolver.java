@@ -1,6 +1,5 @@
 package technology.dice.dicewhere.api.api;
 
-import com.google.common.base.Suppliers;
 import technology.dice.dicewhere.api.exceptions.DuplicateProviderException;
 import technology.dice.dicewhere.api.exceptions.NoProvidersException;
 import technology.dice.dicewhere.api.exceptions.ProviderNotAvailableException;
@@ -32,16 +31,14 @@ public class IPResolver {
 
 	public CompletionStage<Optional<IPInformation>> resolveAsync(IP ip, DatabaseProvider provider) {
 		return CompletableFuture.supplyAsync(
-				Suppliers.memoize(
-						() -> this.databases.get(provider).get(ip)
-				));
+				() -> this.databases.get(provider).get(ip)
+		);
 	}
 
 	public CompletionStage<Optional<IPInformation>> resolveAsync(IP ip, DatabaseProvider provider, ExecutorService executorService) {
 		return CompletableFuture.supplyAsync(
-				Suppliers.memoize(
-						() -> this.databases.get(provider).get(ip)
-				), executorService);
+				() -> this.databases.get(provider).get(ip)
+				, executorService);
 	}
 
 	public Optional<IPInformation> resolve(IP ip, DatabaseProvider provider) {
