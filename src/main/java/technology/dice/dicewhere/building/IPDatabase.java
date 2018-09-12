@@ -21,7 +21,7 @@ public class IPDatabase {
 	public Optional<IPInformation> get(IP ip) {
 		Map.Entry<IP, byte[]> ipEntry = db.floorEntry(ip);
 		return Optional.ofNullable(ipEntry)
-				.map(entry -> {
+				.flatMap(entry -> {
 					try {
 						IPInformationProto.IpInformationProto ipInformationProto = IPInformationProto.IpInformationProto.parseFrom(entry.getValue());
 						IPInformation ipInformation = new IPInformation(
@@ -36,10 +36,10 @@ public class IPDatabase {
 								"".equals(ipInformationProto.getOriginalLine()) || ipInformationProto.getOriginalLine() == null ? null : ipInformationProto.getOriginalLine());
 
 						if (ip.isGreaterThan(ipInformation.getEndOfRange())) {
-							return null;
+							return Optional.empty();
 						}
 
-						return ipInformation;
+						return Optional.of(ipInformation);
 
 					} catch (InvalidProtocolBufferException e) {
 						throw new RuntimeException(e);
