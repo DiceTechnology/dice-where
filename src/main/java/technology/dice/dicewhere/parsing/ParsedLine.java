@@ -7,9 +7,6 @@ import technology.dice.dicewhere.reading.RawLine;
 
 import java.util.Objects;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public class ParsedLine {
 	private final RawLine rawLine;
 	private final IP startIp;

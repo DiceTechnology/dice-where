@@ -6,9 +6,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public class IPInformation implements Serializable {
 	private final Optional<String> originalLine;
 	private final String countryCodeAlpha2;

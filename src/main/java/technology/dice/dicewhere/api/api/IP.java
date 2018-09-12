@@ -6,9 +6,6 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Objects;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public class IP implements Comparable<IP>, Serializable {
 	private final byte[] bytes;
 

@@ -12,9 +12,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public class MaxmindDbReader extends LineReader {
 	private static final int BUFFER_SIZE = 1024 * 1024;
 	private final MaxmindLineParser parser;

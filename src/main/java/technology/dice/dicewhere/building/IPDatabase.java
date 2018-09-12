@@ -9,9 +9,6 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public class IPDatabase {
 	private final NavigableMap<IP, byte[]> db;
 	private final long size;

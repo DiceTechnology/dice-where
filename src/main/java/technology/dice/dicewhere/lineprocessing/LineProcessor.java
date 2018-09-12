@@ -18,9 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-/**
- * Created by gluiz on 09/07/2018.
- */
 public class LineProcessor implements Runnable {
 	private static final int WORKER_BATCH_SIZE = 10000;
 	private static final int WORKER_COUNT = 4;

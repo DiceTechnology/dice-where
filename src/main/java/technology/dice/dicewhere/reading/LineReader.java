@@ -36,9 +36,6 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public abstract class LineReader {
 	private static final int LINES_BUFFER = 100000;
 	public static byte[] MAGIC_ZIP = {'P', 'K', 0x3, 0x4};

@@ -2,9 +2,6 @@ package technology.dice.dicewhere.reading.provider.maxmind;
 
 import java.util.Objects;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public class MaxmindLocation {
 	public final static MaxmindLocation UNKNOWN = new MaxmindLocation("", "ZZ", "", "", "");
 

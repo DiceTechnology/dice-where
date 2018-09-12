@@ -8,9 +8,6 @@ import technology.dice.dicewhere.api.api.IP;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
-/**
- * Created by gluiz on 10/07/2018.
- */
 public class IPSerializer extends GroupSerializerObjectArray<IP> {
 
 	@Override

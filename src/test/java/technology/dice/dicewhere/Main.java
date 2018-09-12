@@ -19,9 +19,6 @@ import java.util.Scanner;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Created by gluiz on 05/07/2018.
- */
 public class Main {
 	public static void maisn(String[] args) throws IOException {
 		String IPV4 = "192.168.4.5";
