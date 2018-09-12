@@ -47,7 +47,7 @@ public class Main {
 						new MaxmindDbReader(
 								Paths.get("/Users/gluiz/Downloads/GeoIP2-City-CSV_20180703/GeoIP2-City-Locations-en.csv.zip"),
 								Paths.get("/Users/gluiz/Downloads/GeoIP2-City-CSV_20180703/GeoIP2-City-Blocks-IPv4.csv.zip"),
-								Paths.get("/Users/gluiz/Downloads/GeoIP2-City-CSV_20180703/GeoIP2-City-Blocks-IPv6.csv")
+								Paths.get("/Users/gluiz/Downloads/GeoIP2-City-CSV_2018070D3/GeoIP2-City-Blocks-IPv6.csv")
 						))
 				.withProvider(
 						new DbIpLineReader(Paths.get("/Users/gluiz/dev/geoip2-poc/src/test/resources/provider/dbip/dbip-country-2018-07.csv.gz"))

@@ -8,6 +8,7 @@ import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
+import technology.dice.dicewhere.utils.StringUtils;
 
 import java.net.InetAddress;
 import java.util.Iterator;
@@ -21,20 +22,20 @@ public class DbIpLineParser implements LineParser {
 		try {
 			Iterable<String> fieldsIterable = splitter.split(line.getLine());
 			Iterator<String> fieldsIterator = fieldsIterable.iterator();
-			String rangeStartString = removeQuotes(fieldsIterator.next());
-			String rangeEndString = removeQuotes(fieldsIterator.next());
+			String rangeStartString = StringUtils.removeQuotes(fieldsIterator.next());
+			String rangeEndString = StringUtils.removeQuotes(fieldsIterator.next());
 			String countryCode = fieldsIterator.next();
-			String leastSpecificDivision = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
-			String mostSpecificDivision = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
-			String city = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
-			String postCode = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
+			String leastSpecificDivision = fieldsIterator.hasNext() ? fieldsIterator.next() : null;
+			String mostSpecificDivision = fieldsIterator.hasNext() ? fieldsIterator.next() : null;
+			String city = fieldsIterator.hasNext() ? fieldsIterator.next() : null;
+			String postCode = fieldsIterator.hasNext() ? fieldsIterator.next() : null;
 			if (fieldsIterator.hasNext()) {
 				fieldsIterator.next();
 			}
 			if (fieldsIterator.hasNext()) {
 				fieldsIterator.next();
 			}
-			String geoname = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
+			String geoname = fieldsIterator.hasNext() ? fieldsIterator.next() : null;
 			try {
 				InetAddress e = InetAddresses.forString(rangeEndString);
 				InetAddress s = InetAddresses.forString(rangeStartString);
@@ -44,12 +45,12 @@ public class DbIpLineParser implements LineParser {
 						startIp,
 						endIp,
 						new IPInformation(
-								removeQuotes(countryCode),
-								removeQuotes(geoname),
-								removeQuotes(city),
-								removeQuotes(leastSpecificDivision),
-								removeQuotes(mostSpecificDivision),
-								removeQuotes(postCode),
+								StringUtils.removeQuotes(countryCode),
+								StringUtils.removeQuotes(geoname),
+								StringUtils.removeQuotes(city),
+								StringUtils.removeQuotes(leastSpecificDivision),
+								StringUtils.removeQuotes(mostSpecificDivision),
+								StringUtils.removeQuotes(postCode),
 								startIp,
 								endIp,
 								retainOriginalLine ? line.getLine() : null

@@ -10,7 +10,7 @@ public abstract class StringUtils {
 		This method outperforms String.replaceAll() by avoiding compiling a regex on each execution
 	 */
 	public static String removeQuotes(String string) {
-		return quotesRemover.matcher(string).replaceAll("");
+		return isNullOrEmpty(string) ? string : quotesRemover.matcher(string).replaceAll("");
 	}
 
 	public static boolean isNullOrEmpty(String string) {

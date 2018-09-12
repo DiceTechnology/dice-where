@@ -11,6 +11,7 @@ import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.reading.provider.maxmind.MaxmindLocation;
+import technology.dice.dicewhere.utils.StringUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class MaxmindLineParser implements LineParser {
 		try {
 			Iterable<String> fieldsIterable = splitter.split(rawLine.getLine());
 			Iterator<String> fieldsIterator = fieldsIterable.iterator();
-			String range = removeQuotes(fieldsIterator.next());
+			String range = StringUtils.removeQuotes(fieldsIterator.next());
 			String geonameId = fieldsIterator.next();
 			String geonameIdRepresented = fieldsIterator.next();
 			if (fieldsIterator.hasNext()) {
@@ -41,7 +42,7 @@ public class MaxmindLineParser implements LineParser {
 			if (fieldsIterator.hasNext()) {
 				fieldsIterator.next();
 			}
-			String postcode = fieldsIterator.hasNext() ? fieldsIterator.next() : "";
+			String postcode = fieldsIterator.hasNext() ? fieldsIterator.next() : null;
 			MaxmindLocation loc = locationDictionary.get(geonameId);
 			if (loc == null) {
 				loc = locationDictionary.get(geonameIdRepresented);
@@ -62,12 +63,12 @@ public class MaxmindLineParser implements LineParser {
 					new IP(rangeStart.getBytes()),
 					new IP(rangeEnd.getBytes()),
 					new IPInformation(
-							removeQuotes(loc.getCountryCodeAlpha2()),
-							removeQuotes(geonameId),
-							removeQuotes(loc.getCity()),
-							removeQuotes(loc.getLeastSpecificDivision()),
-							removeQuotes(loc.getMostSpecificDivision()),
-							removeQuotes(postcode),
+							StringUtils.removeQuotes(loc.getCountryCodeAlpha2()),
+							StringUtils.removeQuotes(geonameId),
+							StringUtils.removeQuotes(loc.getCity()),
+							StringUtils.removeQuotes(loc.getLeastSpecificDivision()),
+							StringUtils.removeQuotes(loc.getMostSpecificDivision()),
+							StringUtils.removeQuotes(postcode),
 							new IP(rangeStart.getBytes()),
 							new IP(rangeEnd.getBytes()),
 							retainOriginalLine ? rawLine.getLine() : null
