@@ -2,7 +2,7 @@ package technology.dice.dicewhere;
 
 import com.google.common.net.InetAddresses;
 import technology.dice.dicewhere.api.api.IP;
-import technology.dice.dicewhere.api.api.IPInformation;
+import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
 import technology.dice.dicewhere.reading.LineReaderListener;
@@ -95,9 +95,9 @@ public class Main {
 
 	private static void print(IP ip, IPResolver resolver) {
 		long beforeLookup = System.nanoTime();
-		Map<DatabaseProvider, Optional<IPInformation>> resolve = resolver.resolve(ip);
+		Map<DatabaseProvider, Optional<IpInformation>> resolve = resolver.resolve(ip);
 		long afterLookup = System.nanoTime();
-		for (Optional<IPInformation> found : resolve.values()) {
+		for (Optional<IpInformation> found : resolve.values()) {
 			{
 				if (found.isPresent()) {
 					found.ifPresent(

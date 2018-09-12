@@ -5,7 +5,7 @@ import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import technology.dice.dicewhere.api.api.IP;
-import technology.dice.dicewhere.api.api.IPInformation;
+import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
@@ -62,7 +62,7 @@ public class MaxmindLineParser implements LineParser {
 			return new ParsedLine(
 					new IP(rangeStart.getBytes()),
 					new IP(rangeEnd.getBytes()),
-					new IPInformation(
+					new IpInformation(
 							StringUtils.removeQuotes(loc.getCountryCodeAlpha2()),
 							StringUtils.removeQuotes(geonameId),
 							StringUtils.removeQuotes(loc.getCity()),

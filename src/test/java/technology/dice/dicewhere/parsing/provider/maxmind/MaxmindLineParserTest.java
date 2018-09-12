@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import technology.dice.dicewhere.api.api.IP;
-import technology.dice.dicewhere.api.api.IPInformation;
+import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
@@ -35,7 +35,7 @@ public class MaxmindLineParserTest {
 		ParsedLine expected = new ParsedLine(
 				new IP(InetAddresses.forString("78.29.134.0")),
 				new IP(InetAddresses.forString("78.29.134.127")),
-				new IPInformation(
+				new IpInformation(
 						"PT",
 						"3372745",
 						"Rabo De Peixe",
@@ -60,7 +60,7 @@ public class MaxmindLineParserTest {
 		ParsedLine expected = new ParsedLine(
 				new IP(InetAddresses.forString("78.29.134.0")),
 				new IP(InetAddresses.forString("78.29.134.127")),
-				new IPInformation(
+				new IpInformation(
 						"PT",
 						"3372745",
 						"Rabo De Peixe",
@@ -84,7 +84,7 @@ public class MaxmindLineParserTest {
 		ParsedLine expected = new ParsedLine(
 				new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")),
 				new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")),
-				new IPInformation(
+				new IpInformation(
 						"GB",
 						"2634096",
 						"Whitehaven",
@@ -108,7 +108,7 @@ public class MaxmindLineParserTest {
 		ParsedLine expected = new ParsedLine(
 				new IP(InetAddresses.forString("0:0:0:0:0:0:0:0")),
 				new IP(InetAddresses.forString("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")),
-				new IPInformation(
+				new IpInformation(
 						"ZZ",
 						"5",
 						"",
@@ -132,7 +132,7 @@ public class MaxmindLineParserTest {
 		ParsedLine expected = new ParsedLine(
 				new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")),
 				new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")),
-				new IPInformation(
+				new IpInformation(
 						"GB",
 						"2634096",
 						"Whitehaven",

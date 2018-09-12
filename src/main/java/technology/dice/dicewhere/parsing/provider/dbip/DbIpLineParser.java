@@ -3,7 +3,7 @@ package technology.dice.dicewhere.parsing.provider.dbip;
 import com.google.common.base.Splitter;
 import com.google.common.net.InetAddresses;
 import technology.dice.dicewhere.api.api.IP;
-import technology.dice.dicewhere.api.api.IPInformation;
+import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
@@ -43,7 +43,7 @@ public class DbIpLineParser implements LineParser {
 			ParsedLine result = new ParsedLine(
 					startIp,
 					endIp,
-					new IPInformation(
+					new IpInformation(
 							StringUtils.removeQuotes(countryCode),
 							StringUtils.removeQuotes(geoname),
 							StringUtils.removeQuotes(city),

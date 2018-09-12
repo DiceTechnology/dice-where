@@ -2,7 +2,7 @@ package technology.dice.dicewhere.parsing;
 
 
 import technology.dice.dicewhere.api.api.IP;
-import technology.dice.dicewhere.api.api.IPInformation;
+import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.reading.RawLine;
 
 import java.util.Objects;
@@ -11,9 +11,9 @@ public class ParsedLine {
 	private final RawLine rawLine;
 	private final IP startIp;
 	private final IP endIp;
-	private final IPInformation info;
+	private final IpInformation info;
 
-	public ParsedLine(IP startIp, IP endIp, IPInformation info, RawLine rawLine) {
+	public ParsedLine(IP startIp, IP endIp, IpInformation info, RawLine rawLine) {
 		this.startIp = startIp;
 		this.endIp = endIp;
 		this.info = info;
@@ -28,7 +28,7 @@ public class ParsedLine {
 		return endIp;
 	}
 
-	public IPInformation getInfo() {
+	public IpInformation getInfo() {
 		return info;
 	}
 

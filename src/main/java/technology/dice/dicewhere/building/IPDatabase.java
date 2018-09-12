@@ -2,7 +2,7 @@ package technology.dice.dicewhere.building;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import technology.dice.dicewhere.api.api.IP;
-import technology.dice.dicewhere.api.api.IPInformation;
+import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
 
 import java.util.Map;
@@ -18,13 +18,13 @@ public class IPDatabase {
 		this.size = db.size();
 	}
 
-	public Optional<IPInformation> get(IP ip) {
+	public Optional<IpInformation> get(IP ip) {
 		Map.Entry<IP, byte[]> ipEntry = db.floorEntry(ip);
 		return Optional.ofNullable(ipEntry)
 				.flatMap(entry -> {
 					try {
 						IPInformationProto.IpInformationProto ipInformationProto = IPInformationProto.IpInformationProto.parseFrom(entry.getValue());
-						IPInformation ipInformation = new IPInformation(
+						IpInformation ipInformation = new IpInformation(
 								ipInformationProto.getCountryCodeAlpha2(),
 								ipInformationProto.getGeonameId(),
 								ipInformationProto.getCity(),

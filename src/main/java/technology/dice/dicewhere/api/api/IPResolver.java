@@ -29,39 +29,39 @@ public class IPResolver {
 		this.databases = databases;
 	}
 
-	public CompletionStage<Optional<IPInformation>> resolveAsync(IP ip, DatabaseProvider provider) {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(IP ip, DatabaseProvider provider) {
 		return CompletableFuture.supplyAsync(
 				() -> databases.get(provider).get(ip)
 		);
 	}
 
-	public CompletionStage<Optional<IPInformation>> resolveAsync(IP ip, DatabaseProvider provider, ExecutorService executorService) {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(IP ip, DatabaseProvider provider, ExecutorService executorService) {
 		return CompletableFuture.supplyAsync(
 				() -> databases.get(provider).get(ip)
 				, executorService);
 	}
 
-	public Optional<IPInformation> resolve(IP ip, DatabaseProvider provider) {
+	public Optional<IpInformation> resolve(IP ip, DatabaseProvider provider) {
 		if (!databases.containsKey(provider)) {
 			throw new ProviderNotAvailableException(String.format("Provider %s not available", provider.name()), provider);
 		}
 		return databases.get(provider).get(ip);
 	}
 
-	public CompletionStage<Optional<IPInformation>> resolveAsync(String ip, DatabaseProvider provider) throws UnknownHostException {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(String ip, DatabaseProvider provider) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)), provider);
 	}
 
-	public CompletionStage<Optional<IPInformation>> resolveAsync(String ip, DatabaseProvider provider, ExecutorService executorService) throws UnknownHostException {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(String ip, DatabaseProvider provider, ExecutorService executorService) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)), provider, executorService);
 	}
 
-	public Optional<IPInformation> resolve(String ip, DatabaseProvider provider) throws UnknownHostException {
+	public Optional<IpInformation> resolve(String ip, DatabaseProvider provider) throws UnknownHostException {
 		return resolve(new IP(InetAddress.getByName(ip)), provider);
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolveAsync(IP ip) {
-		Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolution = databases
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(IP ip) {
+		Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolution = databases
 				.entrySet()
 				.stream()
 				.collect(Collectors.toMap(
@@ -71,20 +71,20 @@ public class IPResolver {
 		return resolution;
 	}
 
-	public Map<DatabaseProvider, Optional<IPInformation>> resolve(String ip) throws UnknownHostException {
+	public Map<DatabaseProvider, Optional<IpInformation>> resolve(String ip) throws UnknownHostException {
 		return resolve(new IP(InetAddress.getByName(ip)));
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolveAsync(String ip) throws UnknownHostException {
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(String ip) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)));
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolveAsync(String ip, ExecutorService executorService) throws UnknownHostException {
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(String ip, ExecutorService executorService) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)), executorService);
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolveAsync(IP ip, ExecutorService executorService) {
-		Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolution = databases
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(IP ip, ExecutorService executorService) {
+		Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolution = databases
 				.entrySet()
 				.stream()
 				.collect(Collectors.toMap(
@@ -94,8 +94,8 @@ public class IPResolver {
 		return resolution;
 	}
 
-	public Map<DatabaseProvider, Optional<IPInformation>> resolve(IP ip) {
-		Map<DatabaseProvider, Optional<IPInformation>> resolution = databases
+	public Map<DatabaseProvider, Optional<IpInformation>> resolve(IP ip) {
+		Map<DatabaseProvider, Optional<IpInformation>> resolution = databases
 				.entrySet()
 				.stream()
 				.collect(Collectors.toMap(

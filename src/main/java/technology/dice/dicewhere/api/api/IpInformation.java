@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 
-public class IPInformation {
+public class IpInformation {
 	private final String originalLine;
 	private final String countryCodeAlpha2;
 	private final String geonameId;
@@ -29,7 +29,7 @@ public class IPInformation {
 	 * @param endOfRange            the last IP of the range of IPs located in this location
 	 * @param originalLine          the database line that got processed into this location object
 	 */
-	public IPInformation(@Nonnull String countryCodeAlpha2,
+	public IpInformation(@Nonnull String countryCodeAlpha2,
 						 @Nullable String geonameId,
 						 @Nullable String city,
 						 @Nullable String leastSpecificDivision,
@@ -91,10 +91,10 @@ public class IPInformation {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof IPInformation)) {
+		if (!(o instanceof IpInformation)) {
 			return false;
 		}
-		IPInformation that = (IPInformation) o;
+		IpInformation that = (IpInformation) o;
 		return Objects.equals(getOriginalLine(), that.getOriginalLine()) &&
 				Objects.equals(getCountryCodeAlpha2(), that.getCountryCodeAlpha2()) &&
 				Objects.equals(getGeonameId(), that.getGeonameId()) &&
@@ -113,7 +113,7 @@ public class IPInformation {
 
 	@Override
 	public String toString() {
-		return "IPInformation{" +
+		return "IpInformation{" +
 				"originalLine='" + originalLine + '\'' +
 				", countryCodeAlpha2='" + countryCodeAlpha2 + '\'' +
 				", geonameId='" + geonameId + '\'' +
