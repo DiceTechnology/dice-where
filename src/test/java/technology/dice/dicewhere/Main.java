@@ -16,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
@@ -96,29 +95,27 @@ public class Main {
 
 	private static void print(IP ip, IPResolver resolver) {
 		long beforeLookup = System.nanoTime();
-		Map<DatabaseProvider, CompletionStage<Optional<IPInformation>>> resolve = resolver.resolveAsync(ip);
+		Map<DatabaseProvider, Optional<IPInformation>> resolve = resolver.resolve(ip);
 		long afterLookup = System.nanoTime();
-		for (CompletionStage<Optional<IPInformation>> foundFuture : resolve.values()) {
-			foundFuture.thenAccept(found ->
-					{
-						if (found.isPresent()) {
-							found.ifPresent(
-									info ->
-									{
-										System.out.println("That IP is in [" + info.getCountryCodeAlpha2() + "," +
-												"" + info.getLeastSpecificDivision() + "," +
-												"" + info.getMostSpecificDivision() + "," +
-												"" + info.getCity() + "," +
-												"" + info.getPostcode() +
-												"]. GeonameId=" + info.getGeonameId() + "(took " + (afterLookup - beforeLookup) / 1e6 + " ms)");
-										info.getOriginalLine().ifPresent(ol -> System.err.println("Original line: " + ol));
+		for (Optional<IPInformation> found : resolve.values()) {
+			{
+				if (found.isPresent()) {
+					found.ifPresent(
+							info ->
+							{
+								System.out.println("That IP is in [" + info.getCountryCodeAlpha2() + "," +
+										"" + info.getLeastSpecificDivision() + "," +
+										"" + info.getMostSpecificDivision() + "," +
+										"" + info.getCity() + "," +
+										"" + info.getPostcode() +
+										"]. GeonameId=" + info.getGeonameId() + "(took " + (afterLookup - beforeLookup) / 1e6 + " ms)");
+								info.getOriginalLine().ifPresent(ol -> System.err.println("Original line: " + ol));
 
-									});
-						} else {
-							System.out.println("IP not found");
-						}
-					}
-			);
+							});
+				} else {
+					System.out.println("IP not found");
+				}
+			}
 		}
 	}
 }
