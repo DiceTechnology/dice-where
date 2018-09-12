@@ -1,5 +1,6 @@
 package technology.dice.dicewhere.utils;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public abstract class StringUtils {
@@ -10,5 +11,13 @@ public abstract class StringUtils {
 	 */
 	public static String removeQuotes(String string) {
 		return quotesRemover.matcher(string).replaceAll("");
+	}
+
+	public static boolean isNullOrEmpty(String string) {
+		return string == null || "".equals(string);
+	}
+
+	public static Optional<String> nonEmptyString(String string) {
+		return StringUtils.isNullOrEmpty(string) ? Optional.empty() : Optional.of(string);
 	}
 }
