@@ -50,15 +50,15 @@ public class IPResolver {
 	}
 
 	public CompletionStage<Optional<IpInformation>> resolveAsync(@Nonnull String ip, @Nonnull DatabaseProvider provider) throws UnknownHostException {
-		return resolveAsync(new IP(InetAddress.getByName(ip)), provider);
+		return resolveAsync(new IP(InetAddress.getByName(Objects.requireNonNull(ip))), Objects.requireNonNull(provider));
 	}
 
 	public CompletionStage<Optional<IpInformation>> resolveAsync(@Nonnull String ip, @Nonnull DatabaseProvider provider, @Nonnull ExecutorService executorService) throws UnknownHostException {
-		return resolveAsync(new IP(InetAddress.getByName(ip)), provider, executorService);
+		return resolveAsync(new IP(InetAddress.getByName(Objects.requireNonNull(ip))), Objects.requireNonNull(provider), Objects.requireNonNull(executorService));
 	}
 
 	public Optional<IpInformation> resolve(@Nonnull String ip, @Nonnull DatabaseProvider provider) throws UnknownHostException {
-		return resolve(new IP(InetAddress.getByName(ip)), provider);
+		return resolve(new IP(InetAddress.getByName(Objects.requireNonNull(ip))), Objects.requireNonNull(provider));
 	}
 
 	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull IP ip) {
@@ -67,21 +67,21 @@ public class IPResolver {
 				.stream()
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,
-						databaseProviderIPDatabaseEntry -> resolveAsync(ip, databaseProviderIPDatabaseEntry.getKey())));
+						databaseProviderIPDatabaseEntry -> resolveAsync(Objects.requireNonNull(ip), databaseProviderIPDatabaseEntry.getKey())));
 
 		return resolution;
 	}
 
 	public Map<DatabaseProvider, Optional<IpInformation>> resolve(@Nonnull String ip) throws UnknownHostException {
-		return resolve(new IP(InetAddress.getByName(ip)));
+		return resolve(new IP(InetAddress.getByName(Objects.requireNonNull(ip))));
 	}
 
 	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull String ip) throws UnknownHostException {
-		return resolveAsync(new IP(InetAddress.getByName(ip)));
+		return resolveAsync(new IP(InetAddress.getByName(Objects.requireNonNull(ip))));
 	}
 
 	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull String ip, @Nonnull ExecutorService executorService) throws UnknownHostException {
-		return resolveAsync(new IP(InetAddress.getByName(ip)), executorService);
+		return resolveAsync(new IP(InetAddress.getByName(Objects.requireNonNull(ip))), Objects.requireNonNull(executorService));
 	}
 
 	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull IP ip, @Nonnull ExecutorService executorService) {
@@ -90,7 +90,7 @@ public class IPResolver {
 				.stream()
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,
-						databaseProviderIPDatabaseEntry -> resolveAsync(ip, databaseProviderIPDatabaseEntry.getKey(), executorService)));
+						databaseProviderIPDatabaseEntry -> resolveAsync(Objects.requireNonNull(ip), databaseProviderIPDatabaseEntry.getKey(), Objects.requireNonNull(executorService))));
 
 		return resolution;
 	}
@@ -101,7 +101,7 @@ public class IPResolver {
 				.stream()
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,
-						databaseProviderIPDatabaseEntry -> resolve(ip, databaseProviderIPDatabaseEntry.getKey())));
+						databaseProviderIPDatabaseEntry -> resolve(Objects.requireNonNull(ip), databaseProviderIPDatabaseEntry.getKey())));
 
 		return resolution;
 	}
@@ -120,8 +120,8 @@ public class IPResolver {
 			providers = new HashMap<>();
 		}
 
-		public Builder withProvider(LineReader lineReader) {
-			if (providers.containsKey(lineReader.provider())) {
+		public Builder withProvider(@Nonnull LineReader lineReader) {
+			if (providers.containsKey(Objects.requireNonNull(lineReader).provider())) {
 				throw new DuplicateProviderException(String.format("Provider %s has already been added", lineReader.provider().name()));
 			}
 			providers.put(lineReader.provider(), lineReader);
@@ -133,17 +133,17 @@ public class IPResolver {
 			return this;
 		}
 
-		public Builder withReaderListener(LineReaderListener readerListener) {
+		public Builder withReaderListener(@Nonnull LineReaderListener readerListener) {
 			this.readerListener = Objects.requireNonNull(readerListener);
 			return this;
 		}
 
-		public Builder withProcessorListener(LineProcessorListener processorListener) {
+		public Builder withProcessorListener(@Nonnull LineProcessorListener processorListener) {
 			this.processorListener = Objects.requireNonNull(processorListener);
 			return this;
 		}
 
-		public Builder withBuilderListener(DatabaseBuilderListener builderListener) {
+		public Builder withBuilderListener(@Nonnull DatabaseBuilderListener builderListener) {
 			this.builderListener = Objects.requireNonNull(builderListener);
 			return this;
 		}
