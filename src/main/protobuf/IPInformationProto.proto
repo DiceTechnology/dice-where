@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package technology.dice.dicewhere.lineprocessing.serializers.protobuf;
+
+message IpInformationProto {
+    string geonameId = 1;
+    string city = 2;
+    string leastSpecificDivision = 3;
+    string mostSpecificDivision = 4;
+    string postcode = 5;
+    string countryCodeAlpha2 = 6;
+    bytes startOfRange = 7;
+    bytes endOfRange = 8;
+    string originalLine = 9;
+}
