@@ -10,6 +10,7 @@ import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
 import technology.dice.dicewhere.reading.LineReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -29,38 +30,38 @@ public class IPResolver {
 		this.databases = databases;
 	}
 
-	public CompletionStage<Optional<IpInformation>> resolveAsync(IP ip, DatabaseProvider provider) {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(@Nonnull IP ip, @Nonnull DatabaseProvider provider) {
 		return CompletableFuture.supplyAsync(
-				() -> databases.get(provider).get(ip)
+				() -> databases.get(Objects.requireNonNull(provider)).get(Objects.requireNonNull(ip))
 		);
 	}
 
-	public CompletionStage<Optional<IpInformation>> resolveAsync(IP ip, DatabaseProvider provider, ExecutorService executorService) {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(@Nonnull IP ip, @Nonnull DatabaseProvider provider, @Nonnull ExecutorService executorService) {
 		return CompletableFuture.supplyAsync(
-				() -> databases.get(provider).get(ip)
-				, executorService);
+				() -> databases.get(Objects.requireNonNull(provider)).get(Objects.requireNonNull(ip))
+				, Objects.requireNonNull(executorService));
 	}
 
-	public Optional<IpInformation> resolve(IP ip, DatabaseProvider provider) {
-		if (!databases.containsKey(provider)) {
+	public Optional<IpInformation> resolve(@Nonnull IP ip, @Nonnull DatabaseProvider provider) {
+		if (!databases.containsKey(Objects.requireNonNull(provider))) {
 			throw new ProviderNotAvailableException(String.format("Provider %s not available", provider.name()), provider);
 		}
-		return databases.get(provider).get(ip);
+		return databases.get(Objects.requireNonNull(provider)).get(Objects.requireNonNull(ip));
 	}
 
-	public CompletionStage<Optional<IpInformation>> resolveAsync(String ip, DatabaseProvider provider) throws UnknownHostException {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(@Nonnull String ip, @Nonnull DatabaseProvider provider) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)), provider);
 	}
 
-	public CompletionStage<Optional<IpInformation>> resolveAsync(String ip, DatabaseProvider provider, ExecutorService executorService) throws UnknownHostException {
+	public CompletionStage<Optional<IpInformation>> resolveAsync(@Nonnull String ip, @Nonnull DatabaseProvider provider, @Nonnull ExecutorService executorService) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)), provider, executorService);
 	}
 
-	public Optional<IpInformation> resolve(String ip, DatabaseProvider provider) throws UnknownHostException {
+	public Optional<IpInformation> resolve(@Nonnull String ip, @Nonnull DatabaseProvider provider) throws UnknownHostException {
 		return resolve(new IP(InetAddress.getByName(ip)), provider);
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(IP ip) {
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull IP ip) {
 		Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolution = databases
 				.entrySet()
 				.stream()
@@ -71,19 +72,19 @@ public class IPResolver {
 		return resolution;
 	}
 
-	public Map<DatabaseProvider, Optional<IpInformation>> resolve(String ip) throws UnknownHostException {
+	public Map<DatabaseProvider, Optional<IpInformation>> resolve(@Nonnull String ip) throws UnknownHostException {
 		return resolve(new IP(InetAddress.getByName(ip)));
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(String ip) throws UnknownHostException {
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull String ip) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)));
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(String ip, ExecutorService executorService) throws UnknownHostException {
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull String ip, @Nonnull ExecutorService executorService) throws UnknownHostException {
 		return resolveAsync(new IP(InetAddress.getByName(ip)), executorService);
 	}
 
-	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(IP ip, ExecutorService executorService) {
+	public Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull IP ip, @Nonnull ExecutorService executorService) {
 		Map<DatabaseProvider, CompletionStage<Optional<IpInformation>>> resolution = databases
 				.entrySet()
 				.stream()
@@ -94,7 +95,7 @@ public class IPResolver {
 		return resolution;
 	}
 
-	public Map<DatabaseProvider, Optional<IpInformation>> resolve(IP ip) {
+	public Map<DatabaseProvider, Optional<IpInformation>> resolve(@Nonnull IP ip) {
 		Map<DatabaseProvider, Optional<IpInformation>> resolution = databases
 				.entrySet()
 				.stream()
@@ -133,17 +134,17 @@ public class IPResolver {
 		}
 
 		public Builder withReaderListener(LineReaderListener readerListener) {
-			readerListener = Objects.requireNonNull(readerListener);
+			this.readerListener = Objects.requireNonNull(readerListener);
 			return this;
 		}
 
 		public Builder withProcessorListener(LineProcessorListener processorListener) {
-			processorListener = Objects.requireNonNull(processorListener);
+			this.processorListener = Objects.requireNonNull(processorListener);
 			return this;
 		}
 
 		public Builder withBuilderListener(DatabaseBuilderListener builderListener) {
-			builderListener = Objects.requireNonNull(builderListener);
+			this.builderListener = Objects.requireNonNull(builderListener);
 			return this;
 		}
 
