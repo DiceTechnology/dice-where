@@ -26,19 +26,10 @@ public class IPDatabase {
                 IPInformationProto.IpInformationProto ipInformationProto =
                     IPInformationProto.IpInformationProto.parseFrom(entry.getValue());
                 IpInformation ipInformation =
-                    new IpInformation(
-                        ipInformationProto.getCountryCodeAlpha2(),
-                        ipInformationProto.getGeonameId(),
-                        ipInformationProto.getCity(),
-                        ipInformationProto.getLeastSpecificDivision(),
-                        ipInformationProto.getMostSpecificDivision(),
-                        ipInformationProto.getPostcode(),
-                        new IP(ipInformationProto.getStartOfRange().toByteArray()),
-                        new IP(ipInformationProto.getEndOfRange().toByteArray()),
-                        "".equals(ipInformationProto.getOriginalLine())
+                        IpInformation.builder().withCountryCodeAlpha2(ipInformationProto.getCountryCodeAlpha2()).withGeonameId(ipInformationProto.getGeonameId()).withCity(ipInformationProto.getCity()).withLeastSpecificDivision(ipInformationProto.getLeastSpecificDivision()).withMostSpecificDivision(ipInformationProto.getMostSpecificDivision()).withPostcode(ipInformationProto.getPostcode()).withStartOfRange(new IP(ipInformationProto.getStartOfRange().toByteArray())).withEndOfRange(new IP(ipInformationProto.getEndOfRange().toByteArray())).withOriginalLine("".equals(ipInformationProto.getOriginalLine())
                                 || ipInformationProto.getOriginalLine() == null
-                            ? null
-                            : ipInformationProto.getOriginalLine());
+                                ? null
+                                : ipInformationProto.getOriginalLine()).build();
 
                 if (ip.isGreaterThan(ipInformation.getEndOfRange())) {
                   return Optional.empty();

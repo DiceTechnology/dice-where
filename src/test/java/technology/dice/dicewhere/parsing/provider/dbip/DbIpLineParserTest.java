@@ -21,16 +21,17 @@ public class DbIpLineParserTest {
         new ParsedLine(
             new IP(InetAddresses.forString("1.0.0.0")),
             new IP(InetAddresses.forString("1.0.0.255")),
-            new IpInformation(
-                "AU",
-                "2207259",
-                "South Brisbane",
-                "Queensland",
-                "Brisbane",
-                "4101",
-                new IP(InetAddresses.forString("1.0.0.0")),
-                new IP(InetAddresses.forString("1.0.0.255")),
-                line),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("AU")
+                .withGeonameId("2207259")
+                .withCity("South Brisbane")
+                .withLeastSpecificDivision("Queensland")
+                .withMostSpecificDivision("Brisbane")
+                .withPostcode("4101")
+                .withStartOfRange(new IP(InetAddresses.forString("1.0.0.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.0.0.255")))
+                .withOriginalLine(line)
+                .build(),
             rawLine);
     Assert.assertEquals(expected, parsed);
   }
@@ -46,16 +47,16 @@ public class DbIpLineParserTest {
         new ParsedLine(
             new IP(InetAddresses.forString("1.0.0.0")),
             new IP(InetAddresses.forString("1.0.0.255")),
-            new IpInformation(
-                "AU",
-                "2207259",
-                "South Brisbane",
-                "Queensland",
-                "Brisbane",
-                "4101",
-                new IP(InetAddresses.forString("1.0.0.0")),
-                new IP(InetAddresses.forString("1.0.0.255")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("AU")
+                .withGeonameId("2207259")
+                .withCity("South Brisbane")
+                .withLeastSpecificDivision("Queensland")
+                .withMostSpecificDivision("Brisbane")
+                .withPostcode("4101")
+                .withStartOfRange(new IP(InetAddresses.forString("1.0.0.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.0.0.255")))
+                .build(),
             rawLine);
     Assert.assertEquals(expected, parsed);
   }
@@ -71,16 +72,16 @@ public class DbIpLineParserTest {
         new ParsedLine(
             new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
             new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "MU",
-                "1106748",
-                "Ebene CyberCity",
-                "Plaines Wilhems",
-                null,
-                null,
-                new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
-                new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-                line),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("MU")
+                .withGeonameId("1106748")
+                .withCity("Ebene CyberCity")
+                .withLeastSpecificDivision("Plaines Wilhems")
+                .withStartOfRange(new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")))
+                .withOriginalLine(line)
+                .build(),
             rawLine);
     Assert.assertEquals(expected, parsed);
   }
@@ -96,16 +97,15 @@ public class DbIpLineParserTest {
         new ParsedLine(
             new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
             new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "MU",
-                "1106748",
-                "Ebene CyberCity",
-                "Plaines Wilhems",
-                null,
-                null,
-                new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
-                new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("MU")
+                .withGeonameId("1106748")
+                .withCity("Ebene CyberCity")
+                .withLeastSpecificDivision("Plaines Wilhems")
+                .withStartOfRange(new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")))
+                .build(),
             rawLine);
     Assert.assertEquals(expected, parsed);
   }
@@ -162,16 +162,11 @@ public class DbIpLineParserTest {
         new ParsedLine(
             new IP(InetAddresses.forString("1.4.128.0")),
             new IP(InetAddresses.forString("1.4.255.255")),
-            new IpInformation(
-                "TH",
-                null,
-                null,
-                null,
-                null,
-                null,
-                new IP(InetAddresses.forString("1.4.128.0")),
-                new IP(InetAddresses.forString("1.4.255.255")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("TH")
+                .withStartOfRange(new IP(InetAddresses.forString("1.4.128.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.4.255.255")))
+                .build(),
             rawLine);
     Assert.assertEquals(expected, parsed);
   }
@@ -186,16 +181,12 @@ public class DbIpLineParserTest {
         new ParsedLine(
             new IP(InetAddresses.forString("2a0c:3800:400::")),
             new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "PT",
-                null,
-                null,
-                null,
-                null,
-                null,
-                new IP(InetAddresses.forString("2a0c:3800:400::")),
-                new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("PT")
+                .withStartOfRange(new IP(InetAddresses.forString("2a0c:3800:400::")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")))
+                .build(),
             rawLine);
     Assert.assertEquals(expected, parsed);
   }

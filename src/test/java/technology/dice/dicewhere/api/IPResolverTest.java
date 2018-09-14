@@ -93,16 +93,14 @@ public class IPResolverTest {
     IPResolver resolver = baseResolver();
     Map<DatabaseProvider, Optional<IpInformation>> result = resolver.resolve("1.0.8.17");
     IpInformation expectedBoth =
-        new IpInformation(
-            "CN",
-            "1809858",
-            "Guangzhou",
-            "Guangdong",
-            null,
-            null,
-            new IP(InetAddresses.forString("1.0.8.0")),
-            new IP(InetAddresses.forString("1.0.15.255")),
-            null);
+        IpInformation.builder()
+            .withCountryCodeAlpha2("CN")
+            .withGeonameId("1809858")
+            .withCity("Guangzhou")
+            .withLeastSpecificDivision("Guangdong")
+            .withStartOfRange(new IP(InetAddresses.forString("1.0.8.0")))
+            .withEndOfRange(new IP(InetAddresses.forString("1.0.15.255")))
+            .build();
     Assert.assertNotNull(result.get(DatabaseProvider.MAXMIND));
     Assert.assertTrue(result.get(DatabaseProvider.MAXMIND).isPresent());
     Assert.assertEquals(expectedBoth, result.get(DatabaseProvider.MAXMIND).get());
@@ -117,16 +115,12 @@ public class IPResolverTest {
     Map<DatabaseProvider, Optional<IpInformation>> result =
         resolver.resolve("2001:200:2:ffff:ffff:ffff:ffff:0000");
     IpInformation expectedBoth =
-        new IpInformation(
-            "JP",
-            "1861060",
-            null,
-            null,
-            null,
-            null,
-            new IP(InetAddresses.forString("2001:200:2::")),
-            new IP(InetAddresses.forString("2001:200:3:ffff:ffff:ffff:ffff:ffff")),
-            null);
+        IpInformation.builder()
+            .withCountryCodeAlpha2("JP")
+            .withGeonameId("1861060")
+            .withStartOfRange(new IP(InetAddresses.forString("2001:200:2::")))
+            .withEndOfRange(new IP(InetAddresses.forString("2001:200:3:ffff:ffff:ffff:ffff:ffff")))
+            .build();
     Assert.assertNotNull(result.get(DatabaseProvider.MAXMIND));
     Assert.assertTrue(result.get(DatabaseProvider.MAXMIND).isPresent());
     Assert.assertEquals(expectedBoth, result.get(DatabaseProvider.MAXMIND).get());
@@ -229,16 +223,15 @@ public class IPResolverTest {
     Map<DatabaseProvider, Optional<IpInformation>> result =
         resolver.resolve("0:0:0:0:0:ffff:100:a");
     IpInformation expectedBoth =
-        new IpInformation(
-            "AU",
-            "2065740",
-            "Morphett Vale",
-            "South Australia",
-            null,
-            "5162",
-            new IP(InetAddresses.forString("1.0.0.0")),
-            new IP(InetAddresses.forString("1.0.0.63")),
-            null);
+        IpInformation.builder()
+            .withCountryCodeAlpha2("AU")
+            .withGeonameId("2065740")
+            .withCity("Morphett Vale")
+            .withLeastSpecificDivision("South Australia")
+            .withPostcode("5162")
+            .withStartOfRange(new IP(InetAddresses.forString("1.0.0.0")))
+            .withEndOfRange(new IP(InetAddresses.forString("1.0.0.63")))
+            .build();
     Assert.assertNotNull(result.get(DatabaseProvider.MAXMIND));
     Assert.assertTrue(result.get(DatabaseProvider.MAXMIND).isPresent());
     Assert.assertEquals(expectedBoth, result.get(DatabaseProvider.MAXMIND).get());
@@ -252,16 +245,16 @@ public class IPResolverTest {
     Map<DatabaseProvider, Optional<IpInformation>> result =
         resolver.resolve("0:0:0:0:0:ffff:75e3:1b3a");
     IpInformation expectedBoth =
-        new IpInformation(
-            "IN",
-            "1269092",
-            "Jeypore",
-            "Odisha",
-            "Koraput",
-            "764002",
-            new IP(InetAddresses.forString("117.227.27.58")),
-            new IP(InetAddresses.forString("117.227.27.58")),
-            null);
+        IpInformation.builder()
+            .withCountryCodeAlpha2("IN")
+            .withGeonameId("1269092")
+            .withCity("Jeypore")
+            .withLeastSpecificDivision("Odisha")
+            .withMostSpecificDivision("Koraput")
+            .withPostcode("764002")
+            .withStartOfRange(new IP(InetAddresses.forString("117.227.27.58")))
+            .withEndOfRange(new IP(InetAddresses.forString("117.227.27.58")))
+            .build();
     Assert.assertNotNull(result.get(DatabaseProvider.DBIP));
     Assert.assertTrue(result.get(DatabaseProvider.DBIP).isPresent());
     Assert.assertEquals(expectedBoth, result.get(DatabaseProvider.DBIP).get());

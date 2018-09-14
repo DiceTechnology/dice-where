@@ -14,6 +14,7 @@ public class IpInformation {
   private final String leastSpecificDivision;
   private final String mostSpecificDivision;
   private final String postcode;
+  private final AnonymousState anonymousState;
   private final IP startOfRange;
   private final IP endOfRange;
 
@@ -32,6 +33,7 @@ public class IpInformation {
    * @param startOfRange the first IP of the range of IPs located in this location
    * @param endOfRange the last IP of the range of IPs located in this location
    * @param originalLine the database line that got processed into this location object
+   * @param anonymousState whether this range is part of anonymous proxy or vpn
    */
   public IpInformation(
       @Nonnull String countryCodeAlpha2,
@@ -42,7 +44,8 @@ public class IpInformation {
       @Nullable String postcode,
       @Nonnull IP startOfRange,
       @Nonnull IP endOfRange,
-      @Nullable String originalLine) {
+      @Nullable String originalLine,
+      @Nullable AnonymousState anonymousState) {
     this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
     this.geonameId = geonameId;
     this.city = city;
@@ -52,6 +55,8 @@ public class IpInformation {
     this.startOfRange = Objects.requireNonNull(startOfRange);
     this.endOfRange = Objects.requireNonNull(endOfRange);
     this.originalLine = originalLine;
+    this.anonymousState =
+        Objects.isNull(anonymousState) ? AnonymousState.NOT_SPECIFIED : anonymousState;
   }
 
   public String getCountryCodeAlpha2() {
@@ -90,6 +95,11 @@ public class IpInformation {
     return StringUtils.nonEmptyString(originalLine);
   }
 
+  public AnonymousState getAnonymousState() {
+    return anonymousState;
+  }
+
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -107,6 +117,7 @@ public class IpInformation {
         && Objects.equals(getMostSpecificDivision(), that.getMostSpecificDivision())
         && Objects.equals(getPostcode(), that.getPostcode())
         && Objects.equals(getStartOfRange(), that.getStartOfRange())
+        && Objects.equals(getAnonymousState(), that.getAnonymousState())
         && Objects.equals(getEndOfRange(), that.getEndOfRange());
   }
 
@@ -121,7 +132,8 @@ public class IpInformation {
         mostSpecificDivision,
         postcode,
         startOfRange,
-        endOfRange);
+        endOfRange,
+        anonymousState);
   }
 
   @Override
@@ -148,10 +160,96 @@ public class IpInformation {
         + ", postcode='"
         + postcode
         + '\''
+        + ", anonymousState="
+        + anonymousState
         + ", startOfRange="
         + startOfRange
         + ", endOfRange="
         + endOfRange
         + '}';
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String countryCodeAlpha2;
+    private String geonameId;
+    private String city;
+    private String leastSpecificDivision;
+    private String mostSpecificDivision;
+    private String postcode;
+    private IP startOfRange;
+    private IP endOfRange;
+    private String originalLine;
+    private AnonymousState anonymousState = AnonymousState.NOT_SPECIFIED;
+
+    private Builder() {}
+
+    public Builder withCountryCodeAlpha2(String countryCodeAlpha2) {
+      this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
+      return this;
+    }
+
+    public Builder withGeonameId(String geonameId) {
+      this.geonameId = geonameId;
+      return this;
+    }
+
+    public Builder withCity(String city) {
+      this.city = city;
+      return this;
+    }
+
+    public Builder withLeastSpecificDivision(String leastSpecificDivision) {
+      this.leastSpecificDivision = leastSpecificDivision;
+      return this;
+    }
+
+    public Builder withMostSpecificDivision(String mostSpecificDivision) {
+      this.mostSpecificDivision = mostSpecificDivision;
+      return this;
+    }
+
+    public Builder withPostcode(String postcode) {
+      this.postcode = postcode;
+      return this;
+    }
+
+    public Builder withStartOfRange(IP startOfRange) {
+      this.startOfRange = Objects.requireNonNull(startOfRange);
+      return this;
+    }
+
+    public Builder withEndOfRange(IP endOfRange) {
+      this.endOfRange = Objects.requireNonNull(endOfRange);
+      return this;
+    }
+
+    public Builder withOriginalLine(String originalLine) {
+      this.originalLine = originalLine;
+      return this;
+    }
+
+    public Builder withAnonymousState(AnonymousState anonymousState) {
+      this.anonymousState = anonymousState;
+      return this;
+    }
+
+
+    public IpInformation build() {
+      return new IpInformation(
+          countryCodeAlpha2,
+          geonameId,
+          city,
+          leastSpecificDivision,
+          mostSpecificDivision,
+          postcode,
+          startOfRange,
+          endOfRange,
+          originalLine,
+          anonymousState);
+    }
   }
 }

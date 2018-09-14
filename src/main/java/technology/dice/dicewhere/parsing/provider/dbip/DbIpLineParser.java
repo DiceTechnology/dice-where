@@ -42,16 +42,7 @@ public class DbIpLineParser implements LineParser {
       return new ParsedLine(
 		  startIp,
 		  endIp,
-		  new IpInformation(
-			  StringUtils.removeQuotes(countryCode),
-			  StringUtils.removeQuotes(geoname),
-			  StringUtils.removeQuotes(city),
-			  StringUtils.removeQuotes(leastSpecificDivision),
-			  StringUtils.removeQuotes(mostSpecificDivision),
-			  StringUtils.removeQuotes(postCode),
-			  startIp,
-			  endIp,
-			  retainOriginalLine ? line.getLine() : null),
+              IpInformation.builder().withCountryCodeAlpha2(StringUtils.removeQuotes(countryCode)).withGeonameId(StringUtils.removeQuotes(geoname)).withCity(StringUtils.removeQuotes(city)).withLeastSpecificDivision(StringUtils.removeQuotes(leastSpecificDivision)).withMostSpecificDivision(StringUtils.removeQuotes(mostSpecificDivision)).withPostcode(StringUtils.removeQuotes(postCode)).withStartOfRange(startIp).withEndOfRange(endIp).withOriginalLine(retainOriginalLine ? line.getLine() : null).build(),
 		  line);
 
     } catch (NoSuchElementException | IllegalArgumentException e) {
