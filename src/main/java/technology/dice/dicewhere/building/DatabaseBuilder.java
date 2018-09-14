@@ -12,18 +12,18 @@ import org.mapdb.Serializer;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
+import technology.dice.dicewhere.provider.ProviderKey;
 
 public class DatabaseBuilder implements Runnable {
   private final ArrayBlockingQueue<SerializedLine> source;
   private final DatabaseBuilderListener listener;
-  private final DatabaseProvider provider;
-  private boolean expectingMore;
+  private final ProviderKey provider;
   private final DB.TreeMapSink<IP, byte[]> sink;
+  private boolean expectingMore;
   private int processedLines = 0;
 
   public DatabaseBuilder(
-      DatabaseProvider provider,
+      ProviderKey provider,
       ArrayBlockingQueue<SerializedLine> source,
       DatabaseBuilderListener listener) {
     this.source = source;

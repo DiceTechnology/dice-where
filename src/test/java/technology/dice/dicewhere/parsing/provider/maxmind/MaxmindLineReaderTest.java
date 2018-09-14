@@ -9,9 +9,9 @@ import org.mockito.Mockito;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.IPDatabase;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
+import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
 import technology.dice.dicewhere.reading.LineReaderListener;
-import technology.dice.dicewhere.reading.provider.maxmind.MaxmindDbReader;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 
 public class MaxmindLineReaderTest {
   @Test
@@ -43,15 +43,15 @@ public class MaxmindLineReaderTest {
     long dbSize = database.size();
     Assert.assertEquals(18, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(MaxmindProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times((int) dbSize))
-        .lineRead(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineRead(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(MaxmindProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times((int) dbSize))
-        .lineProcessed(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineProcessed(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times((int) dbSize))
-        .lineParsed(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineParsed(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.never())
         .dequeueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.never())
@@ -69,7 +69,7 @@ public class MaxmindLineReaderTest {
     Mockito.verify(builderListener, Mockito.never())
         .builderInterrupted(Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times((int) dbSize))
-        .lineAdded(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any());
+        .lineAdded(Mockito.eq(MaxmindProviderKey.of()), Mockito.any());
   }
 
   @Test
@@ -101,15 +101,15 @@ public class MaxmindLineReaderTest {
     long dbSize = database.size();
     Assert.assertEquals(11, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(MaxmindProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times(18))
-        .lineRead(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineRead(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(MaxmindProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(11))
-        .lineProcessed(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineProcessed(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(11))
-        .lineParsed(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineParsed(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.never())
         .dequeueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.never())
@@ -119,13 +119,13 @@ public class MaxmindLineReaderTest {
     Mockito.verify(processorListener, Mockito.never())
         .enqueueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.times(7))
-        .parseError(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.any());
+        .parseError(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.never())
         .lineOutOfOrder(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.never())
         .builderInterrupted(Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times((int) dbSize))
-        .lineAdded(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any());
+        .lineAdded(Mockito.eq(MaxmindProviderKey.of()), Mockito.any());
   }
 
   @Test
@@ -157,15 +157,15 @@ public class MaxmindLineReaderTest {
     long dbSize = database.size();
     Assert.assertEquals(9, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(MaxmindProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times(11))
-        .lineRead(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineRead(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.eq(11L), Mockito.anyLong());
+        .finished(Mockito.eq(MaxmindProviderKey.of()), Mockito.eq(11L), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(11))
-        .lineProcessed(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineProcessed(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(11))
-        .lineParsed(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.anyLong());
+        .lineParsed(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.never())
         .dequeueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.never())
@@ -177,10 +177,10 @@ public class MaxmindLineReaderTest {
     Mockito.verify(processorListener, Mockito.never())
         .parseError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times(2))
-        .lineOutOfOrder(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any(), Mockito.any());
+        .lineOutOfOrder(Mockito.eq(MaxmindProviderKey.of()), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.never())
         .builderInterrupted(Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times((int) dbSize))
-        .lineAdded(Mockito.eq(DatabaseProvider.MAXMIND), Mockito.any());
+        .lineAdded(Mockito.eq(MaxmindProviderKey.of()), Mockito.any());
   }
 }
