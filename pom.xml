@@ -29,8 +29,8 @@
   <distributionManagement>
     <repository>
       <id>bintray-dicetechnology-dice-where</id>
-      <name>DiceTechnology-dice-where</name>
-      <url>https://api.bintray.com/maven/dicetechnology/dice-where/[PACKAGE_NAME]/;publish=1</url>
+      <name>dicetechnology-dice-where</name>
+      <url>https://api.bintray.com/maven/dicetechnology/dice-where/dice-where/;publish=1</url>
     </repository>
   </distributionManagement>
 
