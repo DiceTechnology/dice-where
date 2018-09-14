@@ -58,13 +58,17 @@ public class ParsedLine {
     return Objects.hash(rawLine, startIp, endIp, info);
   }
 
-	@Override
-	public String toString() {
-		return "ParsedLine{" +
-				"rawLine=" + rawLine +
-				", startIp=" + startIp +
-				", endIp=" + endIp +
-				", info=" + info +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "ParsedLine{"
+        + "rawLine="
+        + rawLine
+        + ", startIp="
+        + startIp
+        + ", endIp="
+        + endIp
+        + ", info="
+        + info
+        + '}';
+  }
 }
