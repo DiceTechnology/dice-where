@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.reading.provider.maxmind;
+package technology.dice.dicewhere.provider.maxmind.reading;
 
 import com.google.common.base.Splitter;
 import java.io.BufferedReader;

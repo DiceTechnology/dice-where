@@ -1,14 +1,15 @@
 package technology.dice.dicewhere.parsing.provider.maxmind;
 
+import org.junit.Assert;
+import org.junit.Test;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocationsParser;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
-import technology.dice.dicewhere.reading.provider.maxmind.MaxmindLocation;
-import technology.dice.dicewhere.reading.provider.maxmind.MaxmindLocationsParser;
 
 public class MaxmindLocationsParserTest {
   @Test

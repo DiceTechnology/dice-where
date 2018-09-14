@@ -11,11 +11,11 @@ import java.util.concurrent.ExecutionException;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.api.api.IpInformation;
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
+import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
 import technology.dice.dicewhere.reading.RawLine;
-import technology.dice.dicewhere.reading.provider.dbip.DbIpLineReader;
-import technology.dice.dicewhere.reading.provider.maxmind.MaxmindDbReader;
 
 public class Main {
   public static void maisn(String[] args) throws IOException {
@@ -60,7 +60,7 @@ public class Main {
                 new LineReaderListener() {
                   @Override
                   public void lineRead(
-                      DatabaseProvider provider, RawLine rawLine, long elapsedMillis) {
+                      ProviderKey provider, RawLine rawLine, long elapsedMillis) {
                     if (rawLine.getLineNumber() % 100000 == 0) {
                       System.out.println(
                           Thread.currentThread().getName()
@@ -74,7 +74,7 @@ public class Main {
 
                   @Override
                   public void finished(
-                      DatabaseProvider provider, long linesProcessed, long elapsedMillis) {
+                      ProviderKey provider, long linesProcessed, long elapsedMillis) {
                     System.out.println(
                         "Finished processing "
                             + linesProcessed
@@ -110,7 +110,7 @@ public class Main {
 
   private static void print(IP ip, IPResolver resolver) {
     long beforeLookup = System.nanoTime();
-    Map<DatabaseProvider, Optional<IpInformation>> resolve = resolver.resolve(ip);
+    Map<ProviderKey, Optional<IpInformation>> resolve = resolver.resolve(ip);
     long afterLookup = System.nanoTime();
     for (Optional<IpInformation> found : resolve.values()) {
       {

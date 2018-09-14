@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.parsing.provider.maxmind;
+package technology.dice.dicewhere.provider.maxmind.parsing;
 
 import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
@@ -12,7 +12,7 @@ import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
-import technology.dice.dicewhere.reading.provider.maxmind.MaxmindLocation;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 import technology.dice.dicewhere.utils.StringUtils;
 
 public class MaxmindLineParser implements LineParser {

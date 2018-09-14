@@ -3,15 +3,15 @@ package technology.dice.dicewhere.lineprocessing;
 import java.util.Objects;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.ParsedLine;
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
+import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.reading.RawLine;
 
 public class LineprocessorListenerForProvider {
-  private final DatabaseProvider provider;
+  private final ProviderKey provider;
   private final LineProcessorListener listener;
 
   public LineprocessorListenerForProvider(
-      DatabaseProvider provider, LineProcessorListener lineProcessingExceptionListener) {
+      ProviderKey provider, LineProcessorListener lineProcessingExceptionListener) {
     this.provider = Objects.requireNonNull(provider);
     this.listener = Objects.requireNonNull(lineProcessingExceptionListener);
   }
