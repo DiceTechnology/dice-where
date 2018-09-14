@@ -10,6 +10,8 @@ import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.dbip.parsing.DbIpLineParser;
 import technology.dice.dicewhere.reading.RawLine;
 
+import java.util.stream.Stream;
+
 public class DbIpLineParserTest {
   @Test
   public void ipV4LineWithOriginalLine() throws LineParsingException {
@@ -17,7 +19,7 @@ public class DbIpLineParserTest {
     String line =
         "1.0.0.0,1.0.0.255,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpLineParser.parse(new RawLine(line, 1), true);
+    Stream<ParsedLine> parsed = dbIpLineParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.0.0.0")),
@@ -34,7 +36,7 @@ public class DbIpLineParserTest {
                 .withOriginalLine(line)
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -43,7 +45,7 @@ public class DbIpLineParserTest {
     String line =
         "1.0.0.0,1.0.0.255,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.0.0.0")),
@@ -59,7 +61,7 @@ public class DbIpLineParserTest {
                 .withEndOfRange(new IP(InetAddresses.forString("1.0.0.255")))
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -68,7 +70,7 @@ public class DbIpLineParserTest {
     String line =
         "2c0f:fa41::,2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff,MU,\"Plaines Wilhems\",,\"Ebene CyberCity\",,-20.2419,57.4896,1106748,4,Indian/Mauritius,\"African Network Information Center - ( AfriNIC Ltd )\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpLineParser.parse(new RawLine(line, 1), true);
+    Stream<ParsedLine> parsed = dbIpLineParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
@@ -84,7 +86,7 @@ public class DbIpLineParserTest {
                 .withOriginalLine(line)
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -93,7 +95,7 @@ public class DbIpLineParserTest {
     String line =
         "2c0f:fa41::,2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff,MU,\"Plaines Wilhems\",,\"Ebene CyberCity\",,-20.2419,57.4896,1106748,4,Indian/Mauritius,\"African Network Information Center - ( AfriNIC Ltd )\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
@@ -108,7 +110,7 @@ public class DbIpLineParserTest {
                     new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")))
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test(expected = LineParsingException.class)
@@ -158,7 +160,7 @@ public class DbIpLineParserTest {
     DbIpLineParser dbIpLineParser = new DbIpLineParser();
     String line = "\"1.4.128.0\",\"1.4.255.255\",\"TH\"";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.4.128.0")),
@@ -169,7 +171,7 @@ public class DbIpLineParserTest {
                 .withEndOfRange(new IP(InetAddresses.forString("1.4.255.255")))
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -177,7 +179,7 @@ public class DbIpLineParserTest {
     DbIpLineParser dbIpLineParser = new DbIpLineParser();
     String line = "\"2a0c:3800:400::\",\"2a0c:3800:400:ffff:ffff:ffff:ffff:ffff\",\"PT\"";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = dbIpLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2a0c:3800:400::")),
@@ -189,6 +191,6 @@ public class DbIpLineParserTest {
                     new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")))
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 }

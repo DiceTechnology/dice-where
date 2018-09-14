@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -133,9 +134,13 @@ public class LineProcessor implements Runnable {
 
   private Stream<SerializedLine> attemptParse(RawLine rawLine, long started) {
     try {
-      ParsedLine parsed = parser.parse(rawLine, retainOriginalLine);
-      progressListener.lineParsed(parsed, System.currentTimeMillis() - started);
-      return attemptSerialize(parsed);
+      Stream<ParsedLine> parsed = parser.parse(rawLine, retainOriginalLine);
+      long now = System.currentTimeMillis();
+      return parsed.flatMap(
+          l -> {
+            progressListener.lineParsed(l, now - started);
+            return attemptSerialize(l);
+          });
     } catch (LineParsingException e) {
       progressListener.parseError(rawLine, e);
       return Stream.empty();

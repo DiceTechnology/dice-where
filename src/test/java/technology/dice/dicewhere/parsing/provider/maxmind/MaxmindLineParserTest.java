@@ -3,6 +3,8 @@ package technology.dice.dicewhere.parsing.provider.maxmind;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
 import java.util.Map;
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,7 +35,7 @@ public class MaxmindLineParserTest {
     MaxmindLineParser maxmindLineParser = new MaxmindLineParser(locationNames);
     String line = "78.29.134.0/25,3372745,2264397,,0,0,9600-082,37.8000,-25.5833,500";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = maxmindLineParser.parse(rawLine, true);
+    Stream<ParsedLine> parsed = maxmindLineParser.parse(rawLine, true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("78.29.134.0")),
@@ -50,7 +52,7 @@ public class MaxmindLineParserTest {
                 .withOriginalLine(line)
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -58,7 +60,7 @@ public class MaxmindLineParserTest {
     MaxmindLineParser maxmindLineParser = new MaxmindLineParser(locationNames);
     String line = "78.29.134.0/25,3372745,2264397,,0,0,9600-082,37.8000,-25.5833,500";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = maxmindLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = maxmindLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("78.29.134.0")),
@@ -74,7 +76,7 @@ public class MaxmindLineParserTest {
                 .withEndOfRange(new IP(InetAddresses.forString("78.29.134.127")))
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -82,7 +84,7 @@ public class MaxmindLineParserTest {
     MaxmindLineParser maxmindParser = new MaxmindLineParser(locationNames);
     String line = "2a02:c7f:6a02::/47,2634096,2635167,,0,0,CA28,54.5578,-3.5837,10";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = maxmindParser.parse(new RawLine(line, 1), true);
+    Stream<ParsedLine> parsed = maxmindParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")),
@@ -100,7 +102,7 @@ public class MaxmindLineParserTest {
                 .withOriginalLine(line)
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -108,7 +110,7 @@ public class MaxmindLineParserTest {
     MaxmindLineParser maxmindParser = new MaxmindLineParser(locationNames);
     String line = "::/0,5,5,,0,0,CA28,54.5578,-3.5837,10";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = maxmindParser.parse(new RawLine(line, 1), true);
+    Stream<ParsedLine> parsed = maxmindParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("0:0:0:0:0:0:0:0")),
@@ -126,7 +128,7 @@ public class MaxmindLineParserTest {
                 .withOriginalLine(line)
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -134,7 +136,7 @@ public class MaxmindLineParserTest {
     MaxmindLineParser maxmindParser = new MaxmindLineParser(locationNames);
     String line = "2a02:c7f:6a02::/47,2634096,2635167,,0,0,CA28,54.5578,-3.5837,10";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = maxmindParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = maxmindParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")),
@@ -151,7 +153,7 @@ public class MaxmindLineParserTest {
                     new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")))
                 .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test(expected = LineParsingException.class)
