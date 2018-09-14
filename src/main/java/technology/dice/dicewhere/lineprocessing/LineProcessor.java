@@ -11,6 +11,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
@@ -19,6 +20,10 @@ import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
 
+/**
+ * Responsible for processing the lines from a db provider's files and putting them in a serialized
+ * form.
+ */
 public class LineProcessor implements Runnable {
 
   private static final int WORKER_BATCH_SIZE = 10000;
@@ -29,27 +34,42 @@ public class LineProcessor implements Runnable {
   private final boolean retainOriginalLine;
   private final BlockingQueue<SerializedLine> destination;
   private final LineprocessorListenerForProvider progressListener;
-  private boolean expectingMore;
+  private final AtomicBoolean expectingMore = new AtomicBoolean(true);
 
+  /**
+   * @param executorService the executor service used for handling parsing of batches
+   * @param destination the queue where serializsed lines are written to
+   * @param parser the parser to use for parsing the line data
+   * @param retainOriginalLine indicates if the original line data should be retained alongside the
+   *     serialized data
+   * @param progressListener the listener for reporting progress
+   */
   public LineProcessor(
       ExecutorService executorService,
       BlockingQueue<SerializedLine> destination,
       LineParser parser,
       boolean retainOriginalLine,
-      LineprocessorListenerForProvider progresListener) {
+      LineprocessorListenerForProvider progressListener) {
     this.lines = new ArrayBlockingQueue<>((WORKER_COUNT + 1) * WORKER_BATCH_SIZE);
     this.destination = destination;
     this.executorService = executorService;
     this.parser = parser;
     this.retainOriginalLine = retainOriginalLine;
-    this.expectingMore = true;
-    this.progressListener = progresListener;
+    this.progressListener = progressListener;
   }
 
-  public void dontExpectMore() {
-    expectingMore = false;
+  /**
+   * Marks that the no more data should be expected, though in flight data will still be processed.
+   */
+  public void markDataComplete() {
+    expectingMore.set(false);
   }
 
+  /**
+   * Add a new line of raw data for parsing and serialization
+   *
+   * @param rawLine the raw line data
+   */
   public void addLine(RawLine rawLine) {
     try {
       lines.put(rawLine);
@@ -58,6 +78,7 @@ public class LineProcessor implements Runnable {
     }
   }
 
+  /** Runs the processor, parsing the raw line data and serializing it into a suitable form. */
   @Override
   public void run() {
 
@@ -66,7 +87,7 @@ public class LineProcessor implements Runnable {
     AtomicLong totalLines = new AtomicLong();
     CompletableFuture<List<SerializedLine>>[] workerList = new CompletableFuture[WORKER_COUNT];
 
-    while (expectingMore || lines.size() > 0) {
+    while (expectingMore.get() || lines.size() > 0) {
       try {
         for (int i = 0; i < WORKER_COUNT; i++) {
           Collection<RawLine> batch = new ArrayList<>(WORKER_BATCH_SIZE);

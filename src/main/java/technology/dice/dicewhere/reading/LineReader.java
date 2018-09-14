@@ -147,7 +147,7 @@ public abstract class LineReader {
     }
 
     try {
-      processor.dontExpectMore();
+      processor.markDataComplete();
       processorT.join();
 
       databaseBuilder.dontExpectMore();
