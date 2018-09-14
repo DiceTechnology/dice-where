@@ -36,9 +36,7 @@ public class IPResolver {
   }
 
   public CompletionStage<Optional<IpInformation>> resolveAsync(
-      @Nonnull IP ip,
-      @Nonnull ProviderKey provider,
-      @Nonnull ExecutorService executorService) {
+      @Nonnull IP ip, @Nonnull ProviderKey provider, @Nonnull ExecutorService executorService) {
     return CompletableFuture.supplyAsync(
         () -> databases.get(Objects.requireNonNull(provider)).get(Objects.requireNonNull(ip)),
         Objects.requireNonNull(executorService));
@@ -60,9 +58,7 @@ public class IPResolver {
   }
 
   public CompletionStage<Optional<IpInformation>> resolveAsync(
-      @Nonnull String ip,
-      @Nonnull ProviderKey provider,
-      @Nonnull ExecutorService executorService)
+      @Nonnull String ip, @Nonnull ProviderKey provider, @Nonnull ExecutorService executorService)
       throws UnknownHostException {
     return resolveAsync(
         new IP(InetAddress.getByName(Objects.requireNonNull(ip))),
@@ -77,8 +73,7 @@ public class IPResolver {
         Objects.requireNonNull(provider));
   }
 
-  public Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolveAsync(
-      @Nonnull IP ip) {
+  public Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull IP ip) {
     Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolution =
         databases
             .entrySet()
@@ -98,8 +93,8 @@ public class IPResolver {
     return resolve(new IP(InetAddress.getByName(Objects.requireNonNull(ip))));
   }
 
-  public Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolveAsync(
-      @Nonnull String ip) throws UnknownHostException {
+  public Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull String ip)
+      throws UnknownHostException {
     return resolveAsync(new IP(InetAddress.getByName(Objects.requireNonNull(ip))));
   }
 

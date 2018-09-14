@@ -10,26 +10,26 @@ import technology.dice.dicewhere.provider.dbip.parsing.DbIpLineParser;
 import technology.dice.dicewhere.reading.LineReader;
 
 public class DbIpLineReader extends LineReader {
-	private static final int BUFFER_SIZE = 1024 * 1024;
-	private final LineParser lineParser = new DbIpLineParser();
-	private final Path csv;
+  private static final int BUFFER_SIZE = 1024 * 1024;
+  private final LineParser lineParser = new DbIpLineParser();
+  private final Path csv;
 
-	public DbIpLineReader(Path csv) {
-		this.csv = csv;
-	}
+  public DbIpLineReader(Path csv) {
+    this.csv = csv;
+  }
 
-	@Override
-	protected Stream<String> lines() throws IOException {
-		return bufferedReaderforPath(csv, BUFFER_SIZE).lines();
-	}
+  @Override
+  protected Stream<String> lines() throws IOException {
+    return bufferedReaderforPath(csv, BUFFER_SIZE).lines();
+  }
 
-	@Override
-	public ProviderKey provider() {
-		return DbIpProviderKey.of();
-	}
+  @Override
+  public ProviderKey provider() {
+    return DbIpProviderKey.of();
+  }
 
-	@Override
-	public LineParser parser() {
-		return lineParser;
-	}
+  @Override
+  public LineParser parser() {
+    return lineParser;
+  }
 }

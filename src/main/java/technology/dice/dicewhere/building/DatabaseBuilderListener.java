@@ -1,12 +1,10 @@
 package technology.dice.dicewhere.building;
 
-
 import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.provider.ProviderKey;
 
 public interface DatabaseBuilderListener {
-  default void lineOutOfOrder(
-          ProviderKey provider, SerializedLine serializedLine, Exception e) {
+  default void lineOutOfOrder(ProviderKey provider, SerializedLine serializedLine, Exception e) {
     throw new RuntimeException(e);
   }
 
