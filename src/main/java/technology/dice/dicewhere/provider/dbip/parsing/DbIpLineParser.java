@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.parsing.provider.dbip;
+package technology.dice.dicewhere.provider.dbip.parsing;
 
 import com.google.common.base.Splitter;
 import com.google.common.net.InetAddresses;

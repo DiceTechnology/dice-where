@@ -10,8 +10,9 @@ import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.ParsedLine;
+import technology.dice.dicewhere.provider.maxmind.parsing.MaxmindLineParser;
 import technology.dice.dicewhere.reading.RawLine;
-import technology.dice.dicewhere.reading.provider.maxmind.MaxmindLocation;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 
 public class MaxmindLineParserTest {
 

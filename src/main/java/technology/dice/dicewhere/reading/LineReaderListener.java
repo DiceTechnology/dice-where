@@ -1,9 +1,9 @@
 package technology.dice.dicewhere.reading;
 
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
+import technology.dice.dicewhere.provider.ProviderKey;
 
 public interface LineReaderListener {
-  default void lineRead(DatabaseProvider provider, RawLine rawLine, long elapsedMillis) {}
+  default void lineRead(ProviderKey provider, RawLine rawLine, long elapsedMillis) {}
 
-  default void finished(DatabaseProvider provider, long linesProcessed, long elapsedMillis) {}
+  default void finished(ProviderKey provider, long linesProcessed, long elapsedMillis) {}
 }

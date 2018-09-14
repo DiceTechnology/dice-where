@@ -1,11 +1,12 @@
-package technology.dice.dicewhere.reading.provider.dbip;
+package technology.dice.dicewhere.provider.dbip.reading;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
-import technology.dice.dicewhere.parsing.provider.dbip.DbIpLineParser;
+import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
+import technology.dice.dicewhere.provider.dbip.parsing.DbIpLineParser;
 import technology.dice.dicewhere.reading.LineReader;
 
 public class DbIpLineReader extends LineReader {
@@ -23,8 +24,8 @@ public class DbIpLineReader extends LineReader {
   }
 
   @Override
-  public DatabaseProvider provider() {
-    return DatabaseProvider.DBIP;
+  public ProviderKey provider() {
+    return DbIpProviderKey.of();
   }
 
   @Override

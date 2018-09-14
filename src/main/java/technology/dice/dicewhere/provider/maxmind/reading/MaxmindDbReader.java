@@ -1,14 +1,16 @@
-package technology.dice.dicewhere.reading.provider.maxmind;
+package technology.dice.dicewhere.provider.maxmind.reading;
+
+import technology.dice.dicewhere.parsing.LineParser;
+import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
+import technology.dice.dicewhere.provider.maxmind.parsing.MaxmindLineParser;
+import technology.dice.dicewhere.reading.LineReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
-import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
-import technology.dice.dicewhere.parsing.provider.maxmind.MaxmindLineParser;
-import technology.dice.dicewhere.reading.LineReader;
 
 public class MaxmindDbReader extends LineReader {
   private static final int BUFFER_SIZE = 1024 * 1024;
@@ -40,7 +42,7 @@ public class MaxmindDbReader extends LineReader {
   }
 
   @Override
-  public DatabaseProvider provider() {
-    return DatabaseProvider.MAXMIND;
+  public ProviderKey provider() {
+    return new MaxmindProviderKey();
   }
 }

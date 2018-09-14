@@ -9,9 +9,9 @@ import org.mockito.Mockito;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.IPDatabase;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
-import technology.dice.dicewhere.parsing.provider.DatabaseProvider;
+import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
-import technology.dice.dicewhere.reading.provider.dbip.DbIpLineReader;
 
 public class DbIpLineReaderTest {
   @Test
@@ -31,15 +31,15 @@ public class DbIpLineReaderTest {
     long dbSize = database.size();
     Assert.assertEquals(22, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.DBIP), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times((int) dbSize))
-        .lineRead(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineRead(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.DBIP), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times((int) dbSize))
-        .lineProcessed(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineProcessed(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times((int) dbSize))
-        .lineParsed(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineParsed(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.never())
         .dequeueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.never())
@@ -55,7 +55,7 @@ public class DbIpLineReaderTest {
     Mockito.verify(builderListener, Mockito.never())
         .builderInterrupted(Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times((int) dbSize))
-        .lineAdded(Mockito.eq(DatabaseProvider.DBIP), Mockito.any());
+        .lineAdded(Mockito.eq(DbIpProviderKey.of()), Mockito.any());
   }
 
   @Test
@@ -75,15 +75,15 @@ public class DbIpLineReaderTest {
     long dbSize = database.size();
     Assert.assertEquals(16, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.DBIP), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times(20))
-        .lineRead(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineRead(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.DBIP), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(16))
-        .lineProcessed(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineProcessed(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(16))
-        .lineParsed(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineParsed(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.never())
         .dequeueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.never())
@@ -93,13 +93,13 @@ public class DbIpLineReaderTest {
     Mockito.verify(processorListener, Mockito.never())
         .enqueueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.times(4))
-        .parseError(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.any());
+        .parseError(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.never())
         .lineOutOfOrder(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.never())
         .builderInterrupted(Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times((int) dbSize))
-        .lineAdded(Mockito.eq(DatabaseProvider.DBIP), Mockito.any());
+        .lineAdded(Mockito.eq(DbIpProviderKey.of()), Mockito.any());
   }
 
   @Test
@@ -119,15 +119,15 @@ public class DbIpLineReaderTest {
     long dbSize = database.size();
     Assert.assertEquals(3, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.DBIP), Mockito.eq(dbSize), Mockito.anyLong());
+        .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times(4))
-        .lineRead(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineRead(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(1))
-        .finished(Mockito.eq(DatabaseProvider.DBIP), Mockito.eq(4L), Mockito.anyLong());
+        .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(4L), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(4))
-        .lineProcessed(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineProcessed(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.times(4))
-        .lineParsed(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.anyLong());
+        .lineParsed(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.anyLong());
     Mockito.verify(processorListener, Mockito.never())
         .dequeueError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(processorListener, Mockito.never())
@@ -139,10 +139,10 @@ public class DbIpLineReaderTest {
     Mockito.verify(processorListener, Mockito.never())
         .parseError(Mockito.any(), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times(1))
-        .lineOutOfOrder(Mockito.eq(DatabaseProvider.DBIP), Mockito.any(), Mockito.any());
+        .lineOutOfOrder(Mockito.eq(DbIpProviderKey.of()), Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.never())
         .builderInterrupted(Mockito.any(), Mockito.any());
     Mockito.verify(builderListener, Mockito.times((int) dbSize))
-        .lineAdded(Mockito.eq(DatabaseProvider.DBIP), Mockito.any());
+        .lineAdded(Mockito.eq(DbIpProviderKey.of()), Mockito.any());
   }
 }

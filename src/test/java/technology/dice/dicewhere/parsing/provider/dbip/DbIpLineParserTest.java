@@ -7,6 +7,7 @@ import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.ParsedLine;
+import technology.dice.dicewhere.provider.dbip.parsing.DbIpLineParser;
 import technology.dice.dicewhere.reading.RawLine;
 
 public class DbIpLineParserTest {
