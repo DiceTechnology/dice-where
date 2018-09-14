@@ -19,7 +19,8 @@ import technology.dice.dicewhere.reading.RawLine;
 public class DbIpIpToLocationAndIspCSVLineParserTest {
   @Test
   public void ipV4LineWithOriginalLine() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line =
         "1.0.0.0,1.0.0.255,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
     RawLine rawLine = new RawLine(line, 1);
@@ -44,7 +45,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test
   public void ipV4LineWithoutOriginalLine() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line =
         "1.0.0.0,1.0.0.255,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
     RawLine rawLine = new RawLine(line, 1);
@@ -69,7 +71,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test
   public void ipV6LineWithOriginal() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line =
         "2c0f:fa41::,2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff,MU,\"Plaines Wilhems\",,\"Ebene CyberCity\",,-20.2419,57.4896,1106748,4,Indian/Mauritius,\"African Network Information Center - ( AfriNIC Ltd )\",,";
     RawLine rawLine = new RawLine(line, 1);
@@ -94,7 +97,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test
   public void ipV6LineWithWithoutOriginalLine() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line =
         "2c0f:fa41::,2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff,MU,\"Plaines Wilhems\",,\"Ebene CyberCity\",,-20.2419,57.4896,1106748,4,Indian/Mauritius,\"African Network Information Center - ( AfriNIC Ltd )\",,";
     RawLine rawLine = new RawLine(line, 1);
@@ -119,7 +123,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test(expected = LineParsingException.class)
   public void wrongLineFormat() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line = "column1,column2,column3";
     try {
       dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
@@ -132,7 +137,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test(expected = LineParsingException.class)
   public void wrongStartIpFormat() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
 
     String line =
         "uh-Oh,1.0.0.255,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
@@ -147,7 +153,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test(expected = LineParsingException.class)
   public void wrongEndIpFormat() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line =
         "1.0.0.0,stop-Hammertime,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
     try {
@@ -161,7 +168,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test
   public void onlyCountryIPV4() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line = "\"1.4.128.0\",\"1.4.255.255\",\"TH\"";
     RawLine rawLine = new RawLine(line, 1);
     ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
@@ -185,7 +193,8 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
 
   @Test
   public void onlyCountryIPV6() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser = new DbIpIpToLocationAndIspCSVLineParser();
+    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
+        new DbIpIpToLocationAndIspCSVLineParser();
     String line = "\"2a0c:3800:400::\",\"2a0c:3800:400:ffff:ffff:ffff:ffff:ffff\",\"PT\"";
     RawLine rawLine = new RawLine(line, 1);
     ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
