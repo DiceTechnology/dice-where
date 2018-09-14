@@ -13,14 +13,4 @@ public class DbIpProviderKey extends ProviderKey {
   public static DbIpProviderKey of() {
     return instance;
   }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    return super.equals(obj);
-  }
 }

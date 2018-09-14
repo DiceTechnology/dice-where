@@ -18,12 +18,12 @@ public class DatabaseBuilder implements Runnable {
   private final ArrayBlockingQueue<SerializedLine> source;
   private final DatabaseBuilderListener listener;
   private final ProviderKey provider;
-  private boolean expectingMore;
   private final DB.TreeMapSink<IP, byte[]> sink;
+  private boolean expectingMore;
   private int processedLines = 0;
 
   public DatabaseBuilder(
-          ProviderKey provider,
+      ProviderKey provider,
       ArrayBlockingQueue<SerializedLine> source,
       DatabaseBuilderListener listener) {
     this.source = source;
