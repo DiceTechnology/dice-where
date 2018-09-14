@@ -21,7 +21,7 @@ public class MaxmindDbReader extends LineReader {
     ipV6CSVPath = ipV6CSV;
     MaxmindLocationsParser locationsParser = new MaxmindLocationsParser();
     Map<String, MaxmindLocation> locations =
-        locationsParser.locations(bufferedReaderforPath(locationNames, BUFFER_SIZE));
+        locationsParser.locations(bufferedReaderForPath(locationNames, BUFFER_SIZE));
     parser = new MaxmindLineParser(locations);
   }
 
@@ -32,8 +32,8 @@ public class MaxmindDbReader extends LineReader {
 
   @Override
   protected Stream<String> lines() throws IOException {
-    BufferedReader ipV4ChannelBufferedReader = bufferedReaderforPath(ipV4CSVPath, BUFFER_SIZE);
-    BufferedReader ipV6ChannelBufferedReader = bufferedReaderforPath(ipV6CSVPath, BUFFER_SIZE);
+    BufferedReader ipV4ChannelBufferedReader = bufferedReaderForPath(ipV4CSVPath, BUFFER_SIZE);
+    BufferedReader ipV6ChannelBufferedReader = bufferedReaderForPath(ipV6CSVPath, BUFFER_SIZE);
 
     return Stream.concat(
         ipV4ChannelBufferedReader.lines().skip(1), ipV6ChannelBufferedReader.lines().skip(1));

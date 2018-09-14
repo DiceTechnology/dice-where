@@ -39,22 +39,20 @@ public class DbIpLineParser implements LineParser {
       InetAddress s = InetAddresses.forString(rangeStartString);
       IP startIp = new IP(s);
       IP endIp = new IP(e);
-      ParsedLine result =
-          new ParsedLine(
-              startIp,
-              endIp,
-              new IpInformation(
-                  StringUtils.removeQuotes(countryCode),
-                  StringUtils.removeQuotes(geoname),
-                  StringUtils.removeQuotes(city),
-                  StringUtils.removeQuotes(leastSpecificDivision),
-                  StringUtils.removeQuotes(mostSpecificDivision),
-                  StringUtils.removeQuotes(postCode),
-                  startIp,
-                  endIp,
-                  retainOriginalLine ? line.getLine() : null),
-              line);
-      return result;
+      return new ParsedLine(
+		  startIp,
+		  endIp,
+		  new IpInformation(
+			  StringUtils.removeQuotes(countryCode),
+			  StringUtils.removeQuotes(geoname),
+			  StringUtils.removeQuotes(city),
+			  StringUtils.removeQuotes(leastSpecificDivision),
+			  StringUtils.removeQuotes(mostSpecificDivision),
+			  StringUtils.removeQuotes(postCode),
+			  startIp,
+			  endIp,
+			  retainOriginalLine ? line.getLine() : null),
+		  line);
 
     } catch (NoSuchElementException | IllegalArgumentException e) {
       throw new LineParsingException(e, line);

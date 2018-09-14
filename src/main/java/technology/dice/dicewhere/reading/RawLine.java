@@ -35,4 +35,12 @@ public class RawLine {
   public int hashCode() {
     return Objects.hash(line, lineNumber);
   }
+
+  @Override
+  public String toString() {
+    return "RawLine{" +
+            "line='" + line + '\'' +
+            ", lineNumber=" + lineNumber +
+            '}';
+  }
 }

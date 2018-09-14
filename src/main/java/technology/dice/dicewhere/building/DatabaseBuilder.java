@@ -26,6 +26,7 @@ public class DatabaseBuilder implements Runnable {
       DatabaseProvider provider,
       ArrayBlockingQueue<SerializedLine> source,
       DatabaseBuilderListener listener) {
+
     this.source = source;
     this.expectingMore = true;
     this.listener = listener;
