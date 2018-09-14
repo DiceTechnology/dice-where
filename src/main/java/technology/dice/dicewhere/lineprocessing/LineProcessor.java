@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2018 - present by Dice Technology Ltd.
+ *
+ * Please see distribution for license.
+ */
+
 package technology.dice.dicewhere.lineprocessing;
 
 import com.google.common.collect.ImmutableList;
@@ -118,6 +124,7 @@ public class LineProcessor implements Runnable {
 
       } catch (InterruptedException e) {
         progressListener.processorInterrupted(e);
+        throw new RuntimeException("Line processor interrupted", e);
       }
     }
 

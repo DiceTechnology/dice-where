@@ -1,16 +1,21 @@
-package technology.dice.dicewhere.provider.maxmind.reading;
+/*
+ * Copyright (C) 2018 - present by Dice Technology Ltd.
+ *
+ * Please see distribution for license.
+ */
 
-import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.provider.ProviderKey;
-import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
-import technology.dice.dicewhere.provider.maxmind.parsing.MaxmindLineParser;
-import technology.dice.dicewhere.reading.LineReader;
+package technology.dice.dicewhere.provider.maxmind.reading;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
+import technology.dice.dicewhere.parsing.LineParser;
+import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
+import technology.dice.dicewhere.provider.maxmind.parsing.MaxmindLineParser;
+import technology.dice.dicewhere.reading.LineReader;
 
 public class MaxmindDbReader extends LineReader {
   private static final int BUFFER_SIZE = 1024 * 1024;
