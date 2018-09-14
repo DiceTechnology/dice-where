@@ -7,10 +7,6 @@
 package technology.dice.dicewhere.api;
 
 import com.google.common.net.InetAddresses;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +26,11 @@ import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
 import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
 import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Optional;
 
 public class IPResolverTest {
 
@@ -313,7 +314,7 @@ public class IPResolverTest {
     Assert.assertFalse(result.get(MaxmindProviderKey.of()).isPresent());
   }
 
-  @Test
+  @Test(expected = RuntimeException.class)
   public void outOfOrderDatabaseDbIp() throws IOException {
     new IPResolver.Builder()
         .withProvider(

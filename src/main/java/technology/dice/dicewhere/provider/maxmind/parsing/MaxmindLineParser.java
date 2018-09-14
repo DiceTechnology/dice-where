@@ -17,8 +17,8 @@ import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
-import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
+import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.utils.StringUtils;
 
 public class MaxmindLineParser implements LineParser {

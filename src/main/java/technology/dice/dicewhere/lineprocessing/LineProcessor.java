@@ -125,6 +125,7 @@ public class LineProcessor implements Runnable {
 
       } catch (InterruptedException e) {
         progressListener.processorInterrupted(e);
+        throw new RuntimeException("Line processor interrupted", e);
       }
     }
 
