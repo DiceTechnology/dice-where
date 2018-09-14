@@ -173,7 +173,7 @@ Performance of the library depends on a number of variables including:
 - OS
 
 However, on a 2017 MBP with SSD, MacOS and 16Gb RAM we observed the following performance for
-when loading the full Maxmind and DbIp databases:
+when loading the full Maxmind and DbIp databases (9.4M ip ranges):
 
 - Initial load from ip data files: 35s
 - Single threaded lookup of 1000 distinct ip addresses: 100ms
