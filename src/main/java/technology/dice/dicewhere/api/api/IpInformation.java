@@ -99,7 +99,6 @@ public class IpInformation {
     return anonymousState;
   }
 
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -237,17 +236,16 @@ public class IpInformation {
       return this;
     }
 
-
     public IpInformation build() {
       return new IpInformation(
-          countryCodeAlpha2,
+          Objects.requireNonNull(countryCodeAlpha2),
           geonameId,
           city,
           leastSpecificDivision,
           mostSpecificDivision,
           postcode,
-          startOfRange,
-          endOfRange,
+          Objects.requireNonNull(startOfRange),
+          Objects.requireNonNull(endOfRange),
           originalLine,
           anonymousState);
     }
