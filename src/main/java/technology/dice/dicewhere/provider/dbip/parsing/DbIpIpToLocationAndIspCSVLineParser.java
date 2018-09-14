@@ -8,9 +8,6 @@ package technology.dice.dicewhere.provider.dbip.parsing;
 
 import com.google.common.base.Splitter;
 import com.google.common.net.InetAddresses;
-import java.net.InetAddress;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
@@ -19,7 +16,20 @@ import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.utils.StringUtils;
 
-public class DbIpLineParser implements LineParser {
+import java.net.InetAddress;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+/**
+ * Parser for DB-Ip's <a href="https://db-ip.com/db/ip-to-location-isp">IP to Location + ISP</a> db
+ * in CSV file format<br>
+ * At the time of writing this class, the documentation did not match the contents of the file. This
+ * parser, therefore, does not follow the link above, but rather the following format:<br>
+ * <br>
+ *
+ * <p>ip_start,ip_end,country,stateprov,district,city,zipcode,latitude,longitude,geoname_id,timezone_offset,timeszone_name,isp_name,connection_type,organization_name
+ */
+public class DbIpIpToLocationAndIspCSVLineParser implements LineParser {
   private static final Splitter splitter = Splitter.on(',');
 
   @Override
