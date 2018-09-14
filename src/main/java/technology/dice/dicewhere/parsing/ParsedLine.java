@@ -6,10 +6,11 @@
 
 package technology.dice.dicewhere.parsing;
 
-import java.util.Objects;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.reading.RawLine;
+
+import java.util.Objects;
 
 public class ParsedLine {
   private final RawLine rawLine;
@@ -56,4 +57,14 @@ public class ParsedLine {
 
     return Objects.hash(rawLine, startIp, endIp, info);
   }
+
+	@Override
+	public String toString() {
+		return "ParsedLine{" +
+				"rawLine=" + rawLine +
+				", startIp=" + startIp +
+				", endIp=" + endIp +
+				", info=" + info +
+				'}';
+	}
 }
