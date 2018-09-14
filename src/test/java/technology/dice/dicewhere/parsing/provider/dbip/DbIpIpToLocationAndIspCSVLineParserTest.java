@@ -16,6 +16,8 @@ import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToLocationAndIspCSVLineParser;
 import technology.dice.dicewhere.reading.RawLine;
 
+import java.util.stream.Stream;
+
 public class DbIpIpToLocationAndIspCSVLineParserTest {
   @Test
   public void ipV4LineWithOriginalLine() throws LineParsingException {
@@ -24,23 +26,26 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
     String line =
         "1.0.0.0,1.0.0.255,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), true);
+
+    Stream<ParsedLine> parsed =
+        dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.0.0.0")),
             new IP(InetAddresses.forString("1.0.0.255")),
-            new IpInformation(
-                "AU",
-                "2207259",
-                "South Brisbane",
-                "Queensland",
-                "Brisbane",
-                "4101",
-                new IP(InetAddresses.forString("1.0.0.0")),
-                new IP(InetAddresses.forString("1.0.0.255")),
-                line),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("AU")
+                .withGeonameId("2207259")
+                .withCity("South Brisbane")
+                .withLeastSpecificDivision("Queensland")
+                .withMostSpecificDivision("Brisbane")
+                .withPostcode("4101")
+                .withStartOfRange(new IP(InetAddresses.forString("1.0.0.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.0.0.255")))
+                .withOriginalLine(line)
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -50,23 +55,24 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
     String line =
         "1.0.0.0,1.0.0.255,AU,Queensland,Brisbane,\"South Brisbane\",4101,-27.4748,153.017,2207259,10,Australia/Brisbane,\"APNIC Research and Development\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed =
+        dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.0.0.0")),
             new IP(InetAddresses.forString("1.0.0.255")),
-            new IpInformation(
-                "AU",
-                "2207259",
-                "South Brisbane",
-                "Queensland",
-                "Brisbane",
-                "4101",
-                new IP(InetAddresses.forString("1.0.0.0")),
-                new IP(InetAddresses.forString("1.0.0.255")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("AU")
+                .withGeonameId("2207259")
+                .withCity("South Brisbane")
+                .withLeastSpecificDivision("Queensland")
+                .withMostSpecificDivision("Brisbane")
+                .withPostcode("4101")
+                .withStartOfRange(new IP(InetAddresses.forString("1.0.0.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.0.0.255")))
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -76,23 +82,24 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
     String line =
         "2c0f:fa41::,2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff,MU,\"Plaines Wilhems\",,\"Ebene CyberCity\",,-20.2419,57.4896,1106748,4,Indian/Mauritius,\"African Network Information Center - ( AfriNIC Ltd )\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), true);
+    Stream<ParsedLine> parsed =
+        dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
             new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "MU",
-                "1106748",
-                "Ebene CyberCity",
-                "Plaines Wilhems",
-                null,
-                null,
-                new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
-                new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-                line),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("MU")
+                .withGeonameId("1106748")
+                .withCity("Ebene CyberCity")
+                .withLeastSpecificDivision("Plaines Wilhems")
+                .withStartOfRange(new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")))
+                .withOriginalLine(line)
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -102,23 +109,23 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
     String line =
         "2c0f:fa41::,2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff,MU,\"Plaines Wilhems\",,\"Ebene CyberCity\",,-20.2419,57.4896,1106748,4,Indian/Mauritius,\"African Network Information Center - ( AfriNIC Ltd )\",,";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed =
+        dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
             new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "MU",
-                "1106748",
-                "Ebene CyberCity",
-                "Plaines Wilhems",
-                null,
-                null,
-                new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")),
-                new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("MU")
+                .withGeonameId("1106748")
+                .withCity("Ebene CyberCity")
+                .withLeastSpecificDivision("Plaines Wilhems")
+                .withStartOfRange(new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")))
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test(expected = LineParsingException.class)
@@ -172,23 +179,19 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
         new DbIpIpToLocationAndIspCSVLineParser();
     String line = "\"1.4.128.0\",\"1.4.255.255\",\"TH\"";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed =
+        dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.4.128.0")),
             new IP(InetAddresses.forString("1.4.255.255")),
-            new IpInformation(
-                "TH",
-                null,
-                null,
-                null,
-                null,
-                null,
-                new IP(InetAddresses.forString("1.4.128.0")),
-                new IP(InetAddresses.forString("1.4.255.255")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("TH")
+                .withStartOfRange(new IP(InetAddresses.forString("1.4.128.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.4.255.255")))
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -197,22 +200,19 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
         new DbIpIpToLocationAndIspCSVLineParser();
     String line = "\"2a0c:3800:400::\",\"2a0c:3800:400:ffff:ffff:ffff:ffff:ffff\",\"PT\"";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed =
+        dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2a0c:3800:400::")),
             new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "PT",
-                null,
-                null,
-                null,
-                null,
-                null,
-                new IP(InetAddresses.forString("2a0c:3800:400::")),
-                new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("PT")
+                .withStartOfRange(new IP(InetAddresses.forString("2a0c:3800:400::")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")))
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 }

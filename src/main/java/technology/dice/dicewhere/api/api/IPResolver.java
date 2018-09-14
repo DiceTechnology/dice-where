@@ -207,7 +207,7 @@ public class IPResolver {
     }
 
     private void checkSanity() {
-      if (providers.size() <= 0) {
+      if (providers.isEmpty()) {
         throw new NoProvidersException("Must build with at least one provider");
       }
     }

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package technology.dice.dicewhere.lineprocessing.serializers.protobuf;
+
+enum ThreeStateValue {
+    NOT_SPECIFIED = 0;
+    IS_TRUE = 1;
+    IS_FALSE = 2;
+}

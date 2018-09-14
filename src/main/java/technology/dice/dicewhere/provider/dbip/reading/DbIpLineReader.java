@@ -26,7 +26,7 @@ public class DbIpLineReader extends LineReader {
 
   @Override
   protected Stream<String> lines() throws IOException {
-    return bufferedReaderforPath(csv, BUFFER_SIZE).lines();
+    return bufferedReaderForPath(csv, BUFFER_SIZE).lines();
   }
 
   @Override

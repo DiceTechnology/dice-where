@@ -16,6 +16,8 @@ import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToCityLiteCSVLineParser;
 import technology.dice.dicewhere.reading.RawLine;
 
+import java.util.stream.Stream;
+
 public class DbIpIpToCityLiteCSVLineParserTest {
   @Test
   public void ipV4LineWithOriginalLine() throws LineParsingException {
@@ -23,23 +25,21 @@ public class DbIpIpToCityLiteCSVLineParserTest {
         new DbIpIpToCityLiteCSVLineParser();
     String line = "1.8.154.0,1.8.155.255,AS,CN,Beijing,Beijing,39.904,116.408";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), true);
+    Stream<ParsedLine> parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.8.154.0")),
             new IP(InetAddresses.forString("1.8.155.255")),
-            new IpInformation(
-                "CN",
-                null,
-                "Beijing",
-                "Beijing",
-                null,
-                null,
-                new IP(InetAddresses.forString("1.8.154.0")),
-                new IP(InetAddresses.forString("1.8.155.255")),
-                line),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("CN")
+                .withCity("Beijing")
+                .withLeastSpecificDivision("Beijing")
+                .withStartOfRange(new IP(InetAddresses.forString("1.8.154.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.8.155.255")))
+                .withOriginalLine(line)
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -48,23 +48,20 @@ public class DbIpIpToCityLiteCSVLineParserTest {
         new DbIpIpToCityLiteCSVLineParser();
     String line = "1.8.154.0,1.8.155.255,AS,CN,Beijing,Beijing,39.904,116.408";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("1.8.154.0")),
             new IP(InetAddresses.forString("1.8.155.255")),
-            new IpInformation(
-                "CN",
-                null,
-                "Beijing",
-                "Beijing",
-                null,
-                null,
-                new IP(InetAddresses.forString("1.8.154.0")),
-                new IP(InetAddresses.forString("1.8.155.255")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("CN")
+                .withCity("Beijing")
+                .withLeastSpecificDivision("Beijing")
+                .withStartOfRange(new IP(InetAddresses.forString("1.8.154.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.8.155.255")))
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -74,23 +71,23 @@ public class DbIpIpToCityLiteCSVLineParserTest {
     String line =
         "2c0f:ff80::,2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff,AF,ZA,Gauteng,\"Sandton (Woodmead)\",-26.0561,28.0696";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), true);
+    Stream<ParsedLine> parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), true);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2C0F:FF80:0000:0000:0000:0000:0000:0000")),
             new IP(InetAddresses.forString("2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "ZA",
-                null,
-                "Sandton (Woodmead)",
-                "Gauteng",
-                null,
-                null,
-                new IP(InetAddresses.forString("2C0F:FF80:0000:0000:0000:0000:0000:0000")),
-                new IP(InetAddresses.forString("2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff")),
-                line),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("ZA")
+                .withCity("Sandton (Woodmead)")
+                .withLeastSpecificDivision("Gauteng")
+                .withStartOfRange(
+                    new IP(InetAddresses.forString("2C0F:FF80:0000:0000:0000:0000:0000:0000")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff")))
+                .withOriginalLine(line)
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test
@@ -100,23 +97,22 @@ public class DbIpIpToCityLiteCSVLineParserTest {
     String line =
         "2c0f:ff80::,2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff,AF,ZA,Gauteng,\"Sandton (Woodmead)\",-26.0561,28.0696";
     RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), false);
+    Stream<ParsedLine> parsed = dbIpIpToCityLiteCSVLineParser.parse(new RawLine(line, 1), false);
     ParsedLine expected =
         new ParsedLine(
             new IP(InetAddresses.forString("2C0F:FF80:0000:0000:0000:0000:0000:0000")),
             new IP(InetAddresses.forString("2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "ZA",
-                null,
-                "Sandton (Woodmead)",
-                "Gauteng",
-                null,
-                null,
-                new IP(InetAddresses.forString("2C0F:FF80:0000:0000:0000:0000:0000:0000")),
-                new IP(InetAddresses.forString("2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff")),
-                null),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("ZA")
+                .withCity("Sandton (Woodmead)")
+                .withLeastSpecificDivision("Gauteng")
+                .withStartOfRange(
+                    new IP(InetAddresses.forString("2C0F:FF80:0000:0000:0000:0000:0000:0000")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff")))
+                .build(),
             rawLine);
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected, parsed.findFirst().get());
   }
 
   @Test(expected = LineParsingException.class)

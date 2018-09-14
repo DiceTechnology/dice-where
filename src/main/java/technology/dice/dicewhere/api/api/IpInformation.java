@@ -10,6 +10,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import technology.dice.dicewhere.lineprocessing.serializers.protobuf.ThreeStateValueProto;
+import technology.dice.dicewhere.utils.ProtoValueConverter;
 import technology.dice.dicewhere.utils.StringUtils;
 
 public class IpInformation {
@@ -20,6 +23,7 @@ public class IpInformation {
   private final String leastSpecificDivision;
   private final String mostSpecificDivision;
   private final String postcode;
+  private final Boolean isVpn;
   private final IP startOfRange;
   private final IP endOfRange;
 
@@ -38,6 +42,7 @@ public class IpInformation {
    * @param startOfRange the first IP of the range of IPs located in this location
    * @param endOfRange the last IP of the range of IPs located in this location
    * @param originalLine the database line that got processed into this location object
+   * @param isVpn whether this range is marked as VPN from the DB provider
    */
   public IpInformation(
       @Nonnull String countryCodeAlpha2,
@@ -48,7 +53,8 @@ public class IpInformation {
       @Nullable String postcode,
       @Nonnull IP startOfRange,
       @Nonnull IP endOfRange,
-      @Nullable String originalLine) {
+      @Nullable String originalLine,
+      @Nullable Boolean isVpn) {
     this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
     this.geonameId = geonameId;
     this.city = city;
@@ -58,6 +64,7 @@ public class IpInformation {
     this.startOfRange = Objects.requireNonNull(startOfRange);
     this.endOfRange = Objects.requireNonNull(endOfRange);
     this.originalLine = originalLine;
+    this.isVpn = isVpn;
   }
 
   public String getCountryCodeAlpha2() {
@@ -96,6 +103,10 @@ public class IpInformation {
     return StringUtils.nonEmptyString(originalLine);
   }
 
+  public Optional<Boolean> isVpn() {
+    return Optional.ofNullable(isVpn);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -113,6 +124,7 @@ public class IpInformation {
         && Objects.equals(getMostSpecificDivision(), that.getMostSpecificDivision())
         && Objects.equals(getPostcode(), that.getPostcode())
         && Objects.equals(getStartOfRange(), that.getStartOfRange())
+        && Objects.equals(isVpn(), that.isVpn())
         && Objects.equals(getEndOfRange(), that.getEndOfRange());
   }
 
@@ -127,7 +139,8 @@ public class IpInformation {
         mostSpecificDivision,
         postcode,
         startOfRange,
-        endOfRange);
+        endOfRange,
+        isVpn);
   }
 
   @Override
@@ -154,10 +167,104 @@ public class IpInformation {
         + ", postcode='"
         + postcode
         + '\''
+        + ", isVpn="
+        + isVpn
         + ", startOfRange="
         + startOfRange
         + ", endOfRange="
         + endOfRange
         + '}';
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String countryCodeAlpha2;
+    private String geonameId;
+    private String city;
+    private String leastSpecificDivision;
+    private String mostSpecificDivision;
+    private String postcode;
+    private IP startOfRange;
+    private IP endOfRange;
+    private String originalLine;
+    private Boolean isVpn;
+
+    private Builder() {}
+
+    public Builder withCountryCodeAlpha2(String countryCodeAlpha2) {
+      this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
+      return this;
+    }
+
+    public Builder withGeonameId(String geonameId) {
+      this.geonameId = geonameId;
+      return this;
+    }
+
+    public Builder withCity(String city) {
+      this.city = city;
+      return this;
+    }
+
+    public Builder withLeastSpecificDivision(String leastSpecificDivision) {
+      this.leastSpecificDivision = leastSpecificDivision;
+      return this;
+    }
+
+    public Builder withMostSpecificDivision(String mostSpecificDivision) {
+      this.mostSpecificDivision = mostSpecificDivision;
+      return this;
+    }
+
+    public Builder withPostcode(String postcode) {
+      this.postcode = postcode;
+      return this;
+    }
+
+    public Builder withStartOfRange(IP startOfRange) {
+      this.startOfRange = Objects.requireNonNull(startOfRange);
+      return this;
+    }
+
+    public Builder withEndOfRange(IP endOfRange) {
+      this.endOfRange = Objects.requireNonNull(endOfRange);
+      return this;
+    }
+
+    public Builder withOriginalLine(String originalLine) {
+      this.originalLine = originalLine;
+      return this;
+    }
+
+    public Builder isVpn(Optional<Boolean> isVpn) {
+      this.isVpn = isVpn.orElse(null);
+      return this;
+    }
+
+    public Builder isVpn(boolean isVpn) {
+      this.isVpn = isVpn;
+      return this;
+    }
+    public Builder isVpn(ThreeStateValueProto.ThreeStateValue isVpn) {
+      this.isVpn = ProtoValueConverter.parseThreeStateProto(isVpn).orElse(null);
+      return this;
+    }
+
+    public IpInformation build() {
+      return new IpInformation(
+          Objects.requireNonNull(countryCodeAlpha2),
+          geonameId,
+          city,
+          leastSpecificDivision,
+          mostSpecificDivision,
+          postcode,
+          Objects.requireNonNull(startOfRange),
+          Objects.requireNonNull(endOfRange),
+          originalLine,
+          isVpn);
+    }
   }
 }

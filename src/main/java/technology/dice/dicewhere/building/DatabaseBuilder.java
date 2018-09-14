@@ -33,6 +33,7 @@ public class DatabaseBuilder implements Runnable {
       ProviderKey provider,
       BlockingQueue<SerializedLine> source,
       DatabaseBuilderListener listener) {
+
     this.source = source;
     this.expectingMore = true;
     this.listener = listener;

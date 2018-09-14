@@ -21,6 +21,7 @@ import technology.dice.dicewhere.utils.StringUtils;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 /**
  * Parser for any Maxmind database.<br>
@@ -39,7 +40,8 @@ public class MaxmindLineParser implements LineParser {
   }
 
   @Override
-  public ParsedLine parse(RawLine rawLine, boolean retainOriginalLine) throws LineParsingException {
+  public Stream<ParsedLine> parse(RawLine rawLine, boolean retainOriginalLine)
+      throws LineParsingException {
     try {
       Iterable<String> fieldsIterable = splitter.split(rawLine.getLine());
       Iterator<String> fieldsIterator = fieldsIterable.iterator();
@@ -72,20 +74,23 @@ public class MaxmindLineParser implements LineParser {
       IPAddress rangeStart = rangeString.getAddress().getLower();
       IPAddress rangeEnd = rangeString.getAddress().getUpper();
 
-      return new ParsedLine(
-          new IP(rangeStart.getBytes()),
-          new IP(rangeEnd.getBytes()),
-          new IpInformation(
-              StringUtils.removeQuotes(loc.getCountryCodeAlpha2()),
-              StringUtils.removeQuotes(geonameId),
-              StringUtils.removeQuotes(loc.getCity()),
-              StringUtils.removeQuotes(loc.getLeastSpecificDivision()),
-              StringUtils.removeQuotes(loc.getMostSpecificDivision()),
-              StringUtils.removeQuotes(postcode),
+      return Stream.of(
+          new ParsedLine(
               new IP(rangeStart.getBytes()),
               new IP(rangeEnd.getBytes()),
-              retainOriginalLine ? rawLine.getLine() : null),
-          rawLine);
+              IpInformation.builder()
+                  .withCountryCodeAlpha2(StringUtils.removeQuotes(loc.getCountryCodeAlpha2()))
+                  .withGeonameId(StringUtils.removeQuotes(geonameId))
+                  .withCity(StringUtils.removeQuotes(loc.getCity()))
+                  .withLeastSpecificDivision(
+                      StringUtils.removeQuotes(loc.getLeastSpecificDivision()))
+                  .withMostSpecificDivision(StringUtils.removeQuotes(loc.getMostSpecificDivision()))
+                  .withPostcode(StringUtils.removeQuotes(postcode))
+                  .withStartOfRange(new IP(rangeStart.getBytes()))
+                  .withEndOfRange(new IP(rangeEnd.getBytes()))
+                  .withOriginalLine(retainOriginalLine ? rawLine.getLine() : null)
+                  .build(),
+              rawLine));
     } catch (NoSuchElementException e) {
       throw new LineParsingException(e, rawLine);
     }

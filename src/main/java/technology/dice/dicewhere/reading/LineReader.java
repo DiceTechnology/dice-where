@@ -87,7 +87,7 @@ public abstract class LineReader {
     return magic == GZIPInputStream.GZIP_MAGIC;
   }
 
-  protected BufferedReader bufferedReaderforPath(Path path, int bufferSize) throws IOException {
+  protected BufferedReader bufferedReaderForPath(Path path, int bufferSize) throws IOException {
     BufferedReader br;
     if (isZipFile(path)) {
 
@@ -123,6 +123,7 @@ public abstract class LineReader {
       LineProcessorListener processListener,
       DatabaseBuilderListener buildingListener)
       throws IOException {
+
     long before = System.currentTimeMillis();
     ExecutorService parserExecutorService =
         Executors.newCachedThreadPool(
