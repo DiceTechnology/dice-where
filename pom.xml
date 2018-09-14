@@ -197,7 +197,7 @@
         <executions>
           <execution>
             <id>sign-artifacts</id>
-            <phase>verify</phase>
+            <phase>publish</phase>
             <goals>
               <goal>sign</goal>
             </goals>
