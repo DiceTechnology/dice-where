@@ -1,23 +1,31 @@
 package technology.dice.dicewhere.lineprocessing;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Queues;
 import com.google.protobuf.ByteString;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
-import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
+import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto.IpInformationProto;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
 
+/**
+ * Responsible for processing the lines from a db provider's files and putting them in a serialized
+ * form.
+ */
 public class LineProcessor implements Runnable {
+
   private static final int WORKER_BATCH_SIZE = 10000;
   private static final int WORKER_COUNT = 4;
   private final ExecutorService executorService;
@@ -26,31 +34,42 @@ public class LineProcessor implements Runnable {
   private final boolean retainOriginalLine;
   private final BlockingQueue<SerializedLine> destination;
   private final LineprocessorListenerForProvider progressListener;
-  private boolean expectingMore;
+  private final AtomicBoolean expectingMore = new AtomicBoolean(true);
 
+  /**
+   * @param executorService the executor service used for handling parsing of batches
+   * @param destination the queue where serializsed lines are written to
+   * @param parser the parser to use for parsing the line data
+   * @param retainOriginalLine indicates if the original line data should be retained alongside the
+   *     serialized data
+   * @param progressListener the listener for reporting progress
+   */
   public LineProcessor(
       ExecutorService executorService,
       BlockingQueue<SerializedLine> destination,
       LineParser parser,
       boolean retainOriginalLine,
-      LineprocessorListenerForProvider progresListener) {
+      LineprocessorListenerForProvider progressListener) {
     this.lines = new ArrayBlockingQueue<>((WORKER_COUNT + 1) * WORKER_BATCH_SIZE);
     this.destination = destination;
     this.executorService = executorService;
     this.parser = parser;
     this.retainOriginalLine = retainOriginalLine;
-    this.expectingMore = true;
-    this.progressListener = progresListener;
+    this.progressListener = progressListener;
   }
 
-  public int reimainingLines() {
-    return lines.size();
+  /**
+   * Marks that the no more data should be expected, though in flight data will still be processed.
+   */
+  public void markDataComplete() {
+    expectingMore.set(false);
   }
 
-  public void dontExpectMore() {
-    expectingMore = false;
-  }
-
+  /**
+   * Add a new line of raw data for parsing and serialization
+   *
+   * @param rawLine the raw line data
+   */
   public void addLine(RawLine rawLine) {
     try {
       lines.put(rawLine);
@@ -59,106 +78,99 @@ public class LineProcessor implements Runnable {
     }
   }
 
+  /** Runs the processor, parsing the raw line data and serializing it into a suitable form. */
   @Override
   public void run() {
+
     long started = System.currentTimeMillis();
+
     AtomicLong totalLines = new AtomicLong();
-    CompletableFuture<ArrayList<SerializedLine>>[] workerList = new CompletableFuture[WORKER_COUNT];
-    while (expectingMore || lines.size() > 0) {
+    CompletableFuture<List<SerializedLine>>[] workerList = new CompletableFuture[WORKER_COUNT];
+
+    while (expectingMore.get() || lines.size() > 0) {
       try {
         for (int i = 0; i < WORKER_COUNT; i++) {
           Collection<RawLine> batch = new ArrayList<>(WORKER_BATCH_SIZE);
+
+          // Populate the batch from the lines queue
           Queues.drain(lines, batch, WORKER_BATCH_SIZE, 1, TimeUnit.NANOSECONDS);
           workerList[i] =
               CompletableFuture.supplyAsync(
-                  () ->
-                      batch
-                          .stream()
-                          .map(
-                              rawLine -> {
-                                try {
-                                  ParsedLine parsed = parser.parse(rawLine, retainOriginalLine);
-                                  progressListener.lineParsed(
-                                      parsed, System.currentTimeMillis() - started);
-                                  return parsed;
-                                } catch (LineParsingException e) {
-                                  progressListener.parseError(rawLine, e);
-                                  return null;
-                                }
-                              })
-                          .filter(l -> l != null)
-                          .map(
-                              parsedLine -> {
-                                try {
-                                  IPInformationProto.IpInformationProto.Builder messageBuilder =
-                                      IPInformationProto.IpInformationProto.newBuilder()
-                                          .setCity(parsedLine.getInfo().getCity().orElse(""))
-                                          .setGeonameId(
-                                              parsedLine.getInfo().getGeonameId().orElse(""))
-                                          .setCountryCodeAlpha2(
-                                              parsedLine.getInfo().getCountryCodeAlpha2())
-                                          .setLeastSpecificDivision(
-                                              parsedLine
-                                                  .getInfo()
-                                                  .getLeastSpecificDivision()
-                                                  .orElse(""))
-                                          .setMostSpecificDivision(
-                                              parsedLine
-                                                  .getInfo()
-                                                  .getMostSpecificDivision()
-                                                  .orElse(""))
-                                          .setPostcode(
-                                              parsedLine.getInfo().getPostcode().orElse(""))
-                                          .setStartOfRange(
-                                              ByteString.copyFrom(
-                                                  parsedLine.getStartIp().getBytes()))
-                                          .setEndOfRange(
-                                              ByteString.copyFrom(
-                                                  parsedLine.getEndIp().getBytes()));
-
-                                  parsedLine
-                                      .getInfo()
-                                      .getOriginalLine()
-                                      .ifPresent(
-                                          originalLine ->
-                                              messageBuilder.setOriginalLine(originalLine));
-                                  IPInformationProto.IpInformationProto message =
-                                      messageBuilder.build();
-
-                                  SerializedLine serializedLine =
-                                      new SerializedLine(
-                                          parsedLine.getStartIp(),
-                                          message.toByteArray(),
-                                          parsedLine);
-                                  return serializedLine;
-                                } catch (Exception e) {
-                                  progressListener.serializeError(parsedLine, e);
-                                  return null;
-                                }
-                              })
-                          .filter(e -> e != null)
-                          .collect(Collectors.toCollection(ArrayList::new)),
-                  executorService);
+                  () -> buildSerializedLineBatch(started, batch), executorService);
         }
+
         CompletableFuture.allOf(workerList);
-        for (int i = 0; i < WORKER_COUNT; i++) {
-          ArrayList<SerializedLine> join = workerList[i].join();
-          join.forEach(
-              serializedLine -> {
-                try {
-                  destination.put(serializedLine);
-                  totalLines.getAndIncrement();
-                  progressListener.lineProcessed(
-                      serializedLine, System.currentTimeMillis() - started);
-                } catch (InterruptedException e) {
-                  progressListener.dequeueError(serializedLine, e);
-                }
-              });
+
+        for (CompletableFuture<List<SerializedLine>> worker : workerList) {
+          worker
+              .join()
+              .forEach(
+                  serializedLine -> {
+                    try {
+                      destination.put(serializedLine);
+                      totalLines.getAndIncrement();
+                      progressListener.lineProcessed(
+                          serializedLine, System.currentTimeMillis() - started);
+                    } catch (InterruptedException e) {
+                      progressListener.dequeueError(serializedLine, e);
+                    }
+                  });
         }
+
       } catch (InterruptedException e) {
         progressListener.processorInterrupted(e);
       }
     }
+
     progressListener.finished(totalLines.get(), System.currentTimeMillis() - started);
+  }
+
+  private ImmutableList<SerializedLine> buildSerializedLineBatch(
+      long started, Collection<RawLine> batch) {
+    return batch
+        .stream()
+        .flatMap(rawline -> attemptParse(rawline, started))
+        .collect(ImmutableList.toImmutableList());
+  }
+
+  private Stream<SerializedLine> attemptParse(RawLine rawLine, long started) {
+    try {
+      ParsedLine parsed = parser.parse(rawLine, retainOriginalLine);
+      progressListener.lineParsed(parsed, System.currentTimeMillis() - started);
+      return attemptSerialize(parsed);
+    } catch (LineParsingException e) {
+      progressListener.parseError(rawLine, e);
+      return Stream.empty();
+    }
+  }
+
+  private Stream<SerializedLine> attemptSerialize(ParsedLine parsedLine) {
+    try {
+      IpInformationProto message = createIpProtobuf(parsedLine);
+
+      return Stream.of(
+          new SerializedLine(parsedLine.getStartIp(), message.toByteArray(), parsedLine));
+
+    } catch (Exception e) {
+      progressListener.serializeError(parsedLine, e);
+      return Stream.empty();
+    }
+  }
+
+  private IpInformationProto createIpProtobuf(ParsedLine parsedLine) {
+    IpInformationProto.Builder messageBuilder =
+        IpInformationProto.newBuilder()
+            .setCity(parsedLine.getInfo().getCity().orElse(""))
+            .setGeonameId(parsedLine.getInfo().getGeonameId().orElse(""))
+            .setCountryCodeAlpha2(parsedLine.getInfo().getCountryCodeAlpha2())
+            .setLeastSpecificDivision(parsedLine.getInfo().getLeastSpecificDivision().orElse(""))
+            .setMostSpecificDivision(parsedLine.getInfo().getMostSpecificDivision().orElse(""))
+            .setPostcode(parsedLine.getInfo().getPostcode().orElse(""))
+            .setStartOfRange(ByteString.copyFrom(parsedLine.getStartIp().getBytes()))
+            .setEndOfRange(ByteString.copyFrom(parsedLine.getEndIp().getBytes()));
+
+    parsedLine.getInfo().getOriginalLine().ifPresent(messageBuilder::setOriginalLine);
+
+    return messageBuilder.build();
   }
 }
