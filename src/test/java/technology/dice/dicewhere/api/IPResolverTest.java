@@ -130,16 +130,14 @@ public class IPResolverTest {
     CompletionStage<Map<ProviderKey, Optional<IpInformation>>> futureResult =
         resolver.resolveAsync("1.0.8.17");
     IpInformation expectedBoth =
-        new IpInformation(
-            "CN",
-            "1809858",
-            "Guangzhou",
-            "Guangdong",
-            null,
-            null,
-            new IP(InetAddresses.forString("1.0.8.0")),
-            new IP(InetAddresses.forString("1.0.15.255")),
-            null);
+        IpInformation.builder()
+            .withCountryCodeAlpha2("CN")
+            .withGeonameId("1809858")
+            .withCity("Guangzhou")
+            .withLeastSpecificDivision("Guangdong")
+            .withStartOfRange(new IP(InetAddresses.forString("1.0.8.0")))
+            .withEndOfRange(new IP(InetAddresses.forString("1.0.15.255")))
+            .build();
 
     futureResult.toCompletableFuture().get(1, TimeUnit.SECONDS);
 

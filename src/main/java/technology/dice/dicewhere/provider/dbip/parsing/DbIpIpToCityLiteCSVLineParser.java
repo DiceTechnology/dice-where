@@ -19,16 +19,18 @@ import technology.dice.dicewhere.utils.StringUtils;
 import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 /**
- * Parser for DB-Ip's <a href="https://db-ip.com/db/download/ip-to-city-lite">City Lite</a> db
- * in CSV file format<br>
+ * Parser for DB-Ip's <a href="https://db-ip.com/db/download/ip-to-city-lite">City Lite</a> db in
+ * CSV file format<br>
  */
 public class DbIpIpToCityLiteCSVLineParser implements LineParser {
   private static final Splitter splitter = Splitter.on(',');
 
   @Override
-  public ParsedLine parse(RawLine line, boolean retainOriginalLine) throws LineParsingException {
+  public Stream<ParsedLine> parse(RawLine line, boolean retainOriginalLine)
+      throws LineParsingException {
     try {
       Iterable<String> fieldsIterable = splitter.split(line.getLine());
       Iterator<String> fieldsIterator = fieldsIterable.iterator();
@@ -42,22 +44,19 @@ public class DbIpIpToCityLiteCSVLineParser implements LineParser {
       InetAddress s = InetAddresses.forString(rangeStartString);
       IP startIp = new IP(s);
       IP endIp = new IP(e);
-      ParsedLine result =
+      return Stream.of(
           new ParsedLine(
               startIp,
               endIp,
-              new IpInformation(
-                  StringUtils.removeQuotes(countryCode),
-                  null,
-                  StringUtils.removeQuotes(city),
-                  StringUtils.removeQuotes(leastSpecificDivision),
-                  null,
-                  null,
-                  startIp,
-                  endIp,
-                  retainOriginalLine ? line.getLine() : null),
-              line);
-      return result;
+              IpInformation.builder()
+                  .withCountryCodeAlpha2(StringUtils.removeQuotes(countryCode))
+                  .withCity(StringUtils.removeQuotes(city))
+                  .withLeastSpecificDivision(StringUtils.removeQuotes(leastSpecificDivision))
+                  .withStartOfRange(startIp)
+                  .withEndOfRange(endIp)
+                  .withOriginalLine(retainOriginalLine ? line.getLine() : null)
+                  .build(),
+              line));
 
     } catch (NoSuchElementException | IllegalArgumentException e) {
       throw new LineParsingException(e, line);

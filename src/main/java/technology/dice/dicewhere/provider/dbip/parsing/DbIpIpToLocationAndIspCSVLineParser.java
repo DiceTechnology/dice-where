@@ -34,7 +34,8 @@ public class DbIpIpToLocationAndIspCSVLineParser implements LineParser {
   private static final Splitter splitter = Splitter.on(',');
 
   @Override
-  public Stream<ParsedLine> parse(RawLine line, boolean retainOriginalLine) throws LineParsingException {
+  public Stream<ParsedLine> parse(RawLine line, boolean retainOriginalLine)
+      throws LineParsingException {
     try {
       Iterable<String> fieldsIterable = splitter.split(line.getLine());
       Iterator<String> fieldsIterator = fieldsIterable.iterator();
@@ -56,11 +57,22 @@ public class DbIpIpToLocationAndIspCSVLineParser implements LineParser {
       InetAddress s = InetAddresses.forString(rangeStartString);
       IP startIp = new IP(s);
       IP endIp = new IP(e);
-      return Stream.of(new ParsedLine(
-		  startIp,
-		  endIp,
-              IpInformation.builder().withCountryCodeAlpha2(StringUtils.removeQuotes(countryCode)).withGeonameId(StringUtils.removeQuotes(geoname)).withCity(StringUtils.removeQuotes(city)).withLeastSpecificDivision(StringUtils.removeQuotes(leastSpecificDivision)).withMostSpecificDivision(StringUtils.removeQuotes(mostSpecificDivision)).withPostcode(StringUtils.removeQuotes(postCode)).withStartOfRange(startIp).withEndOfRange(endIp).withOriginalLine(retainOriginalLine ? line.getLine() : null).build(),
-		  line));
+      return Stream.of(
+          new ParsedLine(
+              startIp,
+              endIp,
+              IpInformation.builder()
+                  .withCountryCodeAlpha2(StringUtils.removeQuotes(countryCode))
+                  .withGeonameId(StringUtils.removeQuotes(geoname))
+                  .withCity(StringUtils.removeQuotes(city))
+                  .withLeastSpecificDivision(StringUtils.removeQuotes(leastSpecificDivision))
+                  .withMostSpecificDivision(StringUtils.removeQuotes(mostSpecificDivision))
+                  .withPostcode(StringUtils.removeQuotes(postCode))
+                  .withStartOfRange(startIp)
+                  .withEndOfRange(endIp)
+                  .withOriginalLine(retainOriginalLine ? line.getLine() : null)
+                  .build(),
+              line));
 
     } catch (NoSuchElementException | IllegalArgumentException e) {
       throw new LineParsingException(e, line);
