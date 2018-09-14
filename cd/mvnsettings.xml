@@ -1,9 +1,11 @@
 <settings>
-  <server>
-    <id>bintray-dicetechnology-dice-where</id>
-    <username>streaming-machine-user</username>
-    <password>${env.BINTRAY_API_KEY}</password>
-  </server>
+  <servers>
+    <server>
+      <id>bintray-dicetechnology-dice-where</id>
+      <username>streaming-machine-user</username>
+      <password>${env.BINTRAY_API_KEY}</password>
+    </server>
+  </servers>
   <profiles>
     <profile>
       <id>ossrh</id>
