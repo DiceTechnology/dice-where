@@ -48,6 +48,6 @@ public class MaxmindDbReader extends LineReader {
 
   @Override
   public ProviderKey provider() {
-    return new MaxmindProviderKey();
+    return MaxmindProviderKey.of();
   }
 }
