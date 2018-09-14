@@ -4,6 +4,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
+
+import technology.dice.dicewhere.api.api.AnonymousState;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
@@ -26,10 +28,24 @@ public class IPDatabase {
                 IPInformationProto.IpInformationProto ipInformationProto =
                     IPInformationProto.IpInformationProto.parseFrom(entry.getValue());
                 IpInformation ipInformation =
-                        IpInformation.builder().withCountryCodeAlpha2(ipInformationProto.getCountryCodeAlpha2()).withGeonameId(ipInformationProto.getGeonameId()).withCity(ipInformationProto.getCity()).withLeastSpecificDivision(ipInformationProto.getLeastSpecificDivision()).withMostSpecificDivision(ipInformationProto.getMostSpecificDivision()).withPostcode(ipInformationProto.getPostcode()).withStartOfRange(new IP(ipInformationProto.getStartOfRange().toByteArray())).withEndOfRange(new IP(ipInformationProto.getEndOfRange().toByteArray())).withOriginalLine("".equals(ipInformationProto.getOriginalLine())
-                                || ipInformationProto.getOriginalLine() == null
+                    IpInformation.builder()
+                        .withCountryCodeAlpha2(ipInformationProto.getCountryCodeAlpha2())
+                        .withGeonameId(ipInformationProto.getGeonameId())
+                        .withCity(ipInformationProto.getCity())
+                        .withLeastSpecificDivision(ipInformationProto.getLeastSpecificDivision())
+                        .withMostSpecificDivision(ipInformationProto.getMostSpecificDivision())
+                        .withPostcode(ipInformationProto.getPostcode())
+                        .withStartOfRange(
+                            new IP(ipInformationProto.getStartOfRange().toByteArray()))
+                        .withEndOfRange(new IP(ipInformationProto.getEndOfRange().toByteArray()))
+                        .withAnonymousState(
+                            AnonymousState.fromAnonymousStateProto(ipInformationProto.getAnonymousState()))
+                        .withOriginalLine(
+                            "".equals(ipInformationProto.getOriginalLine())
+                                    || ipInformationProto.getOriginalLine() == null
                                 ? null
-                                : ipInformationProto.getOriginalLine()).build();
+                                : ipInformationProto.getOriginalLine())
+                        .build();
 
                 if (ip.isGreaterThan(ipInformation.getEndOfRange())) {
                   return Optional.empty();

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package technology.dice.dicewhere.lineprocessing.serializers.protobuf;
+
+enum AnonymousStateProto {
+    NOT_SPECIFIED = 0;
+    NOT_ANONYMOUS = 1;
+    IS_ANONYMOUS = 2;
+    IS_ANONYMOUS_VPN = 3;
+}
