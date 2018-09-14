@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/IMGGaming/dice-where.svg?token=F6ktiNWbNbvGRbN5NmqA&branch=master)](https://travis-ci.com/IMGGaming/dice-where)
+[![Build Status](https://travis-ci.com/DiceTechnology/dice-where.svg?token=F6ktiNWbNbvGRbN5NmqA&branch=master)](https://travis-ci.com/DiceTechnology/dice-where)
 
 dice-where is a low memory footprint, highly efficient Geo IP lookup library that relies on locally available data. 
 The library pre-processes all the data from a list of databases and allows the client application to lookup one or all of them in a blocking or non-blocking way.
