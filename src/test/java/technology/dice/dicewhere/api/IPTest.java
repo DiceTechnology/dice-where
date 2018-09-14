@@ -2,6 +2,9 @@ package technology.dice.dicewhere.api;
 
 import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
+
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
 import org.junit.Assert;
 import org.junit.Test;
 import technology.dice.dicewhere.api.api.IP;
@@ -44,4 +47,12 @@ public class IPTest {
     Assert.assertFalse(anIP.isGreaterThan(higherIp));
     Assert.assertFalse(anIP.equals(higherIp));
   }
+
+  @Test
+  public void tests() {
+    IPAddressString addStr = new IPAddressString("1.0.2.0/23");
+    IPAddress address = addStr.getAddress();
+    System.out.println(address);
+  }
+
 }

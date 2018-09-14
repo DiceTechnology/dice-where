@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class MaxmindDbReader extends LineReader {
@@ -17,14 +18,30 @@ public class MaxmindDbReader extends LineReader {
   private final MaxmindLineParser parser;
   private final Path ipV4CSVPath;
   private final Path ipV6CSVPath;
+  private final Path anonymousCSVPath;
 
-  public MaxmindDbReader(Path locationNames, Path ipV4CSV, Path ipV6CSV) throws IOException {
+  public MaxmindDbReader(Path locationNames, Path ipV4CSV, Path ipV6CSV, Path anonymousCSV)
+      throws IOException {
+
     ipV4CSVPath = ipV4CSV;
     ipV6CSVPath = ipV6CSV;
+    anonymousCSVPath = anonymousCSV;
     MaxmindLocationsParser locationsParser = new MaxmindLocationsParser();
     Map<String, MaxmindLocation> locations =
         locationsParser.locations(bufferedReaderForPath(locationNames, BUFFER_SIZE));
-    parser = new MaxmindLineParser(locations);
+
+    if (getAnonymousCSVPath().isPresent()) {
+      parser =
+          new MaxmindLineParser(
+              locations,
+              new MaxmindAnonymousParser(bufferedReaderForPath(anonymousCSVPath, BUFFER_SIZE)));
+    } else {
+      parser = new MaxmindLineParser(locations);
+    }
+  }
+
+  public MaxmindDbReader(Path locationNames, Path ipV4CSV, Path ipV6CSV) throws IOException {
+    this(locationNames, ipV4CSV, ipV6CSV, null);
   }
 
   @Override
@@ -39,6 +56,10 @@ public class MaxmindDbReader extends LineReader {
 
     return Stream.concat(
         ipV4ChannelBufferedReader.lines().skip(1), ipV6ChannelBufferedReader.lines().skip(1));
+  }
+
+  protected Optional<Path> getAnonymousCSVPath() {
+    return Optional.ofNullable(anonymousCSVPath);
   }
 
   @Override
