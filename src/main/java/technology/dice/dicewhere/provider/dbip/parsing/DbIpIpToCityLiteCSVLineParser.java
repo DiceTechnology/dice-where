@@ -20,7 +20,11 @@ import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class DbIpIpToCityCSVLineParser implements LineParser {
+/**
+ * Parser for DB-Ip's <a href="https://db-ip.com/db/download/ip-to-city-lite">City Lite</a> db
+ * in CSV file format<br>
+ */
+public class DbIpIpToCityLiteCSVLineParser implements LineParser {
   private static final Splitter splitter = Splitter.on(',');
 
   @Override
