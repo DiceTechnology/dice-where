@@ -1,0 +1,16 @@
+<settings>
+  <profiles>
+    <profile>
+      <id>ossrh</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <gpg.executable>gpg</gpg.executable>
+        <gpg.keyname>travis.gpg.pem</gpg.keyname>
+        <gpg.passphrase>${env.GPG_KEY_PASSWORD}</gpg.passphrase>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+

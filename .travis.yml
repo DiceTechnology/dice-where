@@ -16,3 +16,10 @@ before_install:
 env:
   global:
   - secure: dT6IZw5LXNKt1d/c7XtndWcPdAwl8lyjAiO9Hh9PWNeDeDd9iax2dI6jR9YEqItbk1vXiwZuND1Wphx4PYZwi7xjms576hZSSIZDK2STiKXp7Utc/IBtK8SbqspvQQFh8EHg6e1vlf0lFCpBhq2LXUsF+SkxnwKtIQtssfDef/GS/QTx+rW/FMh+90z6vmo76bIvAZURmgHW82k0JUtO07xqg4a41gLsO3x/EgIs/VwzzoF6IFMkGSyccY9mrHA8hO6mpEXfE4UOF7SsKMFGTSXASzmmPeass+p8lgTemuPU1wkTYeMAXKR8jzJ3h+46skpQga/mITsTL/Qp9pW68d/qZ7TBHMhI940mgK4NFt6OEHfj5kNZoVkbwzLcXF7uEgH0LOQvswrvXVRr0J/Myr4W0y+72TBkDW60Z59gF8OURd6TFp5sEeFJI+y8f8CMTdiPEcK0Mb+2p48uf2jhZZNIDxZUYiz+HXJKP2VxDTaS6TeS9STpKIGyzwbrE9ZC5J2QHjmT+7+SqzsGiakqKjxg/hzbMwW+VgM+Hj44gPlV04JRDNoxfPH4TUH6Y8gBJ8zPwEi6cRfI25iAKaI7HztxZAJEVvLpK9WlunlH/TSMmrViQH7NYoxNKLWIARRpm0qWanhV7asjW2NNxkiqeSzFB2jNj/N4nMDo4l5JPIE=
+
+cache:
+  directories:
+    - ~/.m2/repository
+
+after_success:
+  - ./cd/deploy.sh
