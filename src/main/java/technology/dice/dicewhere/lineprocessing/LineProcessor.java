@@ -4,6 +4,7 @@ import com.google.common.collect.Queues;
 import com.google.protobuf.ByteString;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
+import technology.dice.dicewhere.lineprocessing.serializers.protobuf.AnonymousStateProtoOuterClass;
 import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
@@ -86,7 +88,7 @@ public class LineProcessor implements Runnable {
                                   return null;
                                 }
                               })
-                          .filter(l -> l != null)
+                          .filter(Objects::nonNull)
                           .map(
                               parsedLine -> {
                                 try {
@@ -113,30 +115,30 @@ public class LineProcessor implements Runnable {
                                               ByteString.copyFrom(
                                                   parsedLine.getStartIp().getBytes()))
                                           .setEndOfRange(
-                                              ByteString.copyFrom(
-                                                  parsedLine.getEndIp().getBytes()));
+                                              ByteString.copyFrom(parsedLine.getEndIp().getBytes()))
+                                          .setAnonymousState(
+                                              AnonymousStateProtoOuterClass.AnonymousStateProto
+                                                  .valueOf(
+                                                      parsedLine
+                                                          .getInfo()
+                                                          .getAnonymousState()
+                                                          .name()));
 
                                   parsedLine
                                       .getInfo()
                                       .getOriginalLine()
-                                      .ifPresent(
-                                          originalLine ->
-                                              messageBuilder.setOriginalLine(originalLine));
+                                      .ifPresent(messageBuilder::setOriginalLine);
                                   IPInformationProto.IpInformationProto message =
                                       messageBuilder.build();
 
-                                  SerializedLine serializedLine =
-                                      new SerializedLine(
-                                          parsedLine.getStartIp(),
-                                          message.toByteArray(),
-                                          parsedLine);
-                                  return serializedLine;
+                                  return new SerializedLine(
+                                      parsedLine.getStartIp(), message.toByteArray(), parsedLine);
                                 } catch (Exception e) {
                                   progressListener.serializeError(parsedLine, e);
                                   return null;
                                 }
                               })
-                          .filter(e -> e != null)
+                          .filter(Objects::nonNull)
                           .collect(Collectors.toCollection(ArrayList::new)),
                   executorService);
         }
