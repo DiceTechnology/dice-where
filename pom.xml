@@ -26,6 +26,14 @@
     </license>
   </licenses>
 
+  <distributionManagement>
+    <repository>
+      <id>bintray-dicetechnology-dice-where</id>
+      <name>DiceTechnology-dice-where</name>
+      <url>https://api.bintray.com/maven/dicetechnology/dice-where/dice-where/;publish=1</url>
+    </repository>
+  </distributionManagement>
+
   <developers>
     <developer>
       <name>Alex Kryvenkyi</name>
@@ -158,6 +166,44 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <extensions>
       <extension>
@@ -167,6 +213,32 @@
       </extension>
     </extensions>
   </build>
+
+  <profiles>
+    <profile>
+      <repositories>
+        <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>bintray-dicetechnology-dice-where</id>
+          <name>bintray</name>
+          <url>https://dl.bintray.com/dicetechnology/dice-where</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>bintray-dicetechnology-dice-where</id>
+          <name>bintray-plugins</name>
+          <url>https://dl.bintray.com/dicetechnology/dice-where</url>
+        </pluginRepository>
+      </pluginRepositories>
+      <id>bintray</id>
+    </profile>
+  </profiles>
 
   <reporting>
     <plugins>
