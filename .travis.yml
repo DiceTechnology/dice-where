@@ -5,8 +5,15 @@ sudo: false
 branches:
   only:
   - master
-  - /^feature.*$/
-  - /^issue.*$/
-  - /^hotfix.*$/
+  - "/^feature.*$/"
+  - "/^issue.*$/"
+  - "/^hotfix.*$/"
 script:
 - mvn clean install -q || travis_terminate 1
+before_install:
+- openssl aes-256-cbc -K $encrypted_9dd2761de049_key -iv $encrypted_9dd2761de049_iv
+  -in travis.gpg.pem.enc -out travis.gpg.pem -d
+- echo $GPG_KEY_PASSWORD | gpg --passphrase-fd 0 --import travis.gpg.pem
+env:
+  global:
+    secure: nQAmPClui0MLRUZpntMwHBjk9n/l3WjWDuS3jyxu/8hZ/l28xvIur/09nKq4//VznKDhZVU8Zqx/dlwTPV1Y7FeVAF6u/2JUTRtXEPvSlRrn0ApsP6efP0hMO0NeiXql2Ddw8GZXYL9HikSF6IGJ43ak8WeYMjeKkkDr8oVbFXdDNScu7LdXBPDtr4sv1AHUTbY3NmvS1uWWuX/xalRiM55oYLyN/ncqpCM45BJIa7t/XQQFtpfkMkMTWTCRp6VOVryyge4+uH0q6JlrbZeB/+zN0Nhgd1rVKMZj7aLN0DaP7/Tj4QY6FxIrGPyTRqRo/ftCDpn/BhPMNVXp0t1LFzPgO81jhugDxw6Ud8t4PMXTfjgB2kwOaKrw+BC8FWpypK0V0ExuW906BVO+ANLUC+Kdl3NARiaIf7T9fr0BL74+9IbZW1h5rIoTq4Vcj3Idl4Oq3kkJq5llExXnKIf2MreFM4vVJpQV/QXqaStfcEkdHYhfnOUA67kev6IvZDSi6OHm6oJXLua0JCVHOAiSbZcDtXv8Ns9sKwFxKfSdMigwlEmqY5lHM7DMt2qgr4l5cQazNcfW9rr/IdZ9p1hxiad1dhi+BwSFpqTZerNekbnXuelEeIQ1pBTYU2p3wNiUM1WcmWL+r44G1wQbSS6zP8mRTK9hC+45ML4Gf+nH0SE=
