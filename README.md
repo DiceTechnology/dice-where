@@ -4,6 +4,25 @@ dice-where is a low memory footprint, highly efficient Geo IP lookup library tha
 The library pre-processes all the data from a list of databases and allows the client application to lookup one or all of them in a blocking or non-blocking way.
 It has been designed to load *csv* datasources but can be extended to load data from any format. This library is also able to load *csv* files directly from within a *gzip* or *zip* file.
 
+# Installation
+
+```xml
+<repository>
+  <snapshots>
+    <enabled>false</enabled>
+  </snapshots>
+  <id>bintray-<username>-maven</id>
+  <name>bintray</name>
+  <url>https://dl.bintray.com/dicetechnology/dice-where</url>
+</repository>
+...
+<dependency>
+  <groupId>technology.dice.open</groupId>
+  <artifactId>dice-where</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
 # Usage Examples
 TL/DR section for quickly getting up and running. The code snippets below assume there is a `print()` method to print out the results of the lookups, printing the fields in the following order: country, least specific division, most specific division, city, and postcode.
 ## Single database
