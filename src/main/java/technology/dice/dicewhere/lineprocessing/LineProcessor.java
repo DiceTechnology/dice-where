@@ -3,12 +3,6 @@ package technology.dice.dicewhere.lineprocessing;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Queues;
 import com.google.protobuf.ByteString;
-import technology.dice.dicewhere.api.exceptions.LineParsingException;
-import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto.IpInformationProto;
-import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.parsing.ParsedLine;
-import technology.dice.dicewhere.reading.RawLine;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +14,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
+import technology.dice.dicewhere.api.exceptions.LineParsingException;
+import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto.IpInformationProto;
+import technology.dice.dicewhere.parsing.LineParser;
+import technology.dice.dicewhere.parsing.ParsedLine;
+import technology.dice.dicewhere.reading.RawLine;
 
 /**
  * Responsible for processing the lines from a db provider's files and putting them in a serialized

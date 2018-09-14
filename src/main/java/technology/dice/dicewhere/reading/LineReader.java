@@ -3,16 +3,6 @@ package technology.dice.dicewhere.reading;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import technology.dice.dicewhere.building.DatabaseBuilder;
-import technology.dice.dicewhere.building.DatabaseBuilderListener;
-import technology.dice.dicewhere.building.IPDatabase;
-import technology.dice.dicewhere.lineprocessing.LineProcessor;
-import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
-import technology.dice.dicewhere.lineprocessing.LineprocessorListenerForProvider;
-import technology.dice.dicewhere.lineprocessing.SerializedLine;
-import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.provider.ProviderKey;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,6 +28,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
+import technology.dice.dicewhere.building.DatabaseBuilder;
+import technology.dice.dicewhere.building.DatabaseBuilderListener;
+import technology.dice.dicewhere.building.IPDatabase;
+import technology.dice.dicewhere.lineprocessing.LineProcessor;
+import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
+import technology.dice.dicewhere.lineprocessing.LineprocessorListenerForProvider;
+import technology.dice.dicewhere.lineprocessing.SerializedLine;
+import technology.dice.dicewhere.parsing.LineParser;
+import technology.dice.dicewhere.provider.ProviderKey;
 
 /**
  * Base class providing data transformation between external IP data format provided by {@link

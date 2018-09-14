@@ -1,6 +1,11 @@
 package technology.dice.dicewhere.building;
 
 import com.google.common.collect.Queues;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import org.mapdb.DB;
 import org.mapdb.DBException;
 import org.mapdb.DBMaker;
@@ -9,12 +14,6 @@ import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
 import technology.dice.dicewhere.provider.ProviderKey;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class DatabaseBuilder implements Runnable {
   private final BlockingQueue<SerializedLine> source;
