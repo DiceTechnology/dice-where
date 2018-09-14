@@ -164,7 +164,19 @@ new MaxmindLineParser(
 )
 ```
 
-The Maxmind reader is can load a database with any precision (for example City or Country) and from both the Lite and commercial versions.
+The Maxmind reader can load a database with any precision (for example City or Country) and from both the Lite and commercial versions.
 
 # Benchmark
-wip
+Performance of the library depends on a number of variables including:
+- CPU
+- type of local disk
+- OS
+
+However, on a 2017 MBP with SSD, MacOS and 16Gb RAM we observed the following performance for
+when loading the full Maxmind and DbIp databases (9.4M ip ranges):
+
+- Initial load from ip data files: 35s
+- Single threaded lookup of 1000 distinct ip addresses: 100ms
+
+Benchmarking on other machine - WIP
+Benchmarking heap and off-heap memory usage - WIP
