@@ -6,12 +6,12 @@ import java.util.stream.Stream;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
-import technology.dice.dicewhere.provider.dbip.parsing.DbIpLineParser;
+import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToLocationAndIspCSVLineParser;
 import technology.dice.dicewhere.reading.LineReader;
 
 public class DbIpLineReader extends LineReader {
   private static final int BUFFER_SIZE = 1024 * 1024;
-  private final LineParser lineParser = new DbIpLineParser();
+  private final LineParser lineParser = new DbIpIpToLocationAndIspCSVLineParser();
   private final Path csv;
 
   public DbIpLineReader(Path csv) {
