@@ -1,6 +1,10 @@
 package technology.dice.dicewhere.api;
 
 import com.google.common.net.InetAddresses;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.Assert;
 import org.junit.Test;
 import technology.dice.dicewhere.api.api.IP;
@@ -113,6 +117,39 @@ public class IPResolverTest {
     Assert.assertNotNull(result.get(DbIpProviderKey.of()));
     Assert.assertTrue(result.get(DbIpProviderKey.of()).isPresent());
     Assert.assertEquals(expectedBoth, result.get(DbIpProviderKey.of()).get());
+  }
+
+  @Test
+  public void existingDualLookupV4Async()
+      throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    IPResolver resolver = baseResolver();
+    CompletionStage<Map<ProviderKey, Optional<IpInformation>>> futureResult =
+        resolver.resolveAsync("1.0.8.17");
+    IpInformation expectedBoth =
+        new IpInformation(
+            "CN",
+            "1809858",
+            "Guangzhou",
+            "Guangdong",
+            null,
+            null,
+            new IP(InetAddresses.forString("1.0.8.0")),
+            new IP(InetAddresses.forString("1.0.15.255")),
+            null);
+
+    futureResult.toCompletableFuture().get(1, TimeUnit.SECONDS);
+
+    futureResult
+        .toCompletableFuture()
+        .thenAccept(
+            result -> {
+              Assert.assertNotNull(result.get(MaxmindProviderKey.of()));
+              Assert.assertTrue(result.get(MaxmindProviderKey.of()).isPresent());
+              Assert.assertEquals(expectedBoth, result.get(MaxmindProviderKey.of()).get());
+              Assert.assertNotNull(result.get(DbIpProviderKey.of()));
+              Assert.assertTrue(result.get(DbIpProviderKey.of()).isPresent());
+              Assert.assertEquals(expectedBoth, result.get(DbIpProviderKey.of()).get());
+            });
   }
 
   @Test

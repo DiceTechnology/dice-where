@@ -1,8 +1,10 @@
 package technology.dice.dicewhere.api.api;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -73,19 +75,28 @@ public class IPResolver {
         Objects.requireNonNull(provider));
   }
 
-  public Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull IP ip) {
-    Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolution =
+  public CompletionStage<Map<ProviderKey, Optional<IpInformation>>> resolveAsync(@Nonnull IP ip) {
+
+    Map<ProviderKey, CompletableFuture<Optional<IpInformation>>> resolution =
         databases
             .entrySet()
             .stream()
             .collect(
-                Collectors.toMap(
+                ImmutableMap.toImmutableMap(
                     Map.Entry::getKey,
-                    databaseProviderIPDatabaseEntry ->
-                        resolveAsync(
-                            Objects.requireNonNull(ip), databaseProviderIPDatabaseEntry.getKey())));
+                    entry ->
+                        resolveAsync(Objects.requireNonNull(ip), entry.getKey())
+                            .toCompletableFuture()));
 
-    return resolution;
+    return CompletableFuture.allOf(resolution.values().toArray(new CompletableFuture<?>[0]))
+        .thenApply(
+            res ->
+                resolution
+                    .entrySet()
+                    .stream()
+                    .collect(
+                        ImmutableMap.toImmutableMap(
+                            Map.Entry::getKey, entry -> entry.getValue().join())));
   }
 
   public Map<ProviderKey, Optional<IpInformation>> resolve(@Nonnull String ip)
@@ -93,7 +104,7 @@ public class IPResolver {
     return resolve(new IP(InetAddress.getByName(Objects.requireNonNull(ip))));
   }
 
-  public Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolveAsync(@Nonnull String ip)
+  public CompletionStage<Map<ProviderKey, Optional<IpInformation>>> resolveAsync(@Nonnull String ip)
       throws UnknownHostException {
     return resolveAsync(new IP(InetAddress.getByName(Objects.requireNonNull(ip))));
   }
