@@ -14,7 +14,6 @@ import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToCityLiteCSVLineParser;
-import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToLocationAndIspCSVLineParser;
 import technology.dice.dicewhere.reading.RawLine;
 
 public class DbIpIpToCityLiteCSVLineParserTest {
@@ -163,55 +162,5 @@ public class DbIpIpToCityLiteCSVLineParserTest {
       Assert.assertEquals(1, e.getOffendingLine().getLineNumber());
       throw e;
     }
-  }
-
-  @Test
-  public void onlyCountryIPV4() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
-        new DbIpIpToLocationAndIspCSVLineParser();
-    String line = "\"1.4.128.0\",\"1.4.255.255\",\"TH\"";
-    RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
-    ParsedLine expected =
-        new ParsedLine(
-            new IP(InetAddresses.forString("1.4.128.0")),
-            new IP(InetAddresses.forString("1.4.255.255")),
-            new IpInformation(
-                "TH",
-                null,
-                null,
-                null,
-                null,
-                null,
-                new IP(InetAddresses.forString("1.4.128.0")),
-                new IP(InetAddresses.forString("1.4.255.255")),
-                null),
-            rawLine);
-    Assert.assertEquals(expected, parsed);
-  }
-
-  @Test
-  public void onlyCountryIPV6() throws LineParsingException {
-    DbIpIpToLocationAndIspCSVLineParser dbIpIpToLocationAndIspCSVLineParser =
-        new DbIpIpToLocationAndIspCSVLineParser();
-    String line = "\"2a0c:3800:400::\",\"2a0c:3800:400:ffff:ffff:ffff:ffff:ffff\",\"PT\"";
-    RawLine rawLine = new RawLine(line, 1);
-    ParsedLine parsed = dbIpIpToLocationAndIspCSVLineParser.parse(new RawLine(line, 1), false);
-    ParsedLine expected =
-        new ParsedLine(
-            new IP(InetAddresses.forString("2a0c:3800:400::")),
-            new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")),
-            new IpInformation(
-                "PT",
-                null,
-                null,
-                null,
-                null,
-                null,
-                new IP(InetAddresses.forString("2a0c:3800:400::")),
-                new IP(InetAddresses.forString("2a0c:3800:400:ffff:ffff:ffff:ffff:ffff")),
-                null),
-            rawLine);
-    Assert.assertEquals(expected, parsed);
   }
 }
