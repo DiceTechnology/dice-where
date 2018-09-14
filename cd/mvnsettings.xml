@@ -1,4 +1,9 @@
 <settings>
+  <server>
+    <id>bintray-dicetechnology-dice-where</id>
+    <username>streaming-machine-user</username>
+    <password>${env.BINTRAY_API_KEY}</password>
+  </server>
   <profiles>
     <profile>
       <id>ossrh</id>
@@ -7,8 +12,8 @@
       </activation>
       <properties>
         <gpg.executable>gpg</gpg.executable>
-        <gpg.keyname>travis.gpg.pem</gpg.keyname>
-        <gpg.passphrase>${env.GPG_KEY_PASSWORD}</gpg.passphrase>
+        <gpg.keyname>C673D7586C1D444B</gpg.keyname>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
       </properties>
     </profile>
   </profiles>
