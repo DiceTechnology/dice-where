@@ -2,7 +2,7 @@ package technology.dice.dicewhere.provider.maxmind;
 
 import technology.dice.dicewhere.provider.ProviderKey;
 
-public class MaxmindProviderKey extends ProviderKey {
+public final class MaxmindProviderKey extends ProviderKey {
 
   private static final MaxmindProviderKey instance = new MaxmindProviderKey();
 
