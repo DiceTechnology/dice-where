@@ -9,9 +9,6 @@ package technology.dice.dicewhere.provider.maxmind.parsing;
 import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
@@ -21,6 +18,18 @@ import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.utils.StringUtils;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+/**
+ * Parser for any Maxmind database.<br>
+ * Maxmind's databases present the fields in increasing order of granularity. A more precise
+ * database will contain all fields of a less precise database, adding the extra precision at the
+ * end. This class will parse fields up to the level of postcode, presented by the GeoIP2-City
+ * databases.<br>
+ * This parser parses both the Commercial and Lite versions of Maxmind's databases.
+ */
 public class MaxmindLineParser implements LineParser {
   private final Splitter splitter = Splitter.on(",");
   private final Map<String, MaxmindLocation> locationDictionary;

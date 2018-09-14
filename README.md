@@ -30,7 +30,7 @@ TL/DR section for quickly getting up and running. The code snippets below assume
 ```java
 IPResolver resolver = new IPResolver.Builder()
       .withProvider(
-        new MaxmindDbReader(
+        new MaxmindLineParser(
             Paths.get("<localHD>/GeoLite2-Country-CSV_20180703/GeoLite2-Country-Locations-en.csv"),
             Paths.get("<localHD>/GeoLite2-Country-CSV_20180703/GeoLite2-Country-Blocks-IPv4.csv"),
             Paths.get("<localHD>/GeoLite2-Country-CSV_20180703/GeoLite2-Country-Blocks-IPv6.csv")
@@ -55,14 +55,12 @@ d3b6:3068:9496:934c:16a:fcfc:23c0:807a -> IP not found
 ```java
 IPResolver resolver = new IPResolver.Builder()
         .withProvider(
-          new MaxmindDbReader(
+          new MaxmindLineParser(
               Paths.get("<localHD>/GeoLite2-Country-CSV_20180703/GeoLite2-Country-Locations-en.csv"),
               Paths.get("<localHD>/GeoLite2-Country-CSV_20180703/GeoLite2-Country-Blocks-IPv4.csv"),
               Paths.get("<localHD>/GeoLite2-Country-CSV_20180703/GeoLite2-Country-Blocks-IPv6.csv")
           ))
-          .withProvider(        						
-        						new DbIpLineReader(Paths.get("<localHD>/dbip-full-2018-07.csv"))
-        				)
+          .withProvider(new DbIpIpToLocationAndIspCSVLineParser(Paths.get("<localHD>/dbip-full-2018-07.csv")))
         build();      			
 
         print(resolver.resolve("31.185.196.84"));
@@ -159,7 +157,7 @@ Maximind distributes their databases spread across three main files:
 dice-where requires the client application to initialise the Maxmind database reader by providing the location of those three files. In its most simple form, a Maxmind reader can be created as follows:
 
 ```java
-new MaxmindDbReader(
+new MaxmindLineParser(
     Paths.get("<localHD>/GeoIP2-City-CSV_20180703/GeoIP2-City-Locations-en.csv.zip"),
 	Paths.get("<localHD>/GeoIP2-City-CSV_20180703/GeoIP2-City-Blocks-IPv4.csv.zip"),
 	Paths.get("<localHD>/GeoIP2-City-CSV_20180703/GeoIP2-City-Blocks-IPv6.csv")
