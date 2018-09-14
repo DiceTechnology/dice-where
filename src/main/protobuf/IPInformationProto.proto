@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package technology.dice.dicewhere.lineprocessing.serializers.protobuf;
 
-import "AnonymousStateProto.proto";
+import "ThreeStateValueProto.proto";
 
 message IpInformationProto {
     string geonameId = 1;
@@ -14,5 +14,5 @@ message IpInformationProto {
     bytes startOfRange = 7;
     bytes endOfRange = 8;
     string originalLine = 9;
-    AnonymousStateProto anonymousState = 10;
+    ThreeStateValue isVpn = 10;
 }

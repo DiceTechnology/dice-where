@@ -4,6 +4,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import technology.dice.dicewhere.lineprocessing.serializers.protobuf.ThreeStateValueProto;
+import technology.dice.dicewhere.utils.ProtoValueConverter;
 import technology.dice.dicewhere.utils.StringUtils;
 
 public class IpInformation {
@@ -14,7 +17,7 @@ public class IpInformation {
   private final String leastSpecificDivision;
   private final String mostSpecificDivision;
   private final String postcode;
-  private final AnonymousState anonymousState;
+  private final Boolean isVpn;
   private final IP startOfRange;
   private final IP endOfRange;
 
@@ -33,7 +36,7 @@ public class IpInformation {
    * @param startOfRange the first IP of the range of IPs located in this location
    * @param endOfRange the last IP of the range of IPs located in this location
    * @param originalLine the database line that got processed into this location object
-   * @param anonymousState whether this range is part of anonymous proxy or vpn
+   * @param isVpn whether this range is marked as VPN from the DB provider
    */
   public IpInformation(
       @Nonnull String countryCodeAlpha2,
@@ -45,7 +48,7 @@ public class IpInformation {
       @Nonnull IP startOfRange,
       @Nonnull IP endOfRange,
       @Nullable String originalLine,
-      @Nullable AnonymousState anonymousState) {
+      @Nullable Boolean isVpn) {
     this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
     this.geonameId = geonameId;
     this.city = city;
@@ -55,8 +58,7 @@ public class IpInformation {
     this.startOfRange = Objects.requireNonNull(startOfRange);
     this.endOfRange = Objects.requireNonNull(endOfRange);
     this.originalLine = originalLine;
-    this.anonymousState =
-        Objects.isNull(anonymousState) ? AnonymousState.NOT_SPECIFIED : anonymousState;
+    this.isVpn = isVpn;
   }
 
   public String getCountryCodeAlpha2() {
@@ -95,8 +97,8 @@ public class IpInformation {
     return StringUtils.nonEmptyString(originalLine);
   }
 
-  public AnonymousState getAnonymousState() {
-    return anonymousState;
+  public Optional<Boolean> isVpn() {
+    return Optional.ofNullable(isVpn);
   }
 
   @Override
@@ -116,7 +118,7 @@ public class IpInformation {
         && Objects.equals(getMostSpecificDivision(), that.getMostSpecificDivision())
         && Objects.equals(getPostcode(), that.getPostcode())
         && Objects.equals(getStartOfRange(), that.getStartOfRange())
-        && Objects.equals(getAnonymousState(), that.getAnonymousState())
+        && Objects.equals(isVpn(), that.isVpn())
         && Objects.equals(getEndOfRange(), that.getEndOfRange());
   }
 
@@ -132,7 +134,7 @@ public class IpInformation {
         postcode,
         startOfRange,
         endOfRange,
-        anonymousState);
+        isVpn);
   }
 
   @Override
@@ -159,8 +161,8 @@ public class IpInformation {
         + ", postcode='"
         + postcode
         + '\''
-        + ", anonymousState="
-        + anonymousState
+        + ", isVpn="
+        + isVpn
         + ", startOfRange="
         + startOfRange
         + ", endOfRange="
@@ -182,7 +184,7 @@ public class IpInformation {
     private IP startOfRange;
     private IP endOfRange;
     private String originalLine;
-    private AnonymousState anonymousState = AnonymousState.NOT_SPECIFIED;
+    private Boolean isVpn;
 
     private Builder() {}
 
@@ -231,8 +233,17 @@ public class IpInformation {
       return this;
     }
 
-    public Builder withAnonymousState(AnonymousState anonymousState) {
-      this.anonymousState = anonymousState;
+    public Builder isVpn(Optional<Boolean> isVpn) {
+      this.isVpn = isVpn.orElse(null);
+      return this;
+    }
+
+    public Builder isVpn(boolean isVpn) {
+      this.isVpn = isVpn;
+      return this;
+    }
+    public Builder isVpn(ThreeStateValueProto.ThreeStateValue isVpn) {
+      this.isVpn = ProtoValueConverter.parseThreeStateProto(isVpn).orElse(null);
       return this;
     }
 
@@ -247,7 +258,7 @@ public class IpInformation {
           Objects.requireNonNull(startOfRange),
           Objects.requireNonNull(endOfRange),
           originalLine,
-          anonymousState);
+          isVpn);
     }
   }
 }

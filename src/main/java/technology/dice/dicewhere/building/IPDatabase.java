@@ -38,8 +38,7 @@ public class IPDatabase {
                         .withStartOfRange(
                             new IP(ipInformationProto.getStartOfRange().toByteArray()))
                         .withEndOfRange(new IP(ipInformationProto.getEndOfRange().toByteArray()))
-                        .withAnonymousState(
-                            AnonymousState.fromAnonymousStateProto(ipInformationProto.getAnonymousState()))
+                        .isVpn(ipInformationProto.getIsVpn())
                         .withOriginalLine(
                             "".equals(ipInformationProto.getOriginalLine())
                                     || ipInformationProto.getOriginalLine() == null

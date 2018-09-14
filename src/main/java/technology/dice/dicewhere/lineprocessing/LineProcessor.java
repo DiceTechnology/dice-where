@@ -18,6 +18,7 @@ import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformati
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
+import technology.dice.dicewhere.utils.ProtoValueConverter;
 
 public class LineProcessor implements Runnable {
   private static final int WORKER_BATCH_SIZE = 10000;
@@ -116,13 +117,9 @@ public class LineProcessor implements Runnable {
                                                   parsedLine.getStartIp().getBytes()))
                                           .setEndOfRange(
                                               ByteString.copyFrom(parsedLine.getEndIp().getBytes()))
-                                          .setAnonymousState(
-                                              AnonymousStateProtoOuterClass.AnonymousStateProto
-                                                  .valueOf(
-                                                      parsedLine
-                                                          .getInfo()
-                                                          .getAnonymousState()
-                                                          .name()));
+                                          .setIsVpn(
+                                              ProtoValueConverter.toThreeStateValue(
+                                                  parsedLine.getInfo().isVpn().orElse(null)));
 
                                   parsedLine
                                       .getInfo()
