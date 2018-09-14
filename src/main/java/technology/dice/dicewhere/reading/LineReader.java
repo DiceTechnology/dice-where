@@ -28,13 +28,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
 
+/**
+ * Base class providing data transformation between external IP data format provided by {@link
+ * #lines()} method, returning standardised {@link IPDatabase}
+ */
 public abstract class LineReader {
   private static final int LINES_BUFFER = 100000;
   public static byte[] MAGIC_ZIP = {'P', 'K', 0x3, 0x4};
@@ -66,10 +74,8 @@ public abstract class LineReader {
 
   private boolean isGZipped(Path path) {
     int magic = 0;
-    try {
-      RandomAccessFile raf = new RandomAccessFile(path.toFile(), "r");
+    try (RandomAccessFile raf = new RandomAccessFile(path.toFile(), "r")) {
       magic = raf.read() & 0xff | ((raf.read() << 8) & MAGIG_GZIP);
-      raf.close();
     } catch (Throwable e) {
       return false;
     }
@@ -116,26 +122,51 @@ public abstract class LineReader {
     ExecutorService parserExecutorService =
         Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("parser-%d").build());
-    ArrayBlockingQueue<SerializedLine> serializedLinesBuffer =
-        new ArrayBlockingQueue<>(LINES_BUFFER);
-    LineProcessor processor =
-        new LineProcessor(
-            parserExecutorService,
-            serializedLinesBuffer,
-            parser(),
-            retainOriginalLine,
-            new LineprocessorListenerForProvider(provider(), processListener));
-    DatabaseBuilder databaseBuilder =
-        new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener);
+    ExecutorService setupExecutorService =
+        Executors.newFixedThreadPool(
+            2, new ThreadFactoryBuilder().setNameFormat("line-reader-setup-%d").build());
 
-    Thread processorT = new Thread(processor);
-    processorT.setName("line-parser");
-    processorT.start();
+    try {
+      BlockingQueue<SerializedLine> serializedLinesBuffer = new ArrayBlockingQueue<>(LINES_BUFFER);
 
-    Thread databaseBuilderT = new Thread(databaseBuilder);
-    databaseBuilderT.setName("tree-builder");
-    databaseBuilderT.start();
+      LineProcessor processor =
+          new LineProcessor(
+              parserExecutorService,
+              serializedLinesBuffer,
+              parser(),
+              retainOriginalLine,
+              new LineprocessorListenerForProvider(provider(), processListener));
+      DatabaseBuilder databaseBuilder =
+          new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener);
 
+      Future processorFuture = setupExecutorService.submit(processor);
+      Future databaseBuilderFuture = setupExecutorService.submit(databaseBuilder);
+
+      publishLinesToProcessor(readerListener, before, processor);
+
+      // WARNING!! DO NOT CHANGE ORDER "dontExpectMore" is expecting `processorFuture` to be done
+      processor.markDataComplete();
+      processorFuture.get();
+      databaseBuilder.dontExpectMore();
+      databaseBuilderFuture.get();
+
+      parserExecutorService.shutdown();
+      parserExecutorService.awaitTermination(1, TimeUnit.HOURS);
+      setupExecutorService.shutdown();
+
+      readerListener.finished(
+          provider(), databaseBuilder.processedLines(), System.currentTimeMillis() - before);
+      return databaseBuilder.build();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException("Line reader read failed", e);
+    } finally {
+      parserExecutorService.shutdown();
+      setupExecutorService.shutdown();
+    }
+  }
+
+  private void publishLinesToProcessor(
+      LineReaderListener readerListener, long before, LineProcessor processor) throws IOException {
     final long[] n = {0};
     try (Stream<String> lines = lines()) {
       lines.forEach(
@@ -146,21 +177,5 @@ public abstract class LineReader {
                 provider(), new RawLine(line, n[0]), System.currentTimeMillis() - before);
           });
     }
-
-    try {
-      processor.markDataComplete();
-      processorT.join();
-
-      databaseBuilder.dontExpectMore();
-      databaseBuilderT.join();
-
-      parserExecutorService.shutdown();
-
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-    readerListener.finished(
-        provider(), databaseBuilder.processedLines(), System.currentTimeMillis() - before);
-    return databaseBuilder.build();
   }
 }

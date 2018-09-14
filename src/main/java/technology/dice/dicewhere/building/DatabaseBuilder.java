@@ -1,10 +1,6 @@
 package technology.dice.dicewhere.building;
 
 import com.google.common.collect.Queues;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import org.mapdb.DB;
 import org.mapdb.DBException;
 import org.mapdb.DBMaker;
@@ -14,8 +10,14 @@ import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
 import technology.dice.dicewhere.provider.ProviderKey;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 public class DatabaseBuilder implements Runnable {
-  private final ArrayBlockingQueue<SerializedLine> source;
+  private final BlockingQueue<SerializedLine> source;
   private final DatabaseBuilderListener listener;
   private final ProviderKey provider;
   private final DB.TreeMapSink<IP, byte[]> sink;
@@ -24,7 +26,7 @@ public class DatabaseBuilder implements Runnable {
 
   public DatabaseBuilder(
       ProviderKey provider,
-      ArrayBlockingQueue<SerializedLine> source,
+      BlockingQueue<SerializedLine> source,
       DatabaseBuilderListener listener) {
     this.source = source;
     this.expectingMore = true;
@@ -63,7 +65,7 @@ public class DatabaseBuilder implements Runnable {
   public void run() {
     while (expectingMore || source.size() > 0) {
       SerializedLine beingProcessed = null;
-      ArrayList<SerializedLine> availableForAdding = new ArrayList(source.size());
+      List<SerializedLine> availableForAdding = new ArrayList<>(source.size());
       try {
         Queues.drain(source, availableForAdding, source.size(), 1, TimeUnit.NANOSECONDS);
         for (SerializedLine currentLine : availableForAdding) {
@@ -79,6 +81,7 @@ public class DatabaseBuilder implements Runnable {
         }
       } catch (InterruptedException e) {
         listener.builderInterrupted(provider, e);
+        throw new RuntimeException("Database builder interrupted", e);
       }
     }
   }
