@@ -146,7 +146,7 @@ This library contains out-of-the-box parsers for the following databases:
 DB-IP distributes their database in a single file, containing the IPV4 and IPV6 ranges and their locations. In it's simplest form, a DB-IP reader can be created as follows:
 
 ```java
-new DbIpLineReader(Paths.get("<localHD>/dbip-country-2018-07.csv.gz"))
+new DbIpIpToLocationAndIspCSVLineParser(Paths.get("<localHD>/dbip-country-2018-07.csv.gz"))
 ```
 
 ### Maxmind
