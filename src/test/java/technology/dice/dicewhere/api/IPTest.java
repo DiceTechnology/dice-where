@@ -61,7 +61,11 @@ public class IPTest {
     //  1.0.2.16/28
     //  1.0.2.64/28
 //    IPAddress address = new IPAddressString("1.0.2.0/23").getAddress();
-    IPAddress address = new IPAddressString("2000:db8::/32").getAddress();
+//    IPAddress address = new IPAddressString("1.0.2.0/27").getAddress(); 0 - 31
+//    IPAddress address = new IPAddressString("1.0.2.0/28").getAddress(); 0 - 15
+//    IPAddress address = new IPAddressString("1.0.2.0/26").getAddress(); 0 - 63
+//    IPAddress address = new IPAddressString("1.0.2.0/25").getAddress(); //0 - 128
+    IPAddress address = new IPAddressString("1.0.2.0/24").getAddress(); //0 - 255
     IPAddress subRange1 = new IPAddressString("1.0.2.16/28").getAddress();
     IP subRange1L = new IP(subRange1.getLower().getBytes());
     IP subRange1U = new IP(subRange1.getUpper().getBytes());
