@@ -47,8 +47,8 @@ public class MaxmindAnonymousDbParser {
       throws IOException {
     this.ipV4AnonymousDatabase = ipV4AnonymousDatabase;
     this.ipV6AnonymousDatabase = ipV6AnonymousDatabase;
-    this.ipV4AnonymousDatabase.readLine(); //first line is header
-    this.ipV6AnonymousDatabase.readLine(); //first line is header
+    this.ipV4AnonymousDatabase.readLine(); // first line is header
+    this.ipV6AnonymousDatabase.readLine(); // first line is header
     this.filter = filter;
     this.readNextLine();
   }
@@ -127,7 +127,8 @@ public class MaxmindAnonymousDbParser {
         .orElse(false);
   }
 
-  private Optional<MaxmindAnonymous> fitToRange(MaxmindAnonymous lastLine, IPAddress ipAddressRange) {
+  private Optional<MaxmindAnonymous> fitToRange(
+      MaxmindAnonymous lastLine, IPAddress ipAddressRange) {
 
     IP rangeLowerBound = new IP(ipAddressRange.getLower().getBytes());
     IP rangeUpperBound = new IP(ipAddressRange.getUpper().getBytes());
@@ -135,7 +136,8 @@ public class MaxmindAnonymousDbParser {
     IP lastLineLowerBound = lastLine.getRangeStart();
     IP lastLineUpperBound = lastLine.getRangeEnd();
 
-    if(lastLineUpperBound.isLowerThan(rangeLowerBound) || lastLineLowerBound.isGreaterThan(rangeUpperBound)) {
+    if (lastLineUpperBound.isLowerThan(rangeLowerBound)
+        || lastLineLowerBound.isGreaterThan(rangeUpperBound)) {
       return Optional.empty();
     }
 
@@ -151,13 +153,14 @@ public class MaxmindAnonymousDbParser {
     if (!toModify) {
       return Optional.of(lastLine);
     } else {
-      return Optional.of(MaxmindAnonymous.builder(lastLineLowerBound, lastLineUpperBound)
-          .isVpn(lastLine.isVpn())
-          .isTorExitProvider(lastLine.isTorExitProvider())
-          .isPublicProxy(lastLine.isPublicProxy())
-          .isHostingProvider(lastLine.isHostingProvider())
-          .isAnonymous(lastLine.isAnonymous())
-          .build());
+      return Optional.of(
+          MaxmindAnonymous.builder(lastLineLowerBound, lastLineUpperBound)
+              .isVpn(lastLine.isVpn())
+              .isTorExitProvider(lastLine.isTorExitProvider())
+              .isPublicProxy(lastLine.isPublicProxy())
+              .isHostingProvider(lastLine.isHostingProvider())
+              .isAnonymous(lastLine.isAnonymous())
+              .build());
     }
   }
 
