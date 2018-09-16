@@ -7,11 +7,15 @@
 package technology.dice.dicewhere.api;
 
 import com.google.common.net.InetAddresses;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
 import org.junit.Assert;
 import org.junit.Test;
 import technology.dice.dicewhere.api.api.IP;
-
-import java.net.InetAddress;
 
 public class IPTest {
   @Test(expected = NullPointerException.class)
@@ -51,4 +55,5 @@ public class IPTest {
     Assert.assertFalse(anIP.isGreaterThan(higherIp));
     Assert.assertFalse(anIP.equals(higherIp));
   }
+
 }

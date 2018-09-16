@@ -31,6 +31,12 @@ import java.util.stream.Stream;
 public class MaxmindLineParserTest {
 
   private static Map<String, MaxmindLocation> locationNames;
+  private String IPV4_ANONYMOUS_LINES =
+      "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
+          + "1.0.2.16/28,1,1,0,0,0\n"
+          + "1.0.2.32/28,1,0,0,0,0\n"
+          + "1.0.2.64/28,1,1,0,0,0\n"
+          + "1.0.3.0/24,1,1,0,0,0\n";
 
   @BeforeClass
   public static void beforeClass() {
@@ -39,6 +45,7 @@ public class MaxmindLineParserTest {
             .put(
                 "2634096", new MaxmindLocation("2634096", "GB", "Cumbria", "England", "Whitehaven"))
             .put("3372745", new MaxmindLocation("3372745", "PT", "", "Azores", "Rabo De Peixe"))
+            .put("3372741", new MaxmindLocation("3372741", "BG", "", "Varna", "Varna"))
             .build();
   }
 
@@ -92,18 +99,11 @@ public class MaxmindLineParserTest {
   }
 
   @Test
-  public void shouldIdentifyIpv4RangesWithVpn() throws LineParsingException, IOException {
-    String ipv4Lines =
-        "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
-            + "1.0.2.16/28,1,1,0,0,0\n"
-            + "1.0.2.32/28,1,0,0,0,0\n"
-            + "1.0.2.64/28,1,1,0,0,0\n"
-            + "1.0.3.16/28,1,1,0,0,0\n"
-            + "1.0.3.32/28,1,0,0,0,0\n"
-            + "1.0.3.64/28,1,1,0,0,0";
+  public void shouldIdentifyIpv4RangesWithVpn_whenRangesDoNotOverlap()
+      throws LineParsingException, IOException {
     String ipv6Lines =
         "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
-    InputStream streamV4 = new ByteArrayInputStream(ipv4Lines.getBytes());
+    InputStream streamV4 = new ByteArrayInputStream(IPV4_ANONYMOUS_LINES.getBytes());
     BufferedReader bufferedReaderV4 = new BufferedReader(new InputStreamReader(streamV4));
     InputStream streamV6 = new ByteArrayInputStream(ipv6Lines.getBytes());
     BufferedReader bufferedReaderV6 = new BufferedReader(new InputStreamReader(streamV6));
@@ -113,8 +113,7 @@ public class MaxmindLineParserTest {
 
     String line = "1.0.2.0/24,3372745,2264397,,0,0,9600-082,37.8000,-25.5833,500";
     RawLine rawLine = new RawLine(line, 1);
-    List<ParsedLine> parsed =
-        maxmindLineParser.parse(new RawLine(line, 1), false).collect(Collectors.toList());
+    List<ParsedLine> parsed = maxmindLineParser.parse(rawLine, false).collect(Collectors.toList());
     IpInformation.Builder baseInfo =
         IpInformation.builder()
             .withCountryCodeAlpha2("PT")
@@ -174,11 +173,58 @@ public class MaxmindLineParserTest {
                 .withEndOfRange(new IP(InetAddresses.forString("1.0.2.255")))
                 .build(),
             rawLine));
-    Assert.assertEquals(expected.get(0), parsed.get(0));
-    Assert.assertEquals(expected.get(1), parsed.get(1));
-    Assert.assertEquals(expected.get(2), parsed.get(2));
-    Assert.assertEquals(expected.get(3), parsed.get(3));
-    Assert.assertEquals(expected.get(4), parsed.get(4));
+    Assert.assertEquals(expected, parsed);
+  }
+
+  @Test
+  public void shouldIdentifyIpv4RangesWithVpn_whenRangesOverlap()
+      throws LineParsingException, IOException {
+
+    String ipv6Lines =
+        "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
+    InputStream streamV4 = new ByteArrayInputStream(IPV4_ANONYMOUS_LINES.getBytes());
+    BufferedReader bufferedReaderV4 = new BufferedReader(new InputStreamReader(streamV4));
+    InputStream streamV6 = new ByteArrayInputStream(ipv6Lines.getBytes());
+    BufferedReader bufferedReaderV6 = new BufferedReader(new InputStreamReader(streamV6));
+    MaxmindAnonymousDbParser anonymousDbParser =
+        new MaxmindAnonymousDbParser(bufferedReaderV4, bufferedReaderV6, MaxmindAnonymous::isVpn);
+    MaxmindLineParser maxmindLineParser = new MaxmindLineParser(locationNames, anonymousDbParser);
+
+    String line1 = "1.0.3.0/25,3372741,2264397,,0,0,9600-082,37.8000,-25.5833,500";
+    String line2 = "1.0.3.128/25,3372741,2264397,,0,0,9600-082,37.8000,-25.5833,500";
+    RawLine rawLine1 = new RawLine(line1, 1);
+    RawLine rawLine2 = new RawLine(line2, 2);
+    List<ParsedLine> parsed = maxmindLineParser.parse(rawLine1, false).collect(Collectors.toList());
+    parsed.addAll(maxmindLineParser.parse(rawLine2, false).collect(Collectors.toList()));
+    IpInformation.Builder baseInfo =
+        IpInformation.builder()
+            .withCountryCodeAlpha2("BG")
+            .withGeonameId("3372741")
+            .withCity("Varna")
+            .withLeastSpecificDivision("Varna")
+            .withPostcode("9600-082");
+    List<ParsedLine> expected = new ArrayList<>();
+    expected.add(
+        new ParsedLine(
+            new IP(InetAddresses.forString("1.0.3.0")),
+            new IP(InetAddresses.forString("1.0.3.127")),
+            baseInfo
+                .isVpn(true)
+                .withStartOfRange(new IP(InetAddresses.forString("1.0.3.0")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.0.3.127")))
+                .build(),
+            rawLine1));
+    expected.add(
+        new ParsedLine(
+            new IP(InetAddresses.forString("1.0.3.128")),
+            new IP(InetAddresses.forString("1.0.3.255")),
+            baseInfo
+                .isVpn(true)
+                .withStartOfRange(new IP(InetAddresses.forString("1.0.3.128")))
+                .withEndOfRange(new IP(InetAddresses.forString("1.0.3.255")))
+                .build(),
+            rawLine2));
+    Assert.assertEquals(expected, parsed);
   }
 
   @Test

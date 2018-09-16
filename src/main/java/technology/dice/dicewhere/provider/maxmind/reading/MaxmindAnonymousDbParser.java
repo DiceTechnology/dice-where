@@ -61,11 +61,19 @@ public class MaxmindAnonymousDbParser {
     IP rangeBoundEnd = new IP(ipAddressRange.getUpper().getBytes());
     Stream.Builder<MaxmindAnonymous> result = Stream.builder();
     do {
-      lastFetched.ifPresent(l -> fitToRange(l, ipAddressRange).ifPresent(result::add));
+      Optional<MaxmindAnonymous> resultRange =
+          lastFetched.flatMap(l -> fitToRange(l, ipAddressRange));
+      if (resultRange.isPresent()) {
+        result.add(resultRange.get());
+        if (isLastLineRangeContainingTargetRange(rangeBoundStart, rangeBoundEnd)) {
+          break;
+        }
+      }
       if (!isFinishingAfter(rangeBoundEnd)) {
         readNextLine();
       }
-    } while (lastOneInRange(rangeBoundStart, rangeBoundEnd));
+    } while (isLastLineBeforeRange(rangeBoundEnd)
+        || isLastLineInRange(rangeBoundStart, rangeBoundEnd));
 
     return result.build();
   }
@@ -103,28 +111,39 @@ public class MaxmindAnonymousDbParser {
     }
   }
 
-  private boolean lastOneInRange(IP targetRangeStart, IP targetRangeEnd) {
+  private boolean isLastLineRangeContainingTargetRange(IP targetRangeStart, IP targetRangeEnd) {
+    return lastFetched
+        .map(
+            a ->
+                a.getRangeStart().isLowerThanOrEqual(targetRangeStart)
+                    && a.getRangeEnd().isGreaterThanOrEqual(targetRangeEnd))
+        .orElse(false);
+  }
+
+  private boolean isLastLineBeforeRange(IP targetRangeStart) {
+    return lastFetched.map(a -> targetRangeStart.isGreaterThan(a.getRangeEnd())).orElse(false);
+  }
+
+  private boolean isLastLineAfterRange(IP targetEndStart) {
+    return lastFetched.map(a -> targetEndStart.isLowerThan(a.getRangeStart())).orElse(false);
+  }
+
+  private boolean isLastLineInRange(IP targetRangeStart, IP targetRangeEnd) {
     return lastFetched
         .map(
             a -> {
               IP lastFetchedRangeStart = a.getRangeStart();
               IP lastFetchedRangeEnd = a.getRangeEnd();
-              return (targetRangeStart.isLowerThan(lastFetchedRangeStart)
-                      && targetRangeEnd.isGreaterThan(lastFetchedRangeStart))
-                  || (targetRangeStart.isLowerThan(lastFetchedRangeEnd)
-                      && targetRangeEnd.isGreaterThan(lastFetchedRangeEnd));
+              return (targetRangeStart.isLowerThanOrEqual(lastFetchedRangeStart)
+                      && targetRangeEnd.isGreaterThanOrEqual(lastFetchedRangeStart))
+                  || (targetRangeStart.isLowerThanOrEqual(lastFetchedRangeEnd)
+                      && targetRangeEnd.isGreaterThanOrEqual(lastFetchedRangeEnd));
             })
         .orElse(false);
   }
 
   private boolean isFinishingAfter(IP targetRangeEnd) {
-    return lastFetched
-        .map(
-            a -> {
-              IP lastFetchedRangeEnd = a.getRangeEnd();
-              return lastFetchedRangeEnd.isGreaterThan(targetRangeEnd);
-            })
-        .orElse(false);
+    return lastFetched.map(a -> a.getRangeEnd().isGreaterThan(targetRangeEnd)).orElse(false);
   }
 
   private Optional<MaxmindAnonymous> fitToRange(
@@ -136,8 +155,7 @@ public class MaxmindAnonymousDbParser {
     IP lastLineLowerBound = lastLine.getRangeStart();
     IP lastLineUpperBound = lastLine.getRangeEnd();
 
-    if (lastLineUpperBound.isLowerThan(rangeLowerBound)
-        || lastLineLowerBound.isGreaterThan(rangeUpperBound)) {
+    if (isLastLineBeforeRange(rangeLowerBound) || isLastLineAfterRange(rangeUpperBound)) {
       return Optional.empty();
     }
 
