@@ -174,7 +174,11 @@ public class MaxmindLineParserTest {
                 .withEndOfRange(new IP(InetAddresses.forString("1.0.2.255")))
                 .build(),
             rawLine));
-    Assert.assertEquals(expected, parsed);
+    Assert.assertEquals(expected.get(0), parsed.get(0));
+    Assert.assertEquals(expected.get(1), parsed.get(1));
+    Assert.assertEquals(expected.get(2), parsed.get(2));
+    Assert.assertEquals(expected.get(3), parsed.get(3));
+    Assert.assertEquals(expected.get(4), parsed.get(4));
   }
 
   @Test

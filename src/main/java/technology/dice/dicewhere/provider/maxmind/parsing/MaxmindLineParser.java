@@ -9,6 +9,7 @@ package technology.dice.dicewhere.provider.maxmind.parsing;
 import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
+import org.jetbrains.annotations.NotNull;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
@@ -18,8 +19,10 @@ import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymous;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymousDbParser;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 import technology.dice.dicewhere.reading.RawLine;
+import technology.dice.dicewhere.utils.IPUtils;
 import technology.dice.dicewhere.utils.StringUtils;
 
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -97,13 +100,13 @@ public class MaxmindLineParser implements LineParser {
               .build();
 
       return parseNestedRanges(rangeString.getAddress(), ipInfo, rawLine);
-    } catch (NoSuchElementException e) {
+    } catch (NoSuchElementException | UnknownHostException e) {
       throw new LineParsingException(e, rawLine);
     }
   }
 
   private Stream<ParsedLine> parseNestedRanges(
-      IPAddress ipAddressRange, IpInformation ipInfo, RawLine rawLine) {
+      IPAddress ipAddressRange, IpInformation ipInfo, RawLine rawLine) throws UnknownHostException {
 
     Stream<MaxmindAnonymous> vpnRanges = vpnDbParser.fetchForRange(ipAddressRange);
 
@@ -117,94 +120,76 @@ public class MaxmindLineParser implements LineParser {
   /**
    * This method produces multiples ranges out of the main IP range split by the VPN ranges
    *
-   * @param vpnRanges
-   * @param ipAddressRange
-   * @param ipInfo
-   * @param rawLine
+   * @param vpnRanges IP ranges that have been identified as VPNs
+   * @param ipAddressRange IP range from the last read line
+   * @param ipInfo Information about the IP range from the least read line
+   * @param rawLine the raw information from the last read line
    * @return
    */
   private Stream<ParsedLine> mergeIpInfoWithVpnData(
       List<MaxmindAnonymous> vpnRanges,
       IPAddress ipAddressRange,
       IpInformation ipInfo,
-      RawLine rawLine) {
+      RawLine rawLine)
+      throws UnknownHostException {
 
+    IP rangeStart = new IP(ipAddressRange.getLower().getBytes());
+    IP rangeEnd = new IP(ipAddressRange.getUpper().getBytes());
     if (vpnRanges.isEmpty()) {
-      IP rangeStart = new IP(ipAddressRange.getLower().getBytes());
-      IP rangeEnd = new IP(ipAddressRange.getUpper().getBytes());
       return Stream.of(new ParsedLine(rangeStart, rangeEnd, ipInfo, rawLine));
     }
 
     Stream.Builder<ParsedLine> result = Stream.builder();
 
-    Iterator<? extends IPAddress> ipRangeIterator = ipAddressRange.getIterable().iterator();
-    IPAddress segmentStartIp = ipAddressRange;
-    IPAddress previousIp = ipAddressRange;
+    IP nextIpForResult = new IP(rangeStart.getBytes());
     for (MaxmindAnonymous vpnRange : vpnRanges) {
-      // find the last ip from the iterator that is before the current vpn range
-      while (ipRangeIterator.hasNext()) {
-        IPAddress lastIp = ipRangeIterator.next();
-        IP lastIpUpperBound = new IP(lastIp.getUpper().getBytes());
-        if (lastIpUpperBound.isGreaterThanOrEqual(vpnRange.getRangeStart())) {
-          // insert the segment that is not vpn
-          System.out.println(
-              String.format(
-                  "Adding source info for %s - %s",
-                  segmentStartIp.getLower(), previousIp.getUpper()));
-          IP s = new IP(segmentStartIp.getLower().getBytes());
-          IP e = new IP(previousIp.getUpper().getBytes());
-          result.add(
-              new ParsedLine(
-                  s,
-                  e,
-                  IpInformation.builder(ipInfo)
-                      .withStartOfRange(s)
-                      .withEndOfRange(e)
-                      .isVpn(false)
-                      .build(),
-                  rawLine));
-          break;
-        }
-        previousIp = lastIp;
+      if (vpnRange.getRangeStart().isGreaterThan(nextIpForResult)) {
+        IPAddress endRangeNoneVpn =
+                IPUtils.from(vpnRange.getRangeStart().getBytes()).increment(-1);
+
+        IP e = new IP(endRangeNoneVpn.getUpper().getBytes());
+        result.add(buildParsedLine(ipInfo, rawLine, e, nextIpForResult, false));
       }
-      // insert vpn segment
+
       IpInformation vpnIpInfo =
-          IpInformation.builder(ipInfo)
-              .isVpn(vpnRange.isVpn())
-              .withStartOfRange(vpnRange.getRangeStart())
-              .withEndOfRange(vpnRange.getRangeEnd())
-              .build();
+              IpInformation.builder(ipInfo)
+                      .isVpn(vpnRange.isVpn())
+                      .withStartOfRange(vpnRange.getRangeStart())
+                      .withEndOfRange(vpnRange.getRangeEnd())
+                      .build();
+      result.add(
+              buildParsedLine(
+                      vpnIpInfo, rawLine, vpnIpInfo.getEndOfRange(), vpnIpInfo.getStartOfRange(), true));
+      nextIpForResult =
+              new IP(
+                      IPUtils.from(vpnRange.getRangeEnd().getBytes())
+                              .increment(1)
+                              .getLower()
+                              .getBytes());
+    }
+
+    if (nextIpForResult.isLowerThan(rangeEnd)) {
+      result.add(buildParsedLine(ipInfo, rawLine, rangeEnd, nextIpForResult, false));
       System.out.println(
           String.format(
-              "Adding VPN info for %s - %s",
-              new String(vpnRange.getRangeStart().getBytes()),
-              new String(vpnRange.getRangeEnd().getBytes())));
-      result.add(
-          new ParsedLine(
-              vpnIpInfo.getStartOfRange(), vpnIpInfo.getEndOfRange(), vpnIpInfo, rawLine));
-
-      // move iterator to the last ip in the current vpn range
-      while (ipRangeIterator.hasNext()) {
-        IPAddress lastIp = ipRangeIterator.next();
-        IP lastRangeUpperBound = new IP(lastIp.getUpper().getBytes());
-        if (lastRangeUpperBound.isGreaterThan(vpnRange.getRangeEnd())) {
-          previousIp = segmentStartIp = lastIp;
-          System.out.println(String.format("New segment start: %s ", lastIp.getLower()));
-          break;
-        }
-      }
-    }
-    IP segmentLowerBoud = new IP(segmentStartIp.getLower().getBytes());
-    if (segmentLowerBoud.isGreaterThan(vpnRanges.get(vpnRanges.size() - 1).getRangeEnd())) {
-      IP s = new IP(segmentStartIp.getLower().getBytes());
-      result.add(
-          new ParsedLine(
-              s,
-              ipInfo.getEndOfRange(),
-              IpInformation.builder(ipInfo).withStartOfRange(s).isVpn(false).build(),
-              rawLine));
+              "Added default info %s - %s",
+              IPUtils.from(nextIpForResult.getBytes()), IPUtils.from(rangeEnd.getBytes())));
     }
 
     return result.build();
+  }
+
+  @NotNull
+  private ParsedLine buildParsedLine(
+      IpInformation ipInfo, RawLine rawLine, IP rangeEnd, IP rangeStart, Boolean isVpn) {
+    return new ParsedLine(
+        rangeStart,
+        rangeEnd,
+        IpInformation.builder(ipInfo)
+            .withStartOfRange(rangeStart)
+            .withEndOfRange(rangeEnd)
+            .isVpn(Optional.ofNullable(isVpn))
+            .build(),
+        rawLine);
   }
 }
