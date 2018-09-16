@@ -128,22 +128,22 @@ public class MaxmindLineParserTest {
     String line = "::/0,5,5,,0,0,CA28,54.5578,-3.5837,10";
     RawLine rawLine = new RawLine(line, 1);
     ParsedLine expected =
-            new ParsedLine(
-                    new IP(InetAddresses.forString("0:0:0:0:0:0:0:0")),
-                    new IP(InetAddresses.forString("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")),
-                    IpInformation.builder()
-                            .withCountryCodeAlpha2("ZZ")
-                            .withGeonameId("5")
-                            .withCity("")
-                            .withLeastSpecificDivision("")
-                            .withMostSpecificDivision("")
-                            .withPostcode("CA28")
-                            .withStartOfRange(new IP(InetAddresses.forString("0:0:0:0:0:0:0:0")))
-                            .withEndOfRange(
-                                    new IP(InetAddresses.forString("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")))
-                            .withOriginalLine(line)
-                            .build(),
-                    rawLine);
+        new ParsedLine(
+            new IP(InetAddresses.forString("0:0:0:0:0:0:0:0")),
+            new IP(InetAddresses.forString("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("ZZ")
+                .withGeonameId("5")
+                .withCity("")
+                .withLeastSpecificDivision("")
+                .withMostSpecificDivision("")
+                .withPostcode("CA28")
+                .withStartOfRange(new IP(InetAddresses.forString("0:0:0:0:0:0:0:0")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")))
+                .withOriginalLine(line)
+                .build(),
+            rawLine);
 
     Stream<ParsedLine> parsed = maxmindLineParser.parse(new RawLine(line, 1), true);
 
@@ -155,21 +155,21 @@ public class MaxmindLineParserTest {
     String line = "2a02:c7f:6a02::/47,2634096,2635167,,0,0,CA28,54.5578,-3.5837,10";
     RawLine rawLine = new RawLine(line, 1);
     ParsedLine expected =
-            new ParsedLine(
-                    new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")),
-                    new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")),
-                    IpInformation.builder()
-                            .withCountryCodeAlpha2("GB")
-                            .withGeonameId("2634096")
-                            .withCity("Whitehaven")
-                            .withLeastSpecificDivision("England")
-                            .withMostSpecificDivision("Cumbria")
-                            .withPostcode("CA28")
-                            .withStartOfRange(new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")))
-                            .withEndOfRange(
-                                    new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")))
-                            .build(),
-                    rawLine);
+        new ParsedLine(
+            new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")),
+            new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")),
+            IpInformation.builder()
+                .withCountryCodeAlpha2("GB")
+                .withGeonameId("2634096")
+                .withCity("Whitehaven")
+                .withLeastSpecificDivision("England")
+                .withMostSpecificDivision("Cumbria")
+                .withPostcode("CA28")
+                .withStartOfRange(new IP(InetAddresses.forString("2a02:c7f:6a02:0:0:0:0:0")))
+                .withEndOfRange(
+                    new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")))
+                .build(),
+            rawLine);
 
     Stream<ParsedLine> parsed = maxmindLineParser.parse(new RawLine(line, 1), false);
 
