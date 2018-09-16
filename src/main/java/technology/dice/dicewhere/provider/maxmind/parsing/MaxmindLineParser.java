@@ -170,10 +170,6 @@ public class MaxmindLineParser implements LineParser {
 
     if (nextIpForResult.isLowerThan(rangeEnd)) {
       result.add(buildParsedLine(ipInfo, rawLine, rangeEnd, nextIpForResult, false));
-      System.out.println(
-          String.format(
-              "Added default info %s - %s",
-              IPUtils.from(nextIpForResult.getBytes()), IPUtils.from(rangeEnd.getBytes())));
     }
 
     return result.build();
