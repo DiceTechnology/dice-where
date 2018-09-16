@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2018 - present by Dice Technology Ltd.
+ *
+ * Please see distribution for license.
+ */
+
 package technology.dice.dicewhere.building;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -5,7 +11,6 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
 
-import technology.dice.dicewhere.api.api.AnonymousState;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;

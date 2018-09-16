@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2018 - present by Dice Technology Ltd.
+ *
+ * Please see distribution for license.
+ */
+
 package technology.dice.dicewhere;
 
 import com.google.common.net.InetAddresses;
@@ -8,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.api.api.IpInformation;
@@ -18,6 +25,7 @@ import technology.dice.dicewhere.reading.LineReaderListener;
 import technology.dice.dicewhere.reading.RawLine;
 
 public class Main {
+
   public static void maisn(String[] args) throws IOException {
     String IPV4 = "192.168.4.5";
     String IPV6 = "0:0:0:0:0:ffff:c0a8:405";

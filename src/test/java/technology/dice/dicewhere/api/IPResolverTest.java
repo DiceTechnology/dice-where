@@ -1,10 +1,16 @@
+/*
+ * Copyright (C) 2018 - present by Dice Technology Ltd.
+ *
+ * Please see distribution for license.
+ */
+
 package technology.dice.dicewhere.api;
 
 import com.google.common.net.InetAddresses;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.Assert;
 import org.junit.Test;
 import technology.dice.dicewhere.api.api.IP;
@@ -20,6 +26,11 @@ import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
 import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
 import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Optional;
 
 public class IPResolverTest {
 
@@ -110,6 +121,37 @@ public class IPResolverTest {
     Assert.assertNotNull(result.get(DbIpProviderKey.of()));
     Assert.assertTrue(result.get(DbIpProviderKey.of()).isPresent());
     Assert.assertEquals(expectedBoth, result.get(DbIpProviderKey.of()).get());
+  }
+
+  @Test
+  public void existingDualLookupV4Async()
+      throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    IPResolver resolver = baseResolver();
+    CompletionStage<Map<ProviderKey, Optional<IpInformation>>> futureResult =
+        resolver.resolveAsync("1.0.8.17");
+    IpInformation expectedBoth =
+        IpInformation.builder()
+            .withCountryCodeAlpha2("CN")
+            .withGeonameId("1809858")
+            .withCity("Guangzhou")
+            .withLeastSpecificDivision("Guangdong")
+            .withStartOfRange(new IP(InetAddresses.forString("1.0.8.0")))
+            .withEndOfRange(new IP(InetAddresses.forString("1.0.15.255")))
+            .build();
+
+    futureResult.toCompletableFuture().get(1, TimeUnit.SECONDS);
+
+    futureResult
+        .toCompletableFuture()
+        .thenAccept(
+            result -> {
+              Assert.assertNotNull(result.get(MaxmindProviderKey.of()));
+              Assert.assertTrue(result.get(MaxmindProviderKey.of()).isPresent());
+              Assert.assertEquals(expectedBoth, result.get(MaxmindProviderKey.of()).get());
+              Assert.assertNotNull(result.get(DbIpProviderKey.of()));
+              Assert.assertTrue(result.get(DbIpProviderKey.of()).isPresent());
+              Assert.assertEquals(expectedBoth, result.get(DbIpProviderKey.of()).get());
+            });
   }
 
   @Test
@@ -263,7 +305,7 @@ public class IPResolverTest {
     Assert.assertFalse(result.get(MaxmindProviderKey.of()).isPresent());
   }
 
-  @Test
+  @Test(expected = RuntimeException.class)
   public void outOfOrderDatabaseDbIp() throws IOException {
     new IPResolver.Builder()
         .withProvider(
