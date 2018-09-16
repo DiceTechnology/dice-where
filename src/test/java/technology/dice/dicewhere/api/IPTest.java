@@ -8,6 +8,7 @@ package technology.dice.dicewhere.api;
 
 import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
+import java.util.Iterator;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
@@ -56,9 +57,33 @@ public class IPTest {
 
   @Test
   public void tests() {
-    IPAddressString addStr = new IPAddressString("1.0.2.0/23");
-    IPAddress address = addStr.getAddress();
-    System.out.println(address);
+    //1.0.2.0/23
+    //  1.0.2.16/28
+    //  1.0.2.64/28
+//    IPAddress address = new IPAddressString("1.0.2.0/23").getAddress();
+    IPAddress address = new IPAddressString("2000:db8::/32").getAddress();
+    IPAddress subRange1 = new IPAddressString("1.0.2.16/28").getAddress();
+    IP subRange1L = new IP(subRange1.getLower().getBytes());
+    IP subRange1U = new IP(subRange1.getUpper().getBytes());
+    IPAddress subRange2 = new IPAddressString("1.0.2.64/28").getAddress();
+    IP subRange2L = new IP(subRange2.getLower().getBytes());
+    IP subRange2U = new IP(subRange2.getUpper().getBytes());
+
+    IPAddress subRange3 = new IPAddressString("1.0.3.16/28").getAddress();
+    IP subRange3L = new IP(subRange1.getLower().getBytes());
+    IP subRange3U = new IP(subRange1.getUpper().getBytes());
+    IPAddress subRange4 = new IPAddressString("1.0.3.64/28").getAddress();
+    IP subRange4L = new IP(subRange2.getLower().getBytes());
+    IP subRange4U = new IP(subRange2.getUpper().getBytes());
+    Iterator<? extends IPAddress> i = address.getIterable().iterator();
+    while(i.hasNext()) {
+      IPAddress a = i.next();
+      IP al = new IP(a.getLower().getBytes());
+      IP au = new IP(a.getUpper().getBytes());
+      boolean nestedRange1 = subRange1L.isLowerThanOrEqual(al) && subRange1U.isGreaterThanOrEqual(au);
+      boolean nestedRange2 = subRange2L.isLowerThanOrEqual(al) && subRange2U.isGreaterThanOrEqual(au);
+      System.out.println(String.format("%s - Nested range 1: %s, Nested range 2: %s", a.toAddressString(), nestedRange1, nestedRange2) );
+    }
   }
 
 }

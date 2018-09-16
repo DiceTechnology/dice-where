@@ -9,22 +9,20 @@ package technology.dice.dicewhere.provider.maxmind.parsing;
 import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import java.util.*;
-import java.util.stream.Stream;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymous;
-import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymousParser;
-import technology.dice.dicewhere.reading.RawLine;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymousDbParser;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
+import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.utils.StringUtils;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Parser for any Maxmind database.<br>
@@ -37,18 +35,17 @@ import java.util.NoSuchElementException;
 public class MaxmindLineParser implements LineParser {
   private final Splitter splitter = Splitter.on(",");
   private final Map<String, MaxmindLocation> locationDictionary;
-  private final MaxmindAnonymousParser anonymousDatabaseParser;
+  private final MaxmindAnonymousDbParser vpnDbParser;
 
   public MaxmindLineParser(
-      Map<String, MaxmindLocation> locationDictionary,
-      MaxmindAnonymousParser anonymousDatabaseParser) {
+      Map<String, MaxmindLocation> locationDictionary, MaxmindAnonymousDbParser vpnDbParser) {
 
     this.locationDictionary = locationDictionary;
-    this.anonymousDatabaseParser = anonymousDatabaseParser;
+    this.vpnDbParser = vpnDbParser;
   }
 
   public MaxmindLineParser(Map<String, MaxmindLocation> locationDictionary) {
-    this(locationDictionary, new MaxmindAnonymousParser());
+    this(locationDictionary, new MaxmindAnonymousDbParser());
   }
 
   @Override
@@ -106,67 +103,80 @@ public class MaxmindLineParser implements LineParser {
   }
 
   private Stream<ParsedLine> parseNestedRanges(
-      IPAddress ipAddress, IpInformation ipInfo, RawLine rawLine) {
-    IPAddress rangeStart = ipAddress.getLower();
-    IPAddress rangeEnd = ipAddress.getUpper();
+      IPAddress ipAddressRange, IpInformation ipInfo, RawLine rawLine) {
 
-    List<MaxmindAnonymous> anonymousDatabaseEntries =
-        anonymousDatabaseParser.fetchForRange(ipAddress);
+    Stream<MaxmindAnonymous> vpnRanges = vpnDbParser.fetchForRange(ipAddressRange);
 
-    return Stream.of(
-        new ParsedLine(
-            new IP(rangeStart.getBytes()), new IP(rangeEnd.getBytes()), ipInfo, rawLine));
+    return mergeIpInfoWithVpnData(
+        Collections.unmodifiableList(vpnRanges.collect(Collectors.toList())),
+        ipAddressRange,
+        ipInfo,
+        rawLine);
   }
 
-  private Stream<ParsedLine> mergeIpInfoAndAnonymousDatabase(
-      List<MaxmindAnonymous> anonymousDatabaseEntries,
-      IPAddress ipAddress,
+  /**
+   * This method produces multiples ranges out of the main IP range split by the VPN ranges
+   *
+   * @param vpnRanges
+   * @param ipAddressRange
+   * @param ipInfo
+   * @param rawLine
+   * @return
+   */
+  private Stream<ParsedLine> mergeIpInfoWithVpnData(
+      List<MaxmindAnonymous> vpnRanges,
+      IPAddress ipAddressRange,
       IpInformation ipInfo,
       RawLine rawLine) {
 
-    IP rangeStart = new IP(ipAddress.getLower().getBytes());
-    IP rangeEnd = new IP(ipAddress.getUpper().getBytes());
-    if (anonymousDatabaseEntries.isEmpty()) {
+    if (vpnRanges.isEmpty()) {
+      IP rangeStart = new IP(ipAddressRange.getLower().getBytes());
+      IP rangeEnd = new IP(ipAddressRange.getUpper().getBytes());
       return Stream.of(new ParsedLine(rangeStart, rangeEnd, ipInfo, rawLine));
     }
 
     Stream.Builder<ParsedLine> result = Stream.builder();
 
-    if (rangeStart.isLowerThan(anonymousDatabaseEntries.get(0).getLowerBound())) {
+    Iterator<? extends IPAddress> ipRangeIterator = ipAddressRange.getIterable().iterator();
+    IPAddress segmentStartIp = ipAddressRange;
+    IPAddress previousIp = ipAddressRange;
+    for (MaxmindAnonymous vpnRange : vpnRanges) {
+      // find the last ip from the iterator that is before the current vpn range
+      while (ipRangeIterator.hasNext()) {
+        IPAddress lastIp = ipRangeIterator.next();
+        IP lastIpUpperBound = new IP(lastIp.getUpper().getBytes());
+        if (lastIpUpperBound.isGreaterThanOrEqual(vpnRange.getRangeStart())) {
+          // insert the segment that is not vpn
+          result.add(
+              new ParsedLine(
+                  new IP(segmentStartIp.getLower().getBytes()),
+                  new IP(previousIp.getUpper().getBytes()),
+                  ipInfo,
+                  rawLine));
+          break;
+        }
+        previousIp = lastIp;
+      }
+      // insert vpn segment
+      IpInformation vpnIpInfo =
+          IpInformation.builder(ipInfo)
+              .isVpn(vpnRange.isVpn())
+              .withStartOfRange(new IP(segmentStartIp.getLower().getBytes()))
+              .withEndOfRange(new IP(previousIp.getUpper().getBytes()))
+              .build();
       result.add(
           new ParsedLine(
-              rangeStart,
-              new IP(
-                  anonymousDatabaseEntries
-                      .get(0)
-                      .getIpAddressRange()
-                      .increment(-1)
-                      .getLower()
-                      .getBytes()),
-              ipInfo,
-              rawLine));
-    }
-    anonymousDatabaseEntries.forEach(
-        a ->
-            result.add(
-                new ParsedLine(
-                    a.getLowerBound(),
-                    a.getUpperBound(),
-                    IpInformation.builder(ipInfo).isVpn(a.isVpn()).build(),
-                    rawLine)));
-    if (rangeEnd.isGreaterThan(
-        anonymousDatabaseEntries.get(anonymousDatabaseEntries.size() - 1).getUpperBound())) {
-      IPAddress lastEntryAddress =
-          anonymousDatabaseEntries.get(anonymousDatabaseEntries.size() - 1).getIpAddressRange();
-      result.add(
-          new ParsedLine(
-              new IP(
-                  lastEntryAddress
-                      .increment(lastEntryAddress.getCount().longValue() + 1L)
-                      .getBytes()),
-              rangeEnd,
-              ipInfo,
-              rawLine));
+              vpnIpInfo.getStartOfRange(), vpnIpInfo.getEndOfRange(), vpnIpInfo, rawLine));
+
+      // move iterator to the last ip in the current vpn range
+      while (ipRangeIterator.hasNext()) {
+        IPAddress lastIp = ipRangeIterator.next();
+        IP lastRangeUpperBound = new IP(lastIp.getUpper().getBytes());
+        if (lastRangeUpperBound.isGreaterThan(vpnRange.getRangeEnd())) {
+          previousIp = segmentStartIp = lastIp;
+          break;
+        }
+      }
     }
 
     return result.build();
