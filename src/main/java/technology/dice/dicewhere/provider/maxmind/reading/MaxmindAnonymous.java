@@ -7,6 +7,7 @@
 package technology.dice.dicewhere.provider.maxmind.reading;
 
 import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressSection;
 import technology.dice.dicewhere.api.api.IP;
 
 import javax.annotation.Nonnull;
@@ -116,7 +117,7 @@ public class MaxmindAnonymous {
   public static Builder builder(@Nonnull IPAddress ipAddress) {
     Objects.requireNonNull(ipAddress);
     IP l = new IP(ipAddress.getLower().getBytes());
-    IP u = new IP(ipAddress.getUpper().getBytes());
+    IP u = new IP(ipAddress.toMaxHost().getBytes());
     return new Builder(l, u);
   }
 

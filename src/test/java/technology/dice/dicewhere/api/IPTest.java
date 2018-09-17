@@ -58,5 +58,13 @@ public class IPTest {
     Assert.assertFalse(anIP.equals(higherIp));
   }
 
+  @Test
+  public void ipv6() {
+    IPAddressString rangeStringStr = new IPAddressString("2001:470:7:a00::/53");
+    IPv6Address rangeString = rangeStringStr.getAddress().toPrefixBlock().toIPv6();
+    System.out.println(rangeString.getLower().toString()); // produces 2001:470:7:800:0:0:0:0/53
+    System.out.println(rangeString.getUpper().toString()); // produces 2001:470:7:fff:ffff:ffff:ffff:ffff/53
+  }
+
 
 }

@@ -8,6 +8,7 @@ package technology.dice.dicewhere.provider.maxmind.reading;
 
 import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressSection;
 import inet.ipaddr.IPAddressString;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.utils.IPUtils;
@@ -60,7 +61,7 @@ public class MaxmindAnonymousDbParser {
       return Stream.empty();
     }
     IP rangeBoundStart = new IP(ipAddressRange.getLower().getBytes());
-    IP rangeBoundEnd = new IP(ipAddressRange.getUpper().getBytes());
+    IP rangeBoundEnd = new IP(ipAddressRange.toMaxHost().getBytes());
     Stream.Builder<MaxmindAnonymous> result = Stream.builder();
     do {
       Optional<MaxmindAnonymous> resultRange =
