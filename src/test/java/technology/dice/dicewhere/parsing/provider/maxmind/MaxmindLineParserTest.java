@@ -188,7 +188,7 @@ public class MaxmindLineParserTest {
     }
   }
 
-  @Test()
+  @Test
   public void wrongCIDRFormat() {
     String line = "2a02:c7f:6a02:Nop:/47,2634096,2635167,,0,0,CA28,54.5578,-3.5837,10";
     try {
@@ -200,7 +200,7 @@ public class MaxmindLineParserTest {
     }
   }
 
-  @Test()
+  @Test
   public void impossibleCIDR() {
     String line = "2a02:c7f:6a02::/1000,2634096,2635167,,0,0,CA28,54.5578,-3.5837,10";
     try {
