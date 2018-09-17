@@ -10,10 +10,12 @@ import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import technology.dice.dicewhere.api.api.IP;
+import technology.dice.dicewhere.utils.IPUtils;
 import technology.dice.dicewhere.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
@@ -149,6 +151,8 @@ public class MaxmindAnonymousDbParser {
   private Optional<MaxmindAnonymous> fitToRange(
       MaxmindAnonymous lastLine, IPAddress ipAddressRange) {
 
+//    ipAddressRange.getSection().getLower()
+
     IP rangeLowerBound = new IP(ipAddressRange.getLower().getBytes());
     IP rangeUpperBound = new IP(ipAddressRange.getUpper().getBytes());
 
@@ -197,6 +201,11 @@ public class MaxmindAnonymousDbParser {
             .isPublicProxy("1".equalsIgnoreCase(fieldsIterator.next()))
             .isTorExitProvider("1".equalsIgnoreCase(fieldsIterator.next()))
             .build();
+    try {
+      System.out.println(String.format("Parsed for range IP: %s %s - %s", rangeString.getAddress(), IPUtils.from(result.getRangeStart().getBytes()), IPUtils.from(result.getRangeEnd().getBytes())));
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
     return Optional.of(result);
   }
 }

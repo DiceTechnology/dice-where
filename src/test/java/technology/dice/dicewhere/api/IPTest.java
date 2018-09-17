@@ -13,10 +13,12 @@ import java.util.Iterator;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
+import inet.ipaddr.ipv6.IPv6Address;
 import org.junit.Assert;
 import org.junit.Test;
 import technology.dice.dicewhere.api.api.IP;
 
+//TODO: add ipv6 tests
 public class IPTest {
   @Test(expected = NullPointerException.class)
   public void bytesCtorNull() {
@@ -55,5 +57,6 @@ public class IPTest {
     Assert.assertFalse(anIP.isGreaterThan(higherIp));
     Assert.assertFalse(anIP.equals(higherIp));
   }
+
 
 }

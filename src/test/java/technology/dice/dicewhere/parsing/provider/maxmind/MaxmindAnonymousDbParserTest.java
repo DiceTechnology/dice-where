@@ -8,6 +8,7 @@ package technology.dice.dicewhere.parsing.provider.maxmind;
 
 import inet.ipaddr.IPAddressString;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymous;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymousDbParser;
@@ -26,6 +27,7 @@ public class MaxmindAnonymousDbParserTest {
             + "1.0.1.16/28,1,1,0,0,0\n"
             + "1.0.2.16/28,1,1,0,0,0\n"
             + "1.0.2.32/28,1,0,0,0,0\n"
+            + "1.0.2.55/32,1,1,0,0,0\n"
             + "1.0.2.64/28,1,1,0,0,0\n"
             + "1.0.3.16/28,1,1,0,0,0\n"
             + "1.0.3.32/28,1,0,0,0,0\n"
@@ -53,6 +55,11 @@ public class MaxmindAnonymousDbParserTest {
         MaxmindAnonymous.builder(new IPAddressString("1.0.2.32/28").getAddress())
             .isAnonymous(true)
             .build());
+    expected.add(
+            MaxmindAnonymous.builder(new IPAddressString("1.0.2.55/32").getAddress())
+                    .isAnonymous(true)
+                    .isVpn(true)
+                    .build());
     expected.add(
         MaxmindAnonymous.builder(new IPAddressString("1.0.2.64/28").getAddress())
             .isAnonymous(true)
@@ -135,6 +142,50 @@ public class MaxmindAnonymousDbParserTest {
             .build());
 
     Assert.assertEquals(expected, parsedLines);
+  }
+
+  @Test
+  @Ignore
+  public void shouldParseIPv6_filteredByVpn() throws IOException {
+    String ipv4Lines =
+            "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
+                    + "1.0.2.16/28,1,1,0,0,0\n"
+                    + "1.0.2.32/28,1,0,0,0,0\n"
+                    + "1.0.2.64/28,1,1,0,0,0\n"
+                    + "1.0.3.16/28,1,1,0,0,0\n"
+                    + "1.0.3.32/28,1,0,0,0,0\n"
+                    + "1.0.3.64/28,1,1,0,0,0";
+    String ipv6Lines =
+            "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
+                    + "2001:470:7:800::/55,1,1,0,0,0\n"
+                    + "2001:470:7:a00::/56,1,1,0,0,0\n"
+                    + "2001:470:7:b70::/62,1,1,0,0,0\n"
+                    + "2001:470:8:80::/59,1,1,0,0,0\n";
+    InputStream streamV4 = new ByteArrayInputStream(ipv4Lines.getBytes());
+    BufferedReader bufferedReaderV4 = new BufferedReader(new InputStreamReader(streamV4));
+    InputStream streamV6 = new ByteArrayInputStream(ipv6Lines.getBytes());
+    BufferedReader bufferedReaderV6 = new BufferedReader(new InputStreamReader(streamV6));
+    MaxmindAnonymousDbParser parser =
+            new MaxmindAnonymousDbParser(bufferedReaderV4, bufferedReaderV6, MaxmindAnonymous::isVpn);
+    List<MaxmindAnonymous> parsedLines =
+            parser
+                    .fetchForRange(new IPAddressString("2001:470:7:a00::/53").getAddress())
+                    .collect(Collectors.toList());
+
+    List<MaxmindAnonymous> expected = new ArrayList<>();
+    expected.add(
+            MaxmindAnonymous.builder(new IPAddressString("2001:470:7:a00::/56").getAddress())
+                    .isAnonymous(true)
+                    .isVpn(true)
+                    .build());
+    expected.add(
+            MaxmindAnonymous.builder(new IPAddressString("2001:470:7:b70::/62").getAddress())
+                    .isAnonymous(true)
+                    .isVpn(true)
+                    .build());
+
+    Assert.assertEquals(expected.get(0), parsedLines.get(0));
+    Assert.assertEquals(expected.get(1), parsedLines.get(1));
   }
 
   @Test
