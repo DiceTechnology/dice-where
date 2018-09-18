@@ -84,7 +84,7 @@ public class MaxmindLineParser implements LineParser {
       }
 
       IPAddress rangeStart = rangeString.getAddress().getLower();
-      IPAddress rangeEnd = rangeString.getAddress().getUpper();
+      IPAddress rangeEnd = rangeString.getAddress().toMaxHost();
 
       IpInformation ipInfo =
           IpInformation.builder()
@@ -134,7 +134,7 @@ public class MaxmindLineParser implements LineParser {
       throws UnknownHostException {
 
     IP rangeStart = new IP(ipAddressRange.getLower().getBytes());
-    IP rangeEnd = new IP(ipAddressRange.getUpper().getBytes());
+    IP rangeEnd = new IP(ipAddressRange.toMaxHost().getBytes());
     if (vpnRanges.isEmpty()) {
       return Stream.of(new ParsedLine(rangeStart, rangeEnd, ipInfo, rawLine));
     }
@@ -147,7 +147,7 @@ public class MaxmindLineParser implements LineParser {
         IPAddress endRangeNoneVpn =
                 IPUtils.from(vpnRange.getRangeStart().getBytes()).increment(-1);
 
-        IP e = new IP(endRangeNoneVpn.getUpper().getBytes());
+        IP e = new IP(endRangeNoneVpn.getBytes());
         result.add(buildParsedLine(ipInfo, rawLine, e, nextIpForResult, false));
       }
 
@@ -164,13 +164,11 @@ public class MaxmindLineParser implements LineParser {
               new IP(
                       IPUtils.from(vpnRange.getRangeEnd().getBytes())
                               .increment(1)
-                              .getLower()
                               .getBytes());
     }
 
     if (nextIpForResult.isLowerThan(rangeEnd)) {
       result.add(buildParsedLine(ipInfo, rawLine, rangeEnd, nextIpForResult, false));
-      System.out.println(String.format("Adding default into %s - %s", IPUtils.from(nextIpForResult.getBytes()), IPUtils.from(rangeEnd.getBytes())));
     }
 
     return result.build();

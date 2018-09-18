@@ -59,7 +59,7 @@ public class IPTest {
   }
 
   @Test
-  public void ipv6() {
+  public void ipv6Bounds() {
     IPAddressString rangeStringStr = new IPAddressString("2001:470:7:a00::/53");
     IPv6Address rangeString = rangeStringStr.getAddress().toPrefixBlock().toIPv6();
     System.out.println(rangeString.getLower().toString()); // produces 2001:470:7:800:0:0:0:0/53

@@ -155,7 +155,7 @@ public class MaxmindAnonymousDbParser {
 //    ipAddressRange.getSection().getLower()
 
     IP rangeLowerBound = new IP(ipAddressRange.getLower().getBytes());
-    IP rangeUpperBound = new IP(ipAddressRange.getUpper().getBytes());
+    IP rangeUpperBound = new IP(ipAddressRange.toMaxHost().getBytes());
 
     IP lastLineLowerBound = lastLine.getRangeStart();
     IP lastLineUpperBound = lastLine.getRangeEnd();
@@ -202,11 +202,6 @@ public class MaxmindAnonymousDbParser {
             .isPublicProxy("1".equalsIgnoreCase(fieldsIterator.next()))
             .isTorExitProvider("1".equalsIgnoreCase(fieldsIterator.next()))
             .build();
-    try {
-      System.out.println(String.format("Parsed for range IP: %s %s - %s", rangeString.getAddress(), IPUtils.from(result.getRangeStart().getBytes()), IPUtils.from(result.getRangeEnd().getBytes())));
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    }
     return Optional.of(result);
   }
 }
