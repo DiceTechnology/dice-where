@@ -46,6 +46,7 @@ public class VpnDecoratorTest {
 
   private String IPv4_LINES_3 =
       "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
+          + "1.0.2.16/28,1,1,0,0,0\n"
           + "1.0.2.64/28,1,1,0,0,0\n"
           + "1.0.3.64/28,1,1,0,0,0";
   private String IPv6_LINES_3 =
@@ -120,6 +121,52 @@ public class VpnDecoratorTest {
     expected.add(
         IpInformation.builder(target)
             .withStartOfRange(getLowerFromIP("1.0.2.0/24"))
+            .withEndOfRange(getMaxHostFromIP("1.0.2.63/32"))
+            .isVpn(false)
+            .build());
+    expected.add(
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.2.64/32"))
+            .withEndOfRange(getMaxHostFromIP("1.0.2.79/32"))
+            .isVpn(true)
+            .build());
+    expected.add(
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.2.80/32"))
+            .withEndOfRange(getMaxHostFromIP("1.0.2.0/24"))
+            .isVpn(false)
+            .build());
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void shouldReturnRangesThatExistInMajoritylDecorators() throws IOException {
+    VpnDecorator decorator = getDecorator(DecorationStrategy.MAJORITY);
+    IPAddress inputAddress = new IPAddressString("1.0.2.0/24").getAddress();
+    IpInformation target =
+        IpInformation.builder()
+            .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
+            .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
+            .withCountryCodeAlpha2("BG")
+            .withGeonameId("111")
+            .build();
+    List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
+    List<IpInformation> expected = new ArrayList<>();
+    expected.add(
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.2.0/24"))
+            .withEndOfRange(getMaxHostFromIP("1.0.2.15/32"))
+            .isVpn(false)
+            .build());
+    expected.add(
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.2.16/32"))
+            .withEndOfRange(getMaxHostFromIP("1.0.2.31/32"))
+            .isVpn(true)
+            .build());
+    expected.add(
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.2.32/32"))
             .withEndOfRange(getMaxHostFromIP("1.0.2.63/32"))
             .isVpn(false)
             .build());

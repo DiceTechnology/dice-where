@@ -95,7 +95,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
     int startPositionCounter = 1;
     for (int i = 1; i < splits.size(); i++) {
       int splitOccurances = splits.get(i - 1).getRangeInfo().getNumberOfMatches();
-      if ((startPositionCounter + splitOccurances - 1) >= filterThreshold) {
+      if (startPositionCounter > 0 && (startPositionCounter + splitOccurances - 1) >= filterThreshold) {
         try {
           result.add(
               splits
