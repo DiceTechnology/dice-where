@@ -32,7 +32,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
     this.decorationStrategy = decorationStrategy;
   }
 
-  public Stream<IpInformation> decorate(IpInformation original) {
+  public Stream<IpInformation> decorate(IpInformation original) throws UnknownHostException {
     Objects.requireNonNull(original);
     Map<Integer, List<T>> extraInformation = new HashMap<>();
     databaseReaders.forEach(
@@ -79,6 +79,8 @@ public abstract class Decorator<T extends DecoratorInformation> {
 
     splits.sort(Comparator.comparing(RangePoint::getIp));
 
+
+
     int filterThreshold;
     switch (this.decorationStrategy) {
       case ALL:
@@ -95,7 +97,8 @@ public abstract class Decorator<T extends DecoratorInformation> {
     int startPositionCounter = 1;
     for (int i = 1; i < splits.size(); i++) {
       int splitOccurances = splits.get(i - 1).getRangeInfo().getNumberOfMatches();
-      if (startPositionCounter > 0 && (startPositionCounter + splitOccurances - 1) >= filterThreshold) {
+      if (startPositionCounter > 0
+          && (startPositionCounter + splitOccurances - 1) >= filterThreshold) {
         try {
           result.add(
               splits
@@ -119,14 +122,14 @@ public abstract class Decorator<T extends DecoratorInformation> {
   }
 
   private Stream<IpInformation> mergeIpInfoWithDecoratorInformation(
-      IpInformation original, List<T> decoratorInfo) {
+      IpInformation original, List<T> decoratorInfo) throws UnknownHostException {
 
     if (decoratorInfo.isEmpty()) {
       return Stream.of(original);
     } else if (decoratorInfo.size() == 1
         && decoratorInfo.get(0).getRangeStart().equals(original.getStartOfRange())
         && decoratorInfo.get(0).getRangeEnd().equals(original.getEndOfRange())) {
-      //the entire IpInformation is covered by one split range
+      // the entire IpInformation is covered by one split range
       return Stream.of(
           decorateIpInformationMatch(
               original,
@@ -140,64 +143,130 @@ public abstract class Decorator<T extends DecoratorInformation> {
     }
 
     List<DecorationRangePoint<Optional<T>>> splits = new ArrayList<>();
-    splits.add(
-        new DecorationRangePoint<>(original.getStartOfRange(), true, Optional.empty(), original));
-    splits.add(
-        new DecorationRangePoint<>(original.getEndOfRange(), false, Optional.empty(), original));
     for (T vdi : decoratorInfo) {
       splits.add(new DecorationRangePoint<>(vdi.getRangeStart(), true, Optional.of(vdi), original));
       splits.add(new DecorationRangePoint<>(vdi.getRangeEnd(), false, Optional.of(vdi), original));
     }
-    // TODO: what happens when there are overlaps?
+
+    splits.sort(Comparator.comparing(RangePoint::getIp));
+    splits.addAll(fillRangeGaps(original, Collections.unmodifiableList(splits)));
     splits.sort(Comparator.comparing(RangePoint::getIp));
 
     Stream.Builder<IpInformation> result = Stream.builder();
-    int startPositionCounter = 1;
-    int isMatchedRangeThreshold = 2;
+    int inRangeCounter = 1;
     for (int i = 1; i < splits.size(); i++) {
-      if (startPositionCounter > 0) {
-        try {
-          IpInformation ipInfo = splits.get(i).getIpInformation();
-          IP start;
-          IP end;
-          IpInformation decorated;
-          if (startPositionCounter >= isMatchedRangeThreshold
-              && splits.get(i).getRangeInfo().isPresent()) {
-            // decorate
-            start = splits.get(i - 1).getIp();
-            end = new IP(IPUtils.from(splits.get(i).getIp().getBytes()).getBytes());
-            decorated = decorateIpInformationMatch(ipInfo, splits.get(i), start, end);
-          } else {
-            // if if's the first iteration and no match, include. Otherwise exclude, because it will
-            // be covered by one of the matches
-            start =
-                i == 1
-                    ? splits.get(i - 1).getIp()
-                    : new IP(
-                        IPUtils.from(splits.get(i - 1).getIp().getBytes()).increment(1).getBytes());
-            // no match, exclude the last one, unless it is the final step
-            end =
-                splits.get(i).getIp().equals(original.getEndOfRange())
-                    ? splits.get(i).getIp()
-                    : new IP(
-                        IPUtils.from(splits.get(i).getIp().getBytes()).increment(-1).getBytes());
-            // only range changes
-            decorated = decorateIpInformationMiss(ipInfo, splits.get(i), start, end);
-          }
-          result.add(decorated);
-        } catch (UnknownHostException e) {
-          // ignore, unlikely case. This would have broken somewhere else
-          result.add(original);
-          break;
+      if (inRangeCounter > 0) {
+        IpInformation ipInfo = splits.get(i).getIpInformation();
+        IP start;
+        IP end;
+        IpInformation decorated;
+        if (inRangeCounter >= 1 && splits.get(i).getRangeInfo().isPresent()) {
+          start = splits.get(i - 1).getIp();
+          end = splits.get(i).getIp();
+          // decorate
+          decorated = decorateIpInformationMatch(ipInfo, splits.get(i), start, end);
+        } else {
+          start = splits.get(i - 1).getIp();
+          end = splits.get(i).getIp();
+          // only range changes
+          decorated = decorateIpInformationMiss(ipInfo, splits.get(i), start, end);
         }
+        result.add(decorated);
       }
       if (splits.get(i).isStart()) {
-        startPositionCounter++;
+        inRangeCounter++;
       } else {
-        startPositionCounter--;
+        inRangeCounter--;
       }
     }
     return result.build();
+  }
+
+  private Set<? extends DecorationRangePoint<Optional<T>>> fillRangeGaps(
+      IpInformation original, List<DecorationRangePoint<Optional<T>>> splits)
+      throws UnknownHostException {
+    Set<DecorationRangePoint<Optional<T>>> result = new HashSet<>();
+
+    IP lookupStart = original.getStartOfRange();
+    IP lookupEnd = original.getEndOfRange();
+
+    int inSplitRange = 0;
+    for (int i = 0; i < splits.size(); i++) {
+      if (inSplitRange <= 0 && splits.get(i).getIp().isGreaterThan(lookupStart)) {
+        result.add(new DecorationRangePoint<>(lookupStart, true, Optional.empty(), original));
+        result.add(
+            new DecorationRangePoint<>(
+                new IP(IPUtils.from(splits.get(i).getIp().getBytes()).increment(-1).getBytes()),
+                false,
+                Optional.empty(),
+                original));
+      }
+      if (splits.get(i).isStart()) {
+        inSplitRange++;
+      } else {
+        inSplitRange--;
+        lookupStart =
+            new IP(IPUtils.from(splits.get(i).getIp().getBytes()).increment(1).getBytes());
+      }
+    }
+    if (lookupEnd.isGreaterThan(splits.get(splits.size() - 1).getIp())) {
+      result.add(
+          new DecorationRangePoint<>(
+              new IP(
+                  IPUtils.from(splits.get(splits.size() - 1).getIp().getBytes())
+                      .increment(1)
+                      .getBytes()),
+              true,
+              Optional.empty(),
+              original));
+      result.add(new DecorationRangePoint<>(lookupEnd, false, Optional.empty(), original));
+    }
+    return result;
+  }
+
+  private Optional<IpInformation> fitIpInformationToSplits(
+      IpInformation original, List<DecorationRangePoint<Optional<T>>> splits)
+      throws UnknownHostException {
+    IP lookupStart = original.getStartOfRange();
+    IP lookupEnd = original.getEndOfRange();
+    Optional<IP> foundStartingPositionForOriginal = Optional.empty();
+    Optional<IP> foundEndingPositionForOriginal = Optional.empty();
+    int inSplitRange = 0;
+    for (int i = 0; i < splits.size(); i++) {
+      if (inSplitRange <= 0 && splits.get(i).getIp().isGreaterThan(lookupStart)) {
+        foundStartingPositionForOriginal = Optional.of(lookupStart);
+        break;
+      }
+      if (splits.get(i).isStart()) {
+        inSplitRange++;
+      } else {
+        inSplitRange--;
+        lookupStart =
+            new IP(IPUtils.from(splits.get(i).getIp().getBytes()).increment(1).getBytes());
+      }
+    }
+    for (int i = splits.size() - 1; i >= 0; i--) {
+      if (inSplitRange <= 0 && splits.get(i).getIp().isLowerThan(lookupEnd)) {
+        foundEndingPositionForOriginal = Optional.of(lookupEnd);
+        break;
+      }
+      if (!splits.get(i).isStart()) {
+        inSplitRange++;
+      } else {
+        inSplitRange--;
+        lookupEnd = new IP(IPUtils.from(splits.get(i).getIp().getBytes()).increment(-1).getBytes());
+      }
+    }
+    if (foundStartingPositionForOriginal.isPresent()
+        && foundEndingPositionForOriginal.isPresent()) {
+      return Optional.of(
+          IpInformation.builder(original)
+              .withStartOfRange(foundStartingPositionForOriginal.get())
+              .withEndOfRange(foundEndingPositionForOriginal.get())
+              .build());
+    } else {
+      return Optional.empty();
+    }
   }
 
   abstract IpInformation decorateIpInformationMatch(
