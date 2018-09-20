@@ -4,6 +4,7 @@ import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class VpnDecorator extends Decorator<VpnDecoratorInformation> {
 
@@ -14,10 +15,26 @@ public class VpnDecorator extends Decorator<VpnDecoratorInformation> {
   }
 
   @Override
-  IpInformation decorateIpInformation(
-      IpInformation ipInfo, VpnDecoratorInformation decorativeInfo, IP start, IP end) {
+  IpInformation decorateIpInformationMatch(
+      IpInformation ipInfo,
+      DecorationRangePoint<Optional<VpnDecoratorInformation>> decorativeInfo,
+      IP start,
+      IP end) {
     return IpInformation.builder(ipInfo)
         .isVpn(true)
+        .withStartOfRange(start)
+        .withEndOfRange(end)
+        .build();
+  }
+
+  @Override
+  IpInformation decorateIpInformationMiss(
+      IpInformation ipInfo,
+      DecorationRangePoint<Optional<VpnDecoratorInformation>> decorativeInfo,
+      IP start,
+      IP end) {
+    return IpInformation.builder(ipInfo)
+        .isVpn(false)
         .withStartOfRange(start)
         .withEndOfRange(end)
         .build();

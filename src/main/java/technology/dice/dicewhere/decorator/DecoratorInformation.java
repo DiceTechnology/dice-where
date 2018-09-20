@@ -2,7 +2,7 @@ package technology.dice.dicewhere.decorator;
 
 import technology.dice.dicewhere.api.api.IP;
 
-public interface DecoratorInformation/*<T extends DecoratorInformation>*/ {
+public interface DecoratorInformation {
 
   IP getRangeStart();
 

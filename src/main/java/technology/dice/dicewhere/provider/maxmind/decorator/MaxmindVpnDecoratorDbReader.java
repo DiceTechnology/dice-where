@@ -50,12 +50,13 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
           Optional<String> readLine = readLine();
           if (readLine.isPresent()) {
             Optional<VpnDecoratorInformation> parsedLine = readLine.flatMap(this::parseDbLine);
-            this.setLastFetched(parsedLine.orElse(null));
             if (parsedLine.isPresent()) {
+              this.setLastFetched(parsedLine.orElse(null));
               break;
             } // else: the line read from DB couldn't be parsed or didn't match the criteria
           } else {
             // no more lines to read from the DB
+            this.setLastFetched(null);
             break;
           }
         }

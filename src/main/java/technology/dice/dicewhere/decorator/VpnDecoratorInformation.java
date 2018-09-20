@@ -70,4 +70,5 @@ public class VpnDecoratorInformation implements DecoratorInformation {
         + numberOfMatches
         + '}';
   }
+
 }
