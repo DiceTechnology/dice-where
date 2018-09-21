@@ -6,6 +6,7 @@
 
 package technology.dice.dicewhere.parsing.provider.maxmind;
 
+import com.google.common.collect.ImmutableList;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.junit.Assert;
@@ -178,20 +179,27 @@ public class MaxmindVpnDecoratorDbReaderTest {
     MaxmindVpnDecoratorDbReader parser =
         new MaxmindVpnDecoratorDbReader(bufferedReaderV4, bufferedReaderV6);
     IPAddress inputAddress = new IPAddressString("1.0.2.0/25").getAddress();
-    List<VpnDecoratorInformation> parsedLines =
+    List<VpnDecoratorInformation> parsedLines1 =
         parser.fetchForRange(
             new IP(inputAddress.getLower().getBytes()),
             new IP(inputAddress.toMaxHost().getBytes()));
     inputAddress = new IPAddressString("1.0.2.128/25").getAddress();
-    parsedLines.addAll(
+    List<VpnDecoratorInformation> parsedLines2 =
         parser.fetchForRange(
             new IP(inputAddress.getLower().getBytes()),
-            new IP(inputAddress.toMaxHost().getBytes())));
+            new IP(inputAddress.toMaxHost().getBytes()));
     inputAddress = new IPAddressString("1.0.3.16/28").getAddress();
-    parsedLines.addAll(
+    List<VpnDecoratorInformation> parsedLines3 =
         parser.fetchForRange(
             new IP(inputAddress.getLower().getBytes()),
-            new IP(inputAddress.toMaxHost().getBytes())));
+            new IP(inputAddress.toMaxHost().getBytes()));
+
+    List<VpnDecoratorInformation> parsedLines =
+        ImmutableList.<VpnDecoratorInformation>builder()
+            .addAll(parsedLines1)
+            .addAll(parsedLines2)
+            .addAll(parsedLines3)
+            .build();
 
     List<VpnDecoratorInformation> expected = new ArrayList<>();
     expected.add(
