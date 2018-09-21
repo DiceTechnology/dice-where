@@ -32,7 +32,10 @@ public class VpnDecoratorTest {
           + "1.0.3.32/28,1,0,0,0,0\n"
           + "1.0.3.64/28,1,1,0,0,0\n"
           + "1.0.4.0/28,1,1,0,0,0\n"
-          + "1.0.4.16/28,1,1,0,0,0\n";
+          + "1.0.4.16/28,1,1,0,0,0\n"
+          + "1.0.5.0/28,1,1,0,0,0\n"
+          + "1.0.5.32/28,1,1,0,0,0";
+
   private String IPv6_LINES =
       "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
           + "2001:470:7:600::/55,1,1,0,0,0\n"
@@ -44,7 +47,8 @@ public class VpnDecoratorTest {
           + "1.0.2.32/28,1,0,0,0,0\n"
           + "1.0.2.55/32,1,1,0,0,0\n"
           + "1.0.2.64/28,1,1,0,0,0\n"
-          + "1.0.4.0/27,1,1,0,0,0";
+          + "1.0.4.0/27,1,1,0,0,0\n"
+          + "1.0.5.0/27,1,1,0,0,0";
   private String IPv6_LINES_2 =
       "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
 
@@ -53,7 +57,9 @@ public class VpnDecoratorTest {
           + "1.0.2.16/28,1,1,0,0,0\n"
           + "1.0.2.64/28,1,1,0,0,0\n"
           + "1.0.3.64/28,1,1,0,0,0\n"
-          + "1.0.4.0/26,1,1,0,0,0";
+          + "1.0.4.0/26,1,1,0,0,0\n"
+          + "1.0.5.0/26,1,1,0,0,0";
+
   private String IPv6_LINES_3 =
       "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
 
@@ -64,30 +70,59 @@ public class VpnDecoratorTest {
   }
 
   @Test
-  public void shouldDecorateMultipleOverlappingRanges() throws IOException {
+  public void shouldDecorateMultipleOverlappingRanges_anyMergeStrategy() throws IOException {
     VpnDecorator decorator = getDecorator(DecorationStrategy.ANY);
-    IPAddress inputAddress = new IPAddressString("1.0.4.0/25").getAddress();
+    IPAddress inputAddress = new IPAddressString("1.0.4.0/24").getAddress();
     IpInformation target =
-            IpInformation.builder()
-                    .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
-                    .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
-                    .withCountryCodeAlpha2("BG")
-                    .withGeonameId("111")
-                    .build();
+        IpInformation.builder()
+            .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
+            .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
+            .withCountryCodeAlpha2("BG")
+            .withGeonameId("111")
+            .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
     expected.add(
-            IpInformation.builder(target)
-                    .withStartOfRange(getLowerFromIP("1.0.1.0/27"))
-                    .withEndOfRange(getMaxHostFromIP("1.0.1.15/32"))
-                    .isVpn(true)
-                    .build());
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.4.0/27"))
+            .withEndOfRange(getMaxHostFromIP("1.0.4.63/32"))
+            .isVpn(true)
+            .build());
     expected.add(
-            IpInformation.builder(target)
-                    .withStartOfRange(getLowerFromIP("1.0.1.16/32"))
-                    .withEndOfRange(getMaxHostFromIP("1.0.1.0/27"))
-                    .isVpn(true)
-                    .build());
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.4.64/32"))
+            .withEndOfRange(getMaxHostFromIP("1.0.4.0/24"))
+            .isVpn(false)
+            .build());
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void shouldDecorateMultipleOverlappingRanges_majorityMergeStrategy() throws IOException {
+    VpnDecorator decorator = getDecorator(DecorationStrategy.MAJORITY);
+    IPAddress inputAddress = new IPAddressString("1.0.5.0/24").getAddress();
+    IpInformation target =
+        IpInformation.builder()
+            .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
+            .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
+            .withCountryCodeAlpha2("BG")
+            .withGeonameId("111")
+            .build();
+    List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
+    List<IpInformation> expected = new ArrayList<>();
+    expected.add(
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.5.0/27"))
+            .withEndOfRange(getMaxHostFromIP("1.0.5.47/32"))
+            .isVpn(true)
+            .build());
+    expected.add(
+        IpInformation.builder(target)
+            .withStartOfRange(getLowerFromIP("1.0.5.48/32"))
+            .withEndOfRange(getMaxHostFromIP("1.0.5.0/24"))
+            .isVpn(false)
+            .build());
 
     Assert.assertEquals(expected, actual);
   }
@@ -108,12 +143,6 @@ public class VpnDecoratorTest {
     expected.add(
         IpInformation.builder(target)
             .withStartOfRange(getLowerFromIP("1.0.1.0/27"))
-            .withEndOfRange(getMaxHostFromIP("1.0.1.15/32"))
-            .isVpn(true)
-            .build());
-    expected.add(
-        IpInformation.builder(target)
-            .withStartOfRange(getLowerFromIP("1.0.1.16/32"))
             .withEndOfRange(getMaxHostFromIP("1.0.1.0/27"))
             .isVpn(true)
             .build());

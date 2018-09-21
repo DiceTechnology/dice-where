@@ -1,5 +1,6 @@
 package technology.dice.dicewhere.decorator;
 
+import org.jetbrains.annotations.NotNull;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.utils.IPUtils;
@@ -44,11 +45,10 @@ public abstract class Decorator<T extends DecoratorInformation> {
         original, mergeDecorationRanges(extraInformation.values()));
   }
 
-  private List<T> mergeDecorationRanges(Collection<List<T>> source) {
-    List<T> result = new ArrayList<>();
+  private List<T> mergeDecorationRanges(Collection<List<T>> found) throws UnknownHostException {
 
-    List<T> sourceList =
-        source
+    List<T> foundRangesList =
+        found
             .stream()
             .flatMap(Collection::stream)
             .sorted(
@@ -56,14 +56,131 @@ public abstract class Decorator<T extends DecoratorInformation> {
                     .thenComparing(DecoratorInformation::getRangeEnd))
             .collect(Collectors.toList());
 
+    if (foundRangesList.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<RangePoint<T>> splits = getRangePointsFromMatchedRanges(foundRangesList);
+
+    int filterThreshold = getFilterThreshold();
+
+    List<T> allValidRanges = getAllValidSplitRanges(splits, filterThreshold);
+
+    if (allValidRanges.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<T> mergedResults = new ArrayList<>();
+    mergedResults.add(allValidRanges.get(0));
+    // below can probably be optimised or incorporated in ::getAllValidSplitRanges
+    for (int i = 1; i < allValidRanges.size(); i++) {
+      if (allValidRanges
+          .get(i)
+          .getRangeStart()
+          .isGreaterThan(
+              IPUtils.increment(mergedResults.get(mergedResults.size() - 1).getRangeEnd()))) {
+        mergedResults.add(allValidRanges.get(i));
+      } else {
+        IP start = mergedResults.get(mergedResults.size() - 1).getRangeStart();
+        IP end = allValidRanges.get(i).getRangeEnd();
+        mergedResults.set(mergedResults.size() - 1, allValidRanges.get(i).withNewRange(start, end));
+      }
+    }
+
+    return mergedResults;
+  }
+
+  @NotNull
+  private List<T> getAllValidSplitRanges(List<RangePoint<T>> splits, int filterThreshold)
+      throws UnknownHostException {
+    List<T> allValidRanges = new ArrayList<>();
+    int rangeNestingLevel = 1;
+    for (int i = 1; i < splits.size(); i++) {
+      if (!splits.get(i).isStart()) {
+        if (splits.get(i - 1).isStart()) {
+          // 1) add the range
+          if (Math.max(splits.get(i).getRangeInfo().getNumberOfMatches(), rangeNestingLevel)
+              >= filterThreshold) {
+            IP splitStart = splits.get(i - 1).getIp();
+            IP splitEnd = new IP(IPUtils.from(splits.get(i).getIp().getBytes()).getBytes());
+            allValidRanges.add(splits.get(i - 1).getRangeInfo().withNewRange(splitStart, splitEnd));
+          }
+          // 2) add the range splits previously in the list
+          if (rangeNestingLevel > 1) {
+            int rangeDiffCoverage =
+                Math.max(
+                    rangeNestingLevel - 1,
+                    Math.min(
+                            splits.get(i - 2).getRangeInfo().getNumberOfMatches(),
+                            splits.get(i - 1).getRangeInfo().getNumberOfMatches())
+                        - 1);
+            if (rangeDiffCoverage >= filterThreshold) {
+              IP start = splits.get(i - 2).getIp();
+              IP nextSplitStart = splits.get(i - 1).getIp();
+              if (new IP(IPUtils.from(start.getBytes()).increment(1).getBytes())
+                  .isLowerThan(nextSplitStart)) {
+                allValidRanges.add(
+                    splits
+                        .get(i - 2)
+                        .getRangeInfo()
+                        .withNumberOfMatches(
+                            splits.get(i - 1).getRangeInfo().getNumberOfMatches() - 1)
+                        .withNewRange(start, nextSplitStart));
+              }
+            }
+          }
+        } else {
+          // 3) add region from this split_End to the previous split_End
+          IP end = splits.get(i).getIp();
+          IP prevSplitEnd = splits.get(i - 1).getIp();
+          if (!end.equals(prevSplitEnd)
+              && Math.max(splits.get(i).getRangeInfo().getNumberOfMatches(), rangeNestingLevel)
+                  >= filterThreshold) {
+            allValidRanges.add(
+                splits
+                    .get(i)
+                    .getRangeInfo()
+                    .withNewRange(
+                        new IP(IPUtils.from(prevSplitEnd.getBytes()).increment(1).getBytes()),
+                        end));
+          }
+        }
+      }
+      if (splits.get(i).isStart()) {
+        rangeNestingLevel++;
+      } else {
+        rangeNestingLevel--;
+      }
+    }
+    return allValidRanges;
+  }
+
+  private int getFilterThreshold() {
+    int filterThreshold;
+    switch (this.decorationStrategy) {
+      case ALL:
+        filterThreshold = this.databaseReaders.keySet().size();
+        break;
+      case MAJORITY:
+        filterThreshold = (this.databaseReaders.keySet().size() + 1) / 2;
+        break;
+      case ANY:
+      default:
+        filterThreshold = 1;
+    }
+    return filterThreshold;
+  }
+
+  @NotNull
+  private List<RangePoint<T>> getRangePointsFromMatchedRanges(List<T> foundRangesList) {
     List<RangePoint<T>> splits = new ArrayList<>();
-    Iterator<T> sourceIterator = sourceList.iterator();
+    Iterator<T> sourceIterator = foundRangesList.iterator();
     int counter = 0;
     while (sourceIterator.hasNext()) {
       T sourceItem = sourceIterator.next();
       int duplicates = 0;
       while (sourceIterator.hasNext()) {
-        if (sourceList.get(counter + 1).equals(sourceItem)) {
+        if (foundRangesList.get(counter + 1).equals(sourceItem)) {
           duplicates++;
           counter++;
           sourceIterator.next();
@@ -78,47 +195,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
     }
 
     splits.sort(Comparator.comparing(RangePoint::getIp));
-
-
-
-    int filterThreshold;
-    switch (this.decorationStrategy) {
-      case ALL:
-        filterThreshold = this.databaseReaders.keySet().size();
-        break;
-      case MAJORITY:
-        filterThreshold = (this.databaseReaders.keySet().size() + 1) / 2;
-        break;
-      case ANY:
-      default:
-        filterThreshold = 1;
-    }
-
-    int startPositionCounter = 1;
-    for (int i = 1; i < splits.size(); i++) {
-      int splitOccurances = splits.get(i - 1).getRangeInfo().getNumberOfMatches();
-      if (startPositionCounter > 0
-          && (startPositionCounter + splitOccurances - 1) >= filterThreshold) {
-        try {
-          result.add(
-              splits
-                  .get(i)
-                  .getRangeInfo()
-                  .withNumberOfMatches(startPositionCounter + splitOccurances - 1)
-                  .withNewRange(
-                      splits.get(i - 1).getIp(),
-                      new IP(IPUtils.from(splits.get(i).getIp().getBytes()).getBytes())));
-        } catch (UnknownHostException e) {
-          // ignore, unlikely case. This would have broken somewhere else
-        }
-      }
-      if (splits.get(i).isStart()) {
-        startPositionCounter++;
-      } else {
-        startPositionCounter--;
-      }
-    }
-    return result;
+    return splits;
   }
 
   private Stream<IpInformation> mergeIpInfoWithDecoratorInformation(
