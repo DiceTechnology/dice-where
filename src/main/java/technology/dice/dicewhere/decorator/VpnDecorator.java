@@ -12,6 +12,10 @@ import technology.dice.dicewhere.api.api.IpInformation;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * Implementation of Decorator that marks all IpInformation ranges as VPN if they are within the
+ * provided DBs
+ */
 public class VpnDecorator extends Decorator<VpnDecoratorInformation> {
 
   public VpnDecorator(

@@ -8,6 +8,9 @@ package technology.dice.dicewhere.decorator;
 
 import technology.dice.dicewhere.api.api.IP;
 
+/**
+ * Minimum set of information for each decorating object.
+ */
 public interface DecoratorInformation {
 
   IP getRangeStart();

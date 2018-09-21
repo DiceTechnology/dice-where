@@ -6,6 +6,9 @@
 
 package technology.dice.dicewhere.decorator;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.NotNull;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
@@ -13,32 +16,46 @@ import technology.dice.dicewhere.utils.IPUtils;
 
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Decorator is used to enrich IpInformation objects based on the data from the DecoratorDbReader.
+ * Example: adding VPN information to IpInformation based on a DB different from the one used to
+ * identify the location of the targeted IP
+ *
+ * @param <T>
+ */
 public abstract class Decorator<T extends DecoratorInformation> {
 
   private final Map<Integer, DecoratorDbReader<T>> databaseReaders;
   private final DecorationStrategy decorationStrategy;
 
-  protected Decorator(
+  Decorator(
       Collection<DecoratorDbReader<T>> databaseReaders, DecorationStrategy decorationStrategy) {
     Objects.requireNonNull(databaseReaders);
     Objects.requireNonNull(decorationStrategy);
     if (databaseReaders.isEmpty()) {
       throw new IllegalArgumentException("Database readers can't be empty");
     }
-    this.databaseReaders = new HashMap<>();
-    int[] counter = new int[1];
-    databaseReaders.forEach(
-        r -> {
-          this.databaseReaders.put(counter[0], r);
-          counter[0]++;
-        });
+    AtomicInteger counter = new AtomicInteger(0);
+    this.databaseReaders =
+        databaseReaders
+            .stream()
+            .collect(
+                ImmutableMap.toImmutableMap(e -> counter.getAndIncrement(), Function.identity()));
     this.decorationStrategy = decorationStrategy;
   }
 
+  /**
+   * Decorate the IpInformation with entries matching it's range from the Decorator's provided
+   * databases;
+   *
+   * @param original
+   * @return
+   * @throws UnknownHostException
+   */
   public Stream<IpInformation> decorate(IpInformation original) throws UnknownHostException {
     Objects.requireNonNull(original);
     Map<Integer, List<T>> extraInformation = new HashMap<>();
@@ -60,10 +77,10 @@ public abstract class Decorator<T extends DecoratorInformation> {
             .sorted(
                 Comparator.comparing((Function<T, IP>) DecoratorInformation::getRangeStart)
                     .thenComparing(DecoratorInformation::getRangeEnd))
-            .collect(Collectors.toList());
+            .collect(ImmutableList.toImmutableList());
 
     if (foundRangesList.isEmpty()) {
-      return Collections.emptyList();
+      return ImmutableList.of();
     }
 
     List<RangePoint<T>> splits = getRangePointsFromMatchedRanges(foundRangesList);
@@ -73,7 +90,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
     List<T> allValidRanges = getAllValidSplitRanges(splits, filterThreshold);
 
     if (allValidRanges.isEmpty()) {
-      return Collections.emptyList();
+      return ImmutableList.of();
     }
 
     List<T> mergedResults = new ArrayList<>();
@@ -93,13 +110,13 @@ public abstract class Decorator<T extends DecoratorInformation> {
       }
     }
 
-    return mergedResults;
+    return ImmutableList.copyOf(mergedResults);
   }
 
   @NotNull
   private List<T> getAllValidSplitRanges(List<RangePoint<T>> splits, int filterThreshold)
       throws UnknownHostException {
-    List<T> allValidRanges = new ArrayList<>();
+    ImmutableList.Builder<T> allValidRanges = ImmutableList.builder();
     int rangeNestingLevel = 1;
     for (int i = 1; i < splits.size(); i++) {
       if (!splits.get(i).isStart()) {
@@ -158,7 +175,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
         rangeNestingLevel--;
       }
     }
-    return allValidRanges;
+    return allValidRanges.build();
   }
 
   private int getFilterThreshold() {
@@ -199,9 +216,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
       splits.add(new RangePoint<>(sourceItem.getRangeEnd(), false, t));
       counter++;
     }
-
-    splits.sort(Comparator.comparing(RangePoint::getIp));
-    return splits;
+    return ImmutableList.sortedCopyOf(Comparator.comparing(RangePoint::getIp), splits);
   }
 
   private Stream<IpInformation> mergeIpInfoWithDecoratorInformation(
@@ -225,15 +240,22 @@ public abstract class Decorator<T extends DecoratorInformation> {
               original.getEndOfRange()));
     }
 
-    List<DecorationRangePoint<Optional<T>>> splits = new ArrayList<>();
+    ImmutableList.Builder<DecorationRangePoint<Optional<T>>> splitsBuilder =
+        ImmutableList.builder();
     for (T vdi : decoratorInfo) {
-      splits.add(new DecorationRangePoint<>(vdi.getRangeStart(), true, Optional.of(vdi), original));
-      splits.add(new DecorationRangePoint<>(vdi.getRangeEnd(), false, Optional.of(vdi), original));
+      splitsBuilder.add(
+          new DecorationRangePoint<>(vdi.getRangeStart(), true, Optional.of(vdi), original));
+      splitsBuilder.add(
+          new DecorationRangePoint<>(vdi.getRangeEnd(), false, Optional.of(vdi), original));
     }
 
-    splits.sort(Comparator.comparing(RangePoint::getIp));
-    splits.addAll(fillRangeGaps(original, Collections.unmodifiableList(splits)));
-    splits.sort(Comparator.comparing(RangePoint::getIp));
+    splitsBuilder.addAll(
+        fillRangeGaps(
+            original,
+            ImmutableList.sortedCopyOf(
+                Comparator.comparing(RangePoint::getIp), splitsBuilder.build())));
+    List<DecorationRangePoint<Optional<T>>> splits =
+        ImmutableList.sortedCopyOf(Comparator.comparing(RangePoint::getIp), splitsBuilder.build());
 
     Stream.Builder<IpInformation> result = Stream.builder();
     int inRangeCounter = 1;
@@ -268,7 +290,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
   private Set<? extends DecorationRangePoint<Optional<T>>> fillRangeGaps(
       IpInformation original, List<DecorationRangePoint<Optional<T>>> splits)
       throws UnknownHostException {
-    Set<DecorationRangePoint<Optional<T>>> result = new HashSet<>();
+    ImmutableSet.Builder<DecorationRangePoint<Optional<T>>> result = ImmutableSet.builder();
 
     IP lookupStart = original.getStartOfRange();
     IP lookupEnd = original.getEndOfRange();
@@ -304,52 +326,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
               original));
       result.add(new DecorationRangePoint<>(lookupEnd, false, Optional.empty(), original));
     }
-    return result;
-  }
-
-  private Optional<IpInformation> fitIpInformationToSplits(
-      IpInformation original, List<DecorationRangePoint<Optional<T>>> splits)
-      throws UnknownHostException {
-    IP lookupStart = original.getStartOfRange();
-    IP lookupEnd = original.getEndOfRange();
-    Optional<IP> foundStartingPositionForOriginal = Optional.empty();
-    Optional<IP> foundEndingPositionForOriginal = Optional.empty();
-    int inSplitRange = 0;
-    for (int i = 0; i < splits.size(); i++) {
-      if (inSplitRange <= 0 && splits.get(i).getIp().isGreaterThan(lookupStart)) {
-        foundStartingPositionForOriginal = Optional.of(lookupStart);
-        break;
-      }
-      if (splits.get(i).isStart()) {
-        inSplitRange++;
-      } else {
-        inSplitRange--;
-        lookupStart =
-            new IP(IPUtils.from(splits.get(i).getIp().getBytes()).increment(1).getBytes());
-      }
-    }
-    for (int i = splits.size() - 1; i >= 0; i--) {
-      if (inSplitRange <= 0 && splits.get(i).getIp().isLowerThan(lookupEnd)) {
-        foundEndingPositionForOriginal = Optional.of(lookupEnd);
-        break;
-      }
-      if (!splits.get(i).isStart()) {
-        inSplitRange++;
-      } else {
-        inSplitRange--;
-        lookupEnd = new IP(IPUtils.from(splits.get(i).getIp().getBytes()).increment(-1).getBytes());
-      }
-    }
-    if (foundStartingPositionForOriginal.isPresent()
-        && foundEndingPositionForOriginal.isPresent()) {
-      return Optional.of(
-          IpInformation.builder(original)
-              .withStartOfRange(foundStartingPositionForOriginal.get())
-              .withEndOfRange(foundEndingPositionForOriginal.get())
-              .build());
-    } else {
-      return Optional.empty();
-    }
+    return result.build();
   }
 
   abstract IpInformation decorateIpInformationMatch(

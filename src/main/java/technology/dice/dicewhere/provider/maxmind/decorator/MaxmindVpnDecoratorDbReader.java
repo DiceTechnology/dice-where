@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Optional;
 
+/**
+ * Reads Maxmind Anonymous db and identifies VPN entries.
+ */
 public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorInformation> {
   private final Splitter splitter = Splitter.on(",");
 

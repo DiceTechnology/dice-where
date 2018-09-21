@@ -10,12 +10,18 @@ import technology.dice.dicewhere.api.api.IP;
 
 import java.util.Objects;
 
-public class RangePoint<T> {
+/**
+ * Helper class representing the decorating information and position within a range of a single IP
+ * address.
+ *
+ * @param <T>
+ */
+class RangePoint<T> {
   private final IP ip;
   private final boolean isStart;
   private final T rangeInfo;
 
-  public RangePoint(IP ip, boolean isStart, T rangeInfo) {
+  RangePoint(IP ip, boolean isStart, T rangeInfo) {
     this.ip = ip;
     this.isStart = isStart;
     this.rangeInfo = rangeInfo;
@@ -50,13 +56,6 @@ public class RangePoint<T> {
 
   @Override
   public String toString() {
-    return "RangePoint{"
-        + "ip="
-        + ip
-        + ", isStart="
-        + isStart
-        + ", rangeInfo="
-        + rangeInfo
-        + '}';
+    return "RangePoint{" + "ip=" + ip + ", isStart=" + isStart + ", rangeInfo=" + rangeInfo + '}';
   }
 }

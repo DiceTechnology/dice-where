@@ -6,18 +6,24 @@
 
 package technology.dice.dicewhere.decorator;
 
+import com.google.common.collect.ImmutableList;
 import technology.dice.dicewhere.api.api.IP;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Reads one line at a time from the provided DB. Only hold one line in memory and stop reading when
+ * an IP is reached, that is outside of the requested one
+ *
+ * @param <T extends DecoratorInformation>
+ */
 public abstract class DecoratorDbReader<T extends DecoratorInformation> {
   private T lastFetched;
 
-  Optional<T> getLastFetched() {
+  private Optional<T> getLastFetched() {
     return Optional.ofNullable(lastFetched);
   }
 
@@ -25,13 +31,15 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
     this.lastFetched = lastFetched;
   }
 
+  // TODO: javadoc
   public final List<T> fetchForRange(IP rangeBoundStart, IP rangeBoundEnd) {
     if (!getLastFetched().isPresent()) {
       return Collections.EMPTY_LIST;
     }
     Stream.Builder<T> result = Stream.builder();
     do {
-      Optional<T> resultRange = getLastFetched().flatMap(l -> fitToRange(l, rangeBoundStart, rangeBoundEnd));
+      Optional<T> resultRange =
+          getLastFetched().flatMap(l -> fitToRange(l, rangeBoundStart, rangeBoundEnd));
       if (resultRange.isPresent()) {
         result.add(resultRange.get());
         if (isLastLineRangeContainingTargetRange(rangeBoundStart, rangeBoundEnd)) {
@@ -44,12 +52,12 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
     } while (isLastLineBeforeRange(rangeBoundEnd)
         || isLastLineInRange(rangeBoundStart, rangeBoundEnd));
 
-    return result.build().collect(Collectors.toList());
+    return result.build().collect(ImmutableList.toImmutableList());
   }
 
   protected abstract void readNextLine();
 
-  boolean isLastLineRangeContainingTargetRange(IP targetRangeStart, IP targetRangeEnd) {
+  private boolean isLastLineRangeContainingTargetRange(IP targetRangeStart, IP targetRangeEnd) {
     return getLastFetched()
         .map(
             a ->
@@ -58,15 +66,15 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
         .orElse(false);
   }
 
-  boolean isLastLineBeforeRange(IP targetRangeStart) {
+  private boolean isLastLineBeforeRange(IP targetRangeStart) {
     return getLastFetched().map(a -> targetRangeStart.isGreaterThan(a.getRangeEnd())).orElse(false);
   }
 
-  boolean isLastLineAfterRange(IP targetEndStart) {
+  private boolean isLastLineAfterRange(IP targetEndStart) {
     return getLastFetched().map(a -> targetEndStart.isLowerThan(a.getRangeStart())).orElse(false);
   }
 
-  boolean isLastLineInRange(IP targetRangeStart, IP targetRangeEnd) {
+  private boolean isLastLineInRange(IP targetRangeStart, IP targetRangeEnd) {
     return getLastFetched()
         .map(
             a -> {
@@ -80,18 +88,19 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
         .orElse(false);
   }
 
-  boolean isFinishingAfter(IP targetRangeEnd) {
+  private boolean isFinishingAfter(IP targetRangeEnd) {
     return getLastFetched().map(a -> a.getRangeEnd().isGreaterThan(targetRangeEnd)).orElse(false);
   }
 
   /**
    * crops the range of the T to the currently requested range, if it's outside of it.
+   *
    * @param lastLine
    * @param rangeLowerBound
    * @param rangeUpperBound
    * @return
    */
-  protected Optional<T> fitToRange(T lastLine, IP rangeLowerBound, IP rangeUpperBound) {
+  private Optional<T> fitToRange(T lastLine, IP rangeLowerBound, IP rangeUpperBound) {
     IP lastLineLowerBound = lastLine.getRangeStart();
     IP lastLineUpperBound = lastLine.getRangeEnd();
 
