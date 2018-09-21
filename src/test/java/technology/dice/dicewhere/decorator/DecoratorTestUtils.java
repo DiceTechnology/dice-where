@@ -50,26 +50,26 @@ public class DecoratorTestUtils {
   public static final String IPv6_LINES_3 =
       "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
 
-	public static VpnDecorator getVpnDecorator(DecorationStrategy strategy, List<String> ipv4Lines, List<String> ipv6Lines) throws IOException {
+	public static VpnDecorator getMaxmindVpnDecorator(DecorationStrategy strategy, List<String> ipv4Lines, List<String> ipv6Lines) throws IOException {
 		Stream.Builder<MaxmindVpnDecoratorDbReader> builder = Stream.builder();
 		for(int i = 0; i < ipv4Lines.size(); i++) {
-			builder.add(getVpnDecorator(ipv4Lines.get(i), ipv6Lines.get(i)));
+			builder.add(getMaxmindVpnDecorator(ipv4Lines.get(i), ipv6Lines.get(i)));
 		}
     return new VpnDecorator(builder.build().collect(Collectors.toList()), strategy);
 	}
 
-  public static VpnDecorator getVpnDecorator(DecorationStrategy strategy) throws IOException {
+  public static VpnDecorator getMaxmindVpnDecorator(DecorationStrategy strategy) throws IOException {
     return new VpnDecorator(
         Stream.<MaxmindVpnDecoratorDbReader>builder()
-            .add(getVpnDecorator(IPv4_LINES, IPv6_LINES))
-            .add(getVpnDecorator(IPv4_LINES_2, IPv6_LINES_2))
-            .add(getVpnDecorator(IPv4_LINES_3, IPv6_LINES_3))
+            .add(getMaxmindVpnDecorator(IPv4_LINES, IPv6_LINES))
+            .add(getMaxmindVpnDecorator(IPv4_LINES_2, IPv6_LINES_2))
+            .add(getMaxmindVpnDecorator(IPv4_LINES_3, IPv6_LINES_3))
             .build()
             .collect(Collectors.toList()),
         strategy);
   }
 
-  public static MaxmindVpnDecoratorDbReader getVpnDecorator(String ipv4Lines, String ipv6Lines)
+  public static MaxmindVpnDecoratorDbReader getMaxmindVpnDecorator(String ipv4Lines, String ipv6Lines)
       throws IOException {
     InputStream streamV4 = new ByteArrayInputStream(ipv4Lines.getBytes());
     BufferedReader bufferedReaderV4 = new BufferedReader(new InputStreamReader(streamV4));

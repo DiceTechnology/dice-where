@@ -23,13 +23,13 @@ public class VpnDecoratorTest {
 
   @Test(expected = NullPointerException.class)
   public void shouldThrowNpe() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ANY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
     decorator.decorate(null);
   }
 
   @Test
   public void shouldDecorateMultipleOverlappingRanges_anyMergeStrategy() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ANY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
     IPAddress inputAddress = new IPAddressString("1.0.4.0/24").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -58,7 +58,7 @@ public class VpnDecoratorTest {
 
   @Test
   public void shouldDecorateMultipleOverlappingRanges_majorityMergeStrategy() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.MAJORITY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.MAJORITY);
     IPAddress inputAddress = new IPAddressString("1.0.5.0/24").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -87,7 +87,7 @@ public class VpnDecoratorTest {
 
   @Test
   public void shouldReturnOriginalInfoCompletelyDecorated_wholeRegionIsVpn() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ANY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
     IPAddress inputAddress = new IPAddressString("1.0.1.0/27").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -110,7 +110,7 @@ public class VpnDecoratorTest {
 
   @Test
   public void shouldReturnOriginalInfo_noVpnRangesMatch() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ANY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
     IPAddress inputAddress = new IPAddressString("1.0.6.0/24").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -125,7 +125,7 @@ public class VpnDecoratorTest {
 
   @Test
   public void shouldReturnOriginalInfoDecorated_matchesExactlyARange() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ANY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
     IPAddress inputAddress = new IPAddressString("1.0.2.16/28").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -142,7 +142,7 @@ public class VpnDecoratorTest {
   @Test
   public void shouldReturnOriginalInfoNotDecorated_doesntMatchDecorationStrategy()
       throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ALL);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ALL);
     IPAddress inputAddress = new IPAddressString("1.0.2.16/28").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -157,7 +157,7 @@ public class VpnDecoratorTest {
 
   @Test
   public void shouldReturnRangesThatExistInAllDecorators() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ALL);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ALL);
     IPAddress inputAddress = new IPAddressString("1.0.2.0/24").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -191,7 +191,7 @@ public class VpnDecoratorTest {
 
   @Test
   public void shouldReturnRangesThatExistInMajoritylDecorators() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.MAJORITY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.MAJORITY);
     IPAddress inputAddress = new IPAddressString("1.0.2.0/24").getAddress();
     IpInformation target =
         IpInformation.builder()
@@ -237,7 +237,7 @@ public class VpnDecoratorTest {
 
   @Test
   public void shouldReturnRangesFromBothDecorators() throws IOException {
-    VpnDecorator decorator = DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ANY);
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
     IPAddress inputAddress = new IPAddressString("1.0.2.0/24").getAddress();
     IpInformation target =
         IpInformation.builder()

@@ -95,7 +95,7 @@ public class MaxmindLineParserTest {
   @Test
   public void shouldIdentifyIpv4RangesWithVpn_whenRangesDoNotOverlap()
       throws LineParsingException, IOException {
-    MaxmindLineParser maxmindLineParser = new MaxmindLineParser(locationNames, DecoratorTestUtils.getVpnDecorator(DecorationStrategy.ANY));
+    MaxmindLineParser maxmindLineParser = new MaxmindLineParser(locationNames, DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY));
 
     String line = "1.0.2.0/24,3372745,2264397,,0,0,9600-082,37.8000,-25.5833,500";
     RawLine rawLine = new RawLine(line, 1);
