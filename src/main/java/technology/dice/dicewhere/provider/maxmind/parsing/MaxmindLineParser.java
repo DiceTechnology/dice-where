@@ -9,23 +9,20 @@ package technology.dice.dicewhere.provider.maxmind.parsing;
 import com.google.common.base.Splitter;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import org.jetbrains.annotations.NotNull;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
+import technology.dice.dicewhere.decorator.Decorator;
+import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.parsing.ParsedLine;
-import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymous;
-import technology.dice.dicewhere.provider.maxmind.reading.MaxmindAnonymousDbParser;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 import technology.dice.dicewhere.reading.RawLine;
-import technology.dice.dicewhere.utils.IPUtils;
 import technology.dice.dicewhere.utils.StringUtils;
 
-import java.net.UnknownHostException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * Parser for any Maxmind database.<br>
@@ -35,24 +32,29 @@ import java.util.stream.Stream;
  * databases.<br>
  * This parser parses both the Commercial and Lite versions of Maxmind's databases.
  */
-public class MaxmindLineParser implements LineParser {
+public class MaxmindLineParser extends LineParser {
   private final Splitter splitter = Splitter.on(",");
   private final Map<String, MaxmindLocation> locationDictionary;
-  private final MaxmindAnonymousDbParser vpnDbParser;
+  private final Decorator<? extends DecoratorInformation> decorator;
 
   public MaxmindLineParser(
-      Map<String, MaxmindLocation> locationDictionary, MaxmindAnonymousDbParser vpnDbParser) {
-
+      Map<String, MaxmindLocation> locationDictionary,
+      Decorator<? extends DecoratorInformation> decorator) {
+    this.decorator = decorator;
     this.locationDictionary = locationDictionary;
-    this.vpnDbParser = vpnDbParser;
   }
 
   public MaxmindLineParser(Map<String, MaxmindLocation> locationDictionary) {
-    this(locationDictionary, new MaxmindAnonymousDbParser());
+    this(locationDictionary, null);
   }
 
   @Override
-  public Stream<ParsedLine> parse(RawLine rawLine, boolean retainOriginalLine)
+  protected Optional<Decorator<? extends DecoratorInformation>> getDecorator() {
+    return Optional.ofNullable(decorator);
+  }
+
+  @Override
+  protected IpInformation parseLine(RawLine rawLine, boolean retainOriginalLine)
       throws LineParsingException {
     try {
       Iterable<String> fieldsIterable = splitter.split(rawLine.getLine());
@@ -86,105 +88,19 @@ public class MaxmindLineParser implements LineParser {
       IPAddress rangeStart = rangeString.getAddress().getLower();
       IPAddress rangeEnd = rangeString.getAddress().toMaxHost();
 
-      IpInformation ipInfo =
-          IpInformation.builder()
-              .withCountryCodeAlpha2(StringUtils.removeQuotes(loc.getCountryCodeAlpha2()))
-              .withGeonameId(StringUtils.removeQuotes(geonameId))
-              .withCity(StringUtils.removeQuotes(loc.getCity()))
-              .withLeastSpecificDivision(StringUtils.removeQuotes(loc.getLeastSpecificDivision()))
-              .withMostSpecificDivision(StringUtils.removeQuotes(loc.getMostSpecificDivision()))
-              .withPostcode(StringUtils.removeQuotes(postcode))
-              .withStartOfRange(new IP(rangeStart.getBytes()))
-              .withEndOfRange(new IP(rangeEnd.getBytes()))
-              .withOriginalLine(retainOriginalLine ? rawLine.getLine() : null)
-              .build();
-
-      return parseNestedRanges(rangeString.getAddress(), ipInfo, rawLine);
-    } catch (NoSuchElementException | UnknownHostException e) {
+      return IpInformation.builder()
+          .withCountryCodeAlpha2(StringUtils.removeQuotes(loc.getCountryCodeAlpha2()))
+          .withGeonameId(StringUtils.removeQuotes(geonameId))
+          .withCity(StringUtils.removeQuotes(loc.getCity()))
+          .withLeastSpecificDivision(StringUtils.removeQuotes(loc.getLeastSpecificDivision()))
+          .withMostSpecificDivision(StringUtils.removeQuotes(loc.getMostSpecificDivision()))
+          .withPostcode(StringUtils.removeQuotes(postcode))
+          .withStartOfRange(new IP(rangeStart.getBytes()))
+          .withEndOfRange(new IP(rangeEnd.getBytes()))
+          .withOriginalLine(retainOriginalLine ? rawLine.getLine() : null)
+          .build();
+    } catch (NoSuchElementException e) {
       throw new LineParsingException(e, rawLine);
     }
-  }
-
-  private Stream<ParsedLine> parseNestedRanges(
-      IPAddress ipAddressRange, IpInformation ipInfo, RawLine rawLine) throws UnknownHostException {
-
-    Stream<MaxmindAnonymous> vpnRanges = vpnDbParser.fetchForRange(ipAddressRange);
-
-    return mergeIpInfoWithVpnData(
-        Collections.unmodifiableList(vpnRanges.collect(Collectors.toList())),
-        ipAddressRange,
-        ipInfo,
-        rawLine);
-  }
-
-  /**
-   * This method produces multiples ranges out of the main IP range split by the VPN ranges
-   *
-   * @param vpnRanges IP ranges that have been identified as VPNs
-   * @param ipAddressRange IP range from the last read line
-   * @param ipInfo Information about the IP range from the least read line
-   * @param rawLine the raw information from the last read line
-   * @return
-   */
-  private Stream<ParsedLine> mergeIpInfoWithVpnData(
-      List<MaxmindAnonymous> vpnRanges,
-      IPAddress ipAddressRange,
-      IpInformation ipInfo,
-      RawLine rawLine)
-      throws UnknownHostException {
-
-    IP rangeStart = new IP(ipAddressRange.getLower().getBytes());
-    IP rangeEnd = new IP(ipAddressRange.toMaxHost().getBytes());
-    if (vpnRanges.isEmpty()) {
-      return Stream.of(new ParsedLine(rangeStart, rangeEnd, ipInfo, rawLine));
-    }
-
-    Stream.Builder<ParsedLine> result = Stream.builder();
-
-    IP nextIpForResult = new IP(rangeStart.getBytes());
-    for (MaxmindAnonymous vpnRange : vpnRanges) {
-      if (vpnRange.getRangeStart().isGreaterThan(nextIpForResult)) {
-        IPAddress endRangeNoneVpn =
-                IPUtils.from(vpnRange.getRangeStart().getBytes()).increment(-1);
-
-        IP e = new IP(endRangeNoneVpn.getBytes());
-        result.add(buildParsedLine(ipInfo, rawLine, e, nextIpForResult, false));
-      }
-
-      IpInformation vpnIpInfo =
-              IpInformation.builder(ipInfo)
-                      .isVpn(vpnRange.isVpn())
-                      .withStartOfRange(vpnRange.getRangeStart())
-                      .withEndOfRange(vpnRange.getRangeEnd())
-                      .build();
-      result.add(
-              buildParsedLine(
-                      vpnIpInfo, rawLine, vpnIpInfo.getEndOfRange(), vpnIpInfo.getStartOfRange(), true));
-      nextIpForResult =
-              new IP(
-                      IPUtils.from(vpnRange.getRangeEnd().getBytes())
-                              .increment(1)
-                              .getBytes());
-    }
-
-    if (nextIpForResult.isLowerThan(rangeEnd)) {
-      result.add(buildParsedLine(ipInfo, rawLine, rangeEnd, nextIpForResult, false));
-    }
-
-    return result.build();
-  }
-
-  @NotNull
-  private ParsedLine buildParsedLine(
-      IpInformation ipInfo, RawLine rawLine, IP rangeEnd, IP rangeStart, Boolean isVpn) {
-    return new ParsedLine(
-        rangeStart,
-        rangeEnd,
-        IpInformation.builder(ipInfo)
-            .withStartOfRange(rangeStart)
-            .withEndOfRange(rangeEnd)
-            .isVpn(Optional.ofNullable(isVpn))
-            .build(),
-        rawLine);
   }
 }
