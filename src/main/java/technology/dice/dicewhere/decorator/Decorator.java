@@ -24,8 +24,6 @@ import java.util.stream.Stream;
  * Decorator is used to enrich IpInformation objects based on the data from the DecoratorDbReader.
  * Example: adding VPN information to IpInformation based on a DB different from the one used to
  * identify the location of the targeted IP
- *
- * @param <T>
  */
 public abstract class Decorator<T extends DecoratorInformation> {
 
@@ -33,7 +31,8 @@ public abstract class Decorator<T extends DecoratorInformation> {
   private final DecorationStrategy decorationStrategy;
 
   Decorator(
-      Collection<DecoratorDbReader<T>> databaseReaders, DecorationStrategy decorationStrategy) {
+      @NotNull Collection<DecoratorDbReader<T>> databaseReaders,
+      @NotNull DecorationStrategy decorationStrategy) {
     Objects.requireNonNull(databaseReaders);
     Objects.requireNonNull(decorationStrategy);
     if (databaseReaders.isEmpty()) {
@@ -52,9 +51,11 @@ public abstract class Decorator<T extends DecoratorInformation> {
    * Decorate the IpInformation with entries matching it's range from the Decorator's provided
    * databases;
    *
-   * @param original
-   * @return
-   * @throws UnknownHostException
+   * @param original the original IpInformation range
+   * @return Stream of decorated IpInformation. It will split the original range into the matches
+   *     and decorate each resulting range with IpInformation accordingly
+   * @throws UnknownHostException if for some reason an IP operation fails because the IP isn't
+   *     valid
    */
   public Stream<IpInformation> decorate(IpInformation original) throws UnknownHostException {
     Objects.requireNonNull(original);
