@@ -120,7 +120,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
     ImmutableList.Builder<T> allValidRanges = ImmutableList.builder();
     int rangeNestingLevel = 1;
     for (int i = 1; i < splits.size(); i++) {
-      if (!splits.get(i).isStart()) {
+      if (splits.get(i).isEnd()) {
         if (splits.get(i - 1).isStart()) {
           // 1) add the range
           if (Math.max(splits.get(i).getRangeInfo().getNumberOfMatches(), rangeNestingLevel)
@@ -169,6 +169,18 @@ public abstract class Decorator<T extends DecoratorInformation> {
                         end));
           }
         }
+      } else if (splits.get(i).isStart() && rangeNestingLevel >= filterThreshold) {
+        // 4) the gaps between ranges that are overlapped by a bigger range
+        IP start = IPUtils.increment(splits.get(i - 1).getIp());
+        IP end = IPUtils.decrement(splits.get(i).getIp());
+        if (start.isLowerThan(end)) {
+          allValidRanges.add(
+              splits
+                  .get(i)
+                  .getRangeInfo()
+                  .withNewRange(start, end)
+                  .withNumberOfMatches(rangeNestingLevel));
+        }
       }
       if (splits.get(i).isStart()) {
         rangeNestingLevel++;
@@ -176,7 +188,9 @@ public abstract class Decorator<T extends DecoratorInformation> {
         rangeNestingLevel--;
       }
     }
-    return allValidRanges.build();
+    return ImmutableList.sortedCopyOf(
+        Comparator.comparing(T::getRangeStart).thenComparing(T::getRangeEnd),
+        allValidRanges.build());
   }
 
   private int getFilterThreshold() {

@@ -35,6 +35,10 @@ class RangePoint<T> {
     return isStart;
   }
 
+  boolean isEnd() {
+    return !isStart();
+  }
+
   T getRangeInfo() {
     return rangeInfo;
   }

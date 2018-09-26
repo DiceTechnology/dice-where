@@ -28,6 +28,143 @@ public class VpnDecoratorTest {
   }
 
   @Test
+  public void shouldDecorateMultipleOverlappingRanges_case2_allMergeStrategy() throws IOException {
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ALL);
+    IPAddress inputAddress = new IPAddressString("1.0.8.0/24").getAddress();
+    IpInformation target =
+            IpInformation.builder()
+                    .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
+                    .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
+                    .withCountryCodeAlpha2("BG")
+                    .withGeonameId("111")
+                    .build();
+    List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
+    List<IpInformation> expected = new ArrayList<>();
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.8.0/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.8.31/32"))
+                    .isVpn(false)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.8.32/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.8.39/32"))
+                    .isVpn(true)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.8.40/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.8.0/24"))
+                    .isVpn(false)
+                    .build());
+
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void shouldDecorateMultipleOverlappingRanges_case2_majorityMergeStrategy() throws IOException {
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.MAJORITY);
+    IPAddress inputAddress = new IPAddressString("1.0.7.0/24").getAddress();
+    IpInformation target =
+            IpInformation.builder()
+                    .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
+                    .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
+                    .withCountryCodeAlpha2("BG")
+                    .withGeonameId("111")
+                    .build();
+    List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
+    List<IpInformation> expected = new ArrayList<>();
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.0/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.15/32"))
+                    .isVpn(false)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.16/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.23/32"))
+                    .isVpn(true)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.24/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.31/32"))
+                    .isVpn(false)
+                    .build());
+
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.32/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.63/32"))
+                    .isVpn(true)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.64/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.71/32"))
+                    .isVpn(false)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.72/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.79/32"))
+                    .isVpn(true)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.80/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.95/32"))
+                    .isVpn(false)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.96/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.103/32"))
+                    .isVpn(true)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.104/32"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.0/24"))
+                    .isVpn(false)
+                    .build());
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void shouldDecorateMultipleOverlappingRanges_case2_anyMergeStrategy() throws IOException {
+    VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
+    IPAddress inputAddress = new IPAddressString("1.0.7.0/24").getAddress();
+    IpInformation target =
+            IpInformation.builder()
+                    .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
+                    .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
+                    .withCountryCodeAlpha2("BG")
+                    .withGeonameId("111")
+                    .build();
+    List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
+    List<IpInformation> expected = new ArrayList<>();
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.0/24"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.0/25"))
+                    .isVpn(true)
+                    .build());
+    expected.add(
+            IpInformation.builder(target)
+                    .withStartOfRange(getLowerFromIP("1.0.7.128/25"))
+                    .withEndOfRange(getMaxHostFromIP("1.0.7.0/24"))
+                    .isVpn(false)
+                    .build());
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
   public void shouldDecorateMultipleOverlappingRanges_anyMergeStrategy() throws IOException {
     VpnDecorator decorator = DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY);
     IPAddress inputAddress = new IPAddressString("1.0.4.0/24").getAddress();
