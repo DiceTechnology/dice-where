@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  * Reads one line at a time from the provided DB. Only hold one line in memory and stop reading when
  * an IP is reached, that is outside of the requested one
  *
- * <p>T lastFetched holds the last line that was read from the DB. The reader will keep reading
+ * <p>T lastFetched holds the last line that was read from the DB The reader will keep reading
  * until it reaches the end of the file or the end of the requested ip range;
  */
 public abstract class DecoratorDbReader<T extends DecoratorInformation> {
@@ -31,6 +31,10 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
     return Optional.ofNullable(lastFetched);
   }
 
+  /**
+   * The last successfully parsed line read from the provided decorating DB
+   * @param lastFetched set the last fetched line to the passed argument
+   */
   protected void setLastFetched(T lastFetched) {
     this.lastFetched = lastFetched;
   }
@@ -38,7 +42,7 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
   // TODO: javadoc
   public final List<T> fetchForRange(IP rangeBoundStart, IP rangeBoundEnd) {
     if (!getLastFetched().isPresent()) {
-      return Collections.EMPTY_LIST;
+      return ImmutableList.of();
     }
     Stream.Builder<T> result = Stream.builder();
     do {

@@ -22,7 +22,7 @@ import java.util.Optional;
  * Reads Maxmind Anonymous db and identifies VPN entries.
  */
 public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorInformation> {
-  private final Splitter splitter = Splitter.on(",");
+  private static final Splitter splitter = Splitter.on(",");
 
   private final BufferedReader ipV4AnonymousDatabase;
   private boolean ipV4DbExhausted = false;
