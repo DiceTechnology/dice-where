@@ -36,7 +36,7 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
     this.ipV6AnonymousDatabase = ipV6AnonymousDatabase;
     this.ipV4AnonymousDatabase.readLine(); // first line is header
     this.ipV6AnonymousDatabase.readLine(); // first line is header
-    this.readNextLine();
+    this.readNextLine().ifPresent(this::setLastFetched);
   }
 
   private Optional<String> readLine() throws IOException {
@@ -52,7 +52,7 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
   }
 
   @Override
-  protected void readNextLine() {
+  protected Optional<VpnDecoratorInformation> readNextLine() {
     try {
       if (ipV4AnonymousDatabase != null && ipV6AnonymousDatabase != null) {
         while (true) {
@@ -60,19 +60,18 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
           if (readLine.isPresent()) {
             Optional<VpnDecoratorInformation> parsedLine = readLine.flatMap(this::parseDbLine);
             if (parsedLine.isPresent()) {
-              this.setLastFetched(parsedLine.orElse(null));
-              break;
+              return parsedLine;
             } // else: the line read from DB couldn't be parsed or didn't match the criteria
           } else {
             // no more lines to read from the DB
-            this.setLastFetched(null);
-            break;
+            return Optional.empty();
           }
         }
       }
     } catch (IOException e) {
-      this.setLastFetched(null);
+      return Optional.empty();
     }
+    return Optional.empty();
   }
 
   @Override
