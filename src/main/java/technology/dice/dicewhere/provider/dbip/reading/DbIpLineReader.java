@@ -15,25 +15,23 @@ import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
-import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToLocationAndIspCSVLineParser;
 import technology.dice.dicewhere.reading.LineReader;
 
-public class DbIpLineReader extends LineReader {
+public abstract class DbIpLineReader extends LineReader {
   private static final int BUFFER_SIZE = 1024 * 1024;
   private final LineParser lineParser;
   private final Path csv;
-
-  //TODO: this needs to somehow switch between different readers, depending on the DB that is being used.
-  //although we have the readers, we don't have the mechanics to switch between.
 
   public DbIpLineReader(Path csv) {
     this(csv, null);
   }
 
   public DbIpLineReader(Path csv, Decorator<? extends DecoratorInformation> decorator) {
-    lineParser = new DbIpIpToLocationAndIspCSVLineParser(decorator);
+    lineParser = buildLineParser(decorator);
     this.csv = csv;
   }
+
+  public abstract LineParser buildLineParser(Decorator<? extends DecoratorInformation> decorator);
 
   @Override
   protected Stream<String> lines() throws IOException {
