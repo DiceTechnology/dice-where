@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import technology.dice.dicewhere.decorator.Decorator;
 import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
@@ -22,11 +24,11 @@ public abstract class DbIpLineReader extends LineReader {
   private final LineParser lineParser;
   private final Path csv;
 
-  public DbIpLineReader(Path csv) {
+  public DbIpLineReader(@NotNull Path csv) {
     this(csv, null);
   }
 
-  public DbIpLineReader(Path csv, Decorator<? extends DecoratorInformation> decorator) {
+  public DbIpLineReader(@NotNull Path csv, @Nullable Decorator<? extends DecoratorInformation> decorator) {
     lineParser = buildLineParser(decorator);
     this.csv = csv;
   }
