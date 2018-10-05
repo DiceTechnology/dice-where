@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. ../functions.sh
+source $(dirname $0)/../functions.sh
 
 init_maxmind_location_download_arguments $@
 
@@ -14,7 +14,6 @@ echo ""
 
 inzip_path="$(unzip -l ${zip_file_destination} | sed -n 4p | awk '{split($4,path,"/"); print path[1]}')"
 db_ts="$(unzip -l ${zip_file_destination} | sed -n 4p | awk '{split($4,path,"/"); print path[1]}' | awk '{ split($1,ts,"_"); print ts[2]}')"
-
 
 echo "Will unzip ${zip_file_destination} into ${unzip_destination_directory}"
 unzip -q -o ${zip_file_destination} -d ${unzip_destination_directory}

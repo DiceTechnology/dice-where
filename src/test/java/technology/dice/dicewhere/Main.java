@@ -92,7 +92,7 @@ public class Main {
                   }
                 });
 
-    IPResolver resolver = resolverBuilder.build();
+    IPResolver resolver = resolverBuilder.withLineProcessorWorkersCount(4).build();
 
     Scanner keyboard = new Scanner(System.in);
     while (true) {

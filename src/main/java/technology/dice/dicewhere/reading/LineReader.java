@@ -111,7 +111,8 @@ public abstract class LineReader {
       boolean retainOriginalLine,
       LineReaderListener readerListener,
       LineProcessorListener processListener,
-      DatabaseBuilderListener buildingListener)
+      DatabaseBuilderListener buildingListener,
+      int workersCount)
       throws IOException {
 
     long before = System.currentTimeMillis();
@@ -131,7 +132,8 @@ public abstract class LineReader {
               serializedLinesBuffer,
               parser(),
               retainOriginalLine,
-              new LineprocessorListenerForProvider(provider(), processListener));
+              new LineprocessorListenerForProvider(provider(), processListener),
+              workersCount);
       DatabaseBuilder databaseBuilder =
           new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener);
 
