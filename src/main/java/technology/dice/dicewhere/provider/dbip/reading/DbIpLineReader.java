@@ -9,20 +9,31 @@ package technology.dice.dicewhere.provider.dbip.reading;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import technology.dice.dicewhere.decorator.Decorator;
+import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
-import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToLocationAndIspCSVLineParser;
 import technology.dice.dicewhere.reading.LineReader;
 
-public class DbIpLineReader extends LineReader {
+public abstract class DbIpLineReader extends LineReader {
   private static final int BUFFER_SIZE = 1024 * 1024;
-  private final LineParser lineParser = new DbIpIpToLocationAndIspCSVLineParser();
+  private final LineParser lineParser;
   private final Path csv;
 
-  public DbIpLineReader(Path csv) {
+  public DbIpLineReader(@NotNull Path csv) {
+    this(csv, null);
+  }
+
+  public DbIpLineReader(@NotNull Path csv, @Nullable Decorator<? extends DecoratorInformation> decorator) {
+    lineParser = buildLineParser(decorator);
     this.csv = csv;
   }
+
+  public abstract LineParser buildLineParser(Decorator<? extends DecoratorInformation> decorator);
 
   @Override
   protected Stream<String> lines() throws IOException {

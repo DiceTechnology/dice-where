@@ -180,6 +180,20 @@ public class IpInformation {
     return new Builder();
   }
 
+  public static Builder builder(IpInformation info) {
+    return new Builder()
+        .withCountryCodeAlpha2(info.getCountryCodeAlpha2())
+        .withEndOfRange(info.getEndOfRange())
+        .withStartOfRange(info.getStartOfRange())
+        .withGeonameId(info.getGeonameId().orElse(null))
+        .withCity(info.getCity().orElse(null))
+        .withLeastSpecificDivision(info.getLeastSpecificDivision().orElse(null))
+        .withPostcode(info.getPostcode().orElse(null))
+        .withMostSpecificDivision(info.getMostSpecificDivision().orElse(null))
+        .withOriginalLine(info.getOriginalLine().orElse(null))
+        .isVpn(info.isVpn());
+  }
+
   public static class Builder {
     private String countryCodeAlpha2;
     private String geonameId;
@@ -248,6 +262,7 @@ public class IpInformation {
       this.isVpn = isVpn;
       return this;
     }
+
     public Builder isVpn(ThreeStateValueProto.ThreeStateValue isVpn) {
       this.isVpn = ProtoValueConverter.parseThreeStateProto(isVpn).orElse(null);
       return this;

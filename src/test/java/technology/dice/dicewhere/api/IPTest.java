@@ -8,10 +8,17 @@ package technology.dice.dicewhere.api;
 
 import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
+import inet.ipaddr.ipv6.IPv6Address;
 import org.junit.Assert;
 import org.junit.Test;
 import technology.dice.dicewhere.api.api.IP;
 
+//TODO: add ipv6 tests
 public class IPTest {
   @Test(expected = NullPointerException.class)
   public void bytesCtorNull() {
@@ -50,4 +57,14 @@ public class IPTest {
     Assert.assertFalse(anIP.isGreaterThan(higherIp));
     Assert.assertFalse(anIP.equals(higherIp));
   }
+//
+//  @Test
+//  public void ipv6Bounds() {
+//    IPAddressString rangeStringStr = new IPAddressString("2001:470:7:a00::/53");
+//    IPv6Address rangeString = rangeStringStr.getAddress().toPrefixBlock().toIPv6();
+//    System.out.println(rangeString.getLower().toString()); // produces 2001:470:7:800:0:0:0:0/53
+//    System.out.println(rangeString.getUpper().toString()); // produces 2001:470:7:fff:ffff:ffff:ffff:ffff/53
+//  }
+
+
 }

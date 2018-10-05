@@ -12,8 +12,9 @@ import inet.ipaddr.IPAddressString;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
+import technology.dice.dicewhere.decorator.Decorator;
+import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.utils.StringUtils;
@@ -21,7 +22,7 @@ import technology.dice.dicewhere.utils.StringUtils;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 /**
  * Parser for any Maxmind database.<br>
@@ -31,16 +32,29 @@ import java.util.stream.Stream;
  * databases.<br>
  * This parser parses both the Commercial and Lite versions of Maxmind's databases.
  */
-public class MaxmindLineParser implements LineParser {
+public class MaxmindLineParser extends LineParser {
   private final Splitter splitter = Splitter.on(",");
   private final Map<String, MaxmindLocation> locationDictionary;
+  private final Decorator<? extends DecoratorInformation> decorator;
 
-  public MaxmindLineParser(Map<String, MaxmindLocation> locationDictionary) {
+  public MaxmindLineParser(
+      Map<String, MaxmindLocation> locationDictionary,
+      Decorator<? extends DecoratorInformation> decorator) {
+    this.decorator = decorator;
     this.locationDictionary = locationDictionary;
   }
 
+  public MaxmindLineParser(Map<String, MaxmindLocation> locationDictionary) {
+    this(locationDictionary, null);
+  }
+
   @Override
-  public Stream<ParsedLine> parse(RawLine rawLine, boolean retainOriginalLine)
+  protected Optional<Decorator<? extends DecoratorInformation>> getDecorator() {
+    return Optional.ofNullable(decorator);
+  }
+
+  @Override
+  protected IpInformation parseLine(RawLine rawLine, boolean retainOriginalLine)
       throws LineParsingException {
     try {
       Iterable<String> fieldsIterable = splitter.split(rawLine.getLine());
@@ -72,25 +86,19 @@ public class MaxmindLineParser implements LineParser {
       }
 
       IPAddress rangeStart = rangeString.getAddress().getLower();
-      IPAddress rangeEnd = rangeString.getAddress().getUpper();
+      IPAddress rangeEnd = rangeString.getAddress().toMaxHost();
 
-      return Stream.of(
-          new ParsedLine(
-              new IP(rangeStart.getBytes()),
-              new IP(rangeEnd.getBytes()),
-              IpInformation.builder()
-                  .withCountryCodeAlpha2(StringUtils.removeQuotes(loc.getCountryCodeAlpha2()))
-                  .withGeonameId(StringUtils.removeQuotes(geonameId))
-                  .withCity(StringUtils.removeQuotes(loc.getCity()))
-                  .withLeastSpecificDivision(
-                      StringUtils.removeQuotes(loc.getLeastSpecificDivision()))
-                  .withMostSpecificDivision(StringUtils.removeQuotes(loc.getMostSpecificDivision()))
-                  .withPostcode(StringUtils.removeQuotes(postcode))
-                  .withStartOfRange(new IP(rangeStart.getBytes()))
-                  .withEndOfRange(new IP(rangeEnd.getBytes()))
-                  .withOriginalLine(retainOriginalLine ? rawLine.getLine() : null)
-                  .build(),
-              rawLine));
+      return IpInformation.builder()
+          .withCountryCodeAlpha2(StringUtils.removeQuotes(loc.getCountryCodeAlpha2()))
+          .withGeonameId(StringUtils.removeQuotes(geonameId))
+          .withCity(StringUtils.removeQuotes(loc.getCity()))
+          .withLeastSpecificDivision(StringUtils.removeQuotes(loc.getLeastSpecificDivision()))
+          .withMostSpecificDivision(StringUtils.removeQuotes(loc.getMostSpecificDivision()))
+          .withPostcode(StringUtils.removeQuotes(postcode))
+          .withStartOfRange(new IP(rangeStart.getBytes()))
+          .withEndOfRange(new IP(rangeEnd.getBytes()))
+          .withOriginalLine(retainOriginalLine ? rawLine.getLine() : null)
+          .build();
     } catch (NoSuchElementException e) {
       throw new LineParsingException(e, rawLine);
     }

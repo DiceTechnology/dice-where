@@ -22,6 +22,7 @@ import technology.dice.dicewhere.api.MaxMemoryProfiler;
 import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLocarionAndIspLineReader;
 import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
@@ -92,7 +93,7 @@ public class LoaderBenchmark {
   public void testDbIp() throws IOException {
 
     DbIpLineReader dbIpLineReader =
-        new DbIpLineReader(Paths.get(RESOURCES_FOLDER + "/dbip-full-2018-09.csv"));
+        new DbIpLocarionAndIspLineReader(Paths.get(RESOURCES_FOLDER + "/dbip-full-2018-09.csv"));
 
     IPResolver.Builder resolverBuilder =
         new IPResolver.Builder()

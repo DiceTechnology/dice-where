@@ -9,31 +9,6 @@ package technology.dice.dicewhere.reading;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
-import java.io.SequenceInputStream;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipFile;
 import technology.dice.dicewhere.building.DatabaseBuilder;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.IPDatabase;
@@ -43,6 +18,21 @@ import technology.dice.dicewhere.lineprocessing.LineprocessorListenerForProvider
 import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.provider.ProviderKey;
+
+import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipFile;
 
 /**
  * Base class providing data transformation between external IP data format provided by {@link
@@ -106,10 +96,10 @@ public abstract class LineReader {
                   .collect(Collectors.toCollection(ArrayList::new)));
 
       SequenceInputStream sequenceInputStream = new SequenceInputStream(zipEntries);
-      br = new BufferedReader(new InputStreamReader(sequenceInputStream, "UTF-8"));
+      br = new BufferedReader(new InputStreamReader(sequenceInputStream, StandardCharsets.UTF_8));
     } else if (isGZipped(path)) {
       InputStream is = new GZIPInputStream(new FileInputStream(path.toFile()));
-      br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
     } else {
       FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
       br = new BufferedReader(Channels.newReader(channel, "UTF-8"), bufferSize);

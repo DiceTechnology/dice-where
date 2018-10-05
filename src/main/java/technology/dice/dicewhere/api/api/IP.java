@@ -36,6 +36,14 @@ public class IP implements Comparable<IP>, Serializable {
     return compareTo(other) > 0;
   }
 
+  public boolean isLowerThanOrEqual(IP other) {
+    return compareTo(other) <= 0;
+  }
+
+  public boolean isGreaterThanOrEqual(IP other) {
+    return compareTo(other) >= 0;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
