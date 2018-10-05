@@ -12,7 +12,6 @@ import technology.dice.dicewhere.api.exceptions.DecoratorDatabaseOutOfOrderExcep
 import technology.dice.dicewhere.utils.IPUtils;
 
 import java.net.UnknownHostException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
