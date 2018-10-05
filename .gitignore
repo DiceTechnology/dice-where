@@ -3,6 +3,7 @@ target/
 .idea/
 bin/
 scripts/db_downloaders/maxmind_location/config
+scripts/db_downloaders/maxmind_anonymous/config
 *.iml
 .DS_Store
 *.mmdb
