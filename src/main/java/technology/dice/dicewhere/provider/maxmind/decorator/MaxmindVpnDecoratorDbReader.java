@@ -11,10 +11,12 @@ import inet.ipaddr.IPAddressString;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.decorator.DecoratorDbReader;
 import technology.dice.dicewhere.decorator.VpnDecoratorInformation;
+import technology.dice.dicewhere.reading.LineReader;
 import technology.dice.dicewhere.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -22,11 +24,17 @@ import java.util.Optional;
  * Reads Maxmind Anonymous db and identifies VPN entries.
  */
 public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorInformation> {
+  private static final int BUFFER_SIZE = 1024 * 1024;
   private static final Splitter splitter = Splitter.on(",");
 
   private final BufferedReader ipV4AnonymousDatabase;
   private boolean ipV4DbExhausted = false;
   private final BufferedReader ipV6AnonymousDatabase;
+
+  public MaxmindVpnDecoratorDbReader(
+          Path ipV4AnonymousDatabase, Path ipV6AnonymousDatabase) throws IOException {
+    this(LineReader.bufferedReaderForPath(ipV4AnonymousDatabase, BUFFER_SIZE), LineReader.bufferedReaderForPath(ipV6AnonymousDatabase, BUFFER_SIZE));
+  }
 
   public MaxmindVpnDecoratorDbReader(
       BufferedReader ipV4AnonymousDatabase, BufferedReader ipV6AnonymousDatabase)

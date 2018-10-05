@@ -49,7 +49,7 @@ public abstract class LineReader {
 
   protected abstract Stream<String> lines() throws IOException;
 
-  private boolean isZipFile(Path path) {
+  private static boolean isZipFile(Path path) {
 
     byte[] buffer = new byte[MAGIC_ZIP.length];
     try {
@@ -67,7 +67,7 @@ public abstract class LineReader {
     return true;
   }
 
-  private boolean isGZipped(Path path) {
+  private static boolean isGZipped(Path path) {
     int magic = 0;
     try (RandomAccessFile raf = new RandomAccessFile(path.toFile(), "r")) {
       magic = raf.read() & 0xff | ((raf.read() << 8) & MAGIG_GZIP);
@@ -77,7 +77,7 @@ public abstract class LineReader {
     return magic == GZIPInputStream.GZIP_MAGIC;
   }
 
-  protected BufferedReader bufferedReaderForPath(Path path, int bufferSize) throws IOException {
+  public static BufferedReader bufferedReaderForPath(Path path, int bufferSize) throws IOException {
     BufferedReader br;
     if (isZipFile(path)) {
 
