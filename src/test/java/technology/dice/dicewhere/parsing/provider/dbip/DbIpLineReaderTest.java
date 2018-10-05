@@ -34,7 +34,7 @@ public class DbIpLineReaderTest {
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
     DbIpLineReader dbIpReader = new DbIpLocarionAndIspLineReader(path);
     IPDatabase database =
-        dbIpReader.read(false, readerListener, processorListener, builderListener);
+        dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
     Assert.assertEquals(22, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
@@ -78,7 +78,7 @@ public class DbIpLineReaderTest {
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
     DbIpLineReader dbIpReader = new DbIpLocarionAndIspLineReader(path);
     IPDatabase database =
-        dbIpReader.read(false, readerListener, processorListener, builderListener);
+        dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
     Assert.assertEquals(16, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
@@ -122,7 +122,7 @@ public class DbIpLineReaderTest {
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
     DbIpLineReader dbIpReader = new DbIpLocarionAndIspLineReader(path);
     IPDatabase database =
-        dbIpReader.read(false, readerListener, processorListener, builderListener);
+        dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
     Assert.assertEquals(3, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))

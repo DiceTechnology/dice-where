@@ -32,7 +32,7 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener);
+    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     Assert.assertEquals(18, dbSize);
@@ -51,7 +51,7 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener);
+    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     Assert.assertEquals(11, dbSize);
@@ -70,7 +70,7 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener);
+    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     Assert.assertEquals(9, dbSize);
