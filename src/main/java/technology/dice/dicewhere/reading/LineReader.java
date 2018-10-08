@@ -155,7 +155,7 @@ public abstract class LineReader {
       readerListener.finished(
           provider(), databaseBuilder.processedLines(), System.currentTimeMillis() - before);
       return databaseBuilder.build();
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (Exception e) {
       throw new RuntimeException("Line reader read failed", e);
     } finally {
       parserExecutorService.shutdown();
