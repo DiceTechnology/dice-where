@@ -87,52 +87,48 @@ public class LineProcessor implements Runnable {
   /** Runs the processor, parsing the raw line data and serializing it into a suitable form. */
   @Override
   public void run() {
-    try {
-      long started = System.currentTimeMillis();
+    long started = System.currentTimeMillis();
 
-      AtomicLong totalLines = new AtomicLong();
-      CompletableFuture<List<SerializedLine>>[] workerList = new CompletableFuture[workersCount];
+    AtomicLong totalLines = new AtomicLong();
+    CompletableFuture<List<SerializedLine>>[] workerList = new CompletableFuture[workersCount];
 
-      while (expectingMore.get() || lines.size() > 0) {
-        try {
-          for (int i = 0; i < workersCount; i++) {
-            Collection<RawLine> batch = new ArrayList<>(WORKER_BATCH_SIZE);
+    while (expectingMore.get() || lines.size() > 0) {
+      try {
+        for (int i = 0; i < workersCount; i++) {
+          Collection<RawLine> batch = new ArrayList<>(WORKER_BATCH_SIZE);
 
-            // Populate the batch from the lines queue
-            Queues.drain(lines, batch, WORKER_BATCH_SIZE, 1, TimeUnit.NANOSECONDS);
-            workerList[i] =
-                CompletableFuture.supplyAsync(
-                    () -> buildSerializedLineBatch(started, batch), executorService);
-          }
-
-          CompletableFuture.allOf(workerList);
-
-          for (CompletableFuture<List<SerializedLine>> worker : workerList) {
-            worker
-                .join()
-                .forEach(
-                    serializedLine -> {
-                      try {
-                        destination.put(serializedLine);
-                        totalLines.getAndIncrement();
-                        progressListener.lineProcessed(
-                            serializedLine, System.currentTimeMillis() - started);
-                      } catch (InterruptedException e) {
-                        progressListener.dequeueError(serializedLine, e);
-                      }
-                    });
-          }
-
-        } catch (InterruptedException e) {
-          progressListener.processorInterrupted(e);
-          throw new RuntimeException("Line processor interrupted", e);
+          // Populate the batch from the lines queue
+          Queues.drain(lines, batch, WORKER_BATCH_SIZE, 1, TimeUnit.NANOSECONDS);
+          workerList[i] =
+              CompletableFuture.supplyAsync(
+                  () -> buildSerializedLineBatch(started, batch), executorService);
         }
-      }
 
-      progressListener.finished(totalLines.get(), System.currentTimeMillis() - started);
-    } catch (Exception e) {
-      e.printStackTrace();
+        CompletableFuture.allOf(workerList);
+
+        for (CompletableFuture<List<SerializedLine>> worker : workerList) {
+          worker
+              .join()
+              .forEach(
+                  serializedLine -> {
+                    try {
+                      destination.put(serializedLine);
+                      totalLines.getAndIncrement();
+                      progressListener.lineProcessed(
+                          serializedLine, System.currentTimeMillis() - started);
+                    } catch (InterruptedException e) {
+                      progressListener.dequeueError(serializedLine, e);
+                    }
+                  });
+        }
+
+      } catch (InterruptedException e) {
+        progressListener.processorInterrupted(e);
+        throw new RuntimeException("Line processor interrupted", e);
+      }
     }
+
+    progressListener.finished(totalLines.get(), System.currentTimeMillis() - started);
   }
 
   private ImmutableList<SerializedLine> buildSerializedLineBatch(
