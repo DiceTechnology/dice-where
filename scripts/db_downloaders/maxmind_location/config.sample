@@ -1,0 +1,4 @@
+maxmind_location_licence_key="<CHANGE_ME>"
+maxmind_location_product="GeoIP2"
+maxmind_location_content="City"
+maxmind_location_zip_destination="./"

@@ -25,12 +25,14 @@ import technology.dice.dicewhere.api.exceptions.NoProvidersException;
 import technology.dice.dicewhere.api.exceptions.ProviderNotAvailableException;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.IPDatabase;
+import technology.dice.dicewhere.lineprocessing.LineProcessor;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.reading.LineReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
 
 public class IPResolver {
+  private static final int DEFAULT_LINE_PROCESSOR_WORKERS_COUNT = 4;
   private final Map<ProviderKey, IPDatabase> databases;
 
   private IPResolver(Map<ProviderKey, IPDatabase> databases) {
@@ -158,12 +160,18 @@ public class IPResolver {
   public static class Builder {
     private final Map<ProviderKey, LineReader> providers;
     private boolean retainOriginalLine = false;
+    private int workersCount = DEFAULT_LINE_PROCESSOR_WORKERS_COUNT;
     private LineReaderListener readerListener = new LineReaderListener() {};
     private LineProcessorListener processorListener = new LineProcessorListener() {};
     private DatabaseBuilderListener builderListener = new DatabaseBuilderListener() {};
 
     public Builder() {
       providers = new HashMap<>();
+    }
+
+    public Builder withLineProcessorWorkersCount(int count) {
+      this.workersCount = count;
+      return this;
     }
 
     public Builder withProvider(@Nonnull LineReader lineReader) {
@@ -201,7 +209,12 @@ public class IPResolver {
       for (LineReader reader : providers.values()) {
         databases.put(
             reader.provider(),
-            reader.read(retainOriginalLine, readerListener, processorListener, builderListener));
+            reader.read(
+                retainOriginalLine,
+                readerListener,
+                processorListener,
+                builderListener,
+                workersCount));
       }
       return new IPResolver(databases);
     }

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -32,7 +31,6 @@ import java.util.stream.Stream;
 public class LineProcessor implements Runnable {
 
   private static final int WORKER_BATCH_SIZE = 10000;
-  private static final int WORKER_COUNT = 4;
   private final ExecutorService executorService;
   private final ArrayBlockingQueue<RawLine> lines;
   private final LineParser parser;
@@ -40,10 +38,11 @@ public class LineProcessor implements Runnable {
   private final BlockingQueue<SerializedLine> destination;
   private final LineprocessorListenerForProvider progressListener;
   private final AtomicBoolean expectingMore = new AtomicBoolean(true);
+  private final int workersCount;
 
   /**
    * @param executorService the executor service used for handling parsing of batches
-   * @param destination the queue where serializsed lines are written to
+   * @param destination the queue where serialized lines are written to
    * @param parser the parser to use for parsing the line data
    * @param retainOriginalLine indicates if the original line data should be retained alongside the
    *     serialized data
@@ -54,13 +53,15 @@ public class LineProcessor implements Runnable {
       BlockingQueue<SerializedLine> destination,
       LineParser parser,
       boolean retainOriginalLine,
-      LineprocessorListenerForProvider progressListener) {
-    this.lines = new ArrayBlockingQueue<>((WORKER_COUNT + 1) * WORKER_BATCH_SIZE);
+      LineprocessorListenerForProvider progressListener,
+      int workersCount) {
+    this.lines = new ArrayBlockingQueue<>((workersCount + 1) * WORKER_BATCH_SIZE);
     this.destination = destination;
     this.executorService = executorService;
     this.parser = parser;
     this.retainOriginalLine = retainOriginalLine;
     this.progressListener = progressListener;
+    this.workersCount = workersCount;
   }
 
   /**
@@ -86,15 +87,14 @@ public class LineProcessor implements Runnable {
   /** Runs the processor, parsing the raw line data and serializing it into a suitable form. */
   @Override
   public void run() {
-
     long started = System.currentTimeMillis();
 
     AtomicLong totalLines = new AtomicLong();
-    CompletableFuture<List<SerializedLine>>[] workerList = new CompletableFuture[WORKER_COUNT];
+    CompletableFuture<List<SerializedLine>>[] workerList = new CompletableFuture[workersCount];
 
     while (expectingMore.get() || lines.size() > 0) {
       try {
-        for (int i = 0; i < WORKER_COUNT; i++) {
+        for (int i = 0; i < workersCount; i++) {
           Collection<RawLine> batch = new ArrayList<>(WORKER_BATCH_SIZE);
 
           // Populate the batch from the lines queue
@@ -150,6 +150,9 @@ public class LineProcessor implements Runnable {
           });
     } catch (LineParsingException e) {
       progressListener.parseError(rawLine, e);
+      return Stream.empty();
+    } catch (Exception e) {
+      progressListener.parseError(rawLine, new LineParsingException(e, rawLine));
       return Stream.empty();
     }
   }

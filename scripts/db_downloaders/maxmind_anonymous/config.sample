@@ -1,0 +1,4 @@
+maxmind_anonymous_licence_key="<CHANGE_ME>"
+maxmind_anonymous_product="GeoIP2"
+maxmind_anonymous_content="Anonymous"
+maxmind_anonymous_zip_destination="/Users/stan/www/maxmind"

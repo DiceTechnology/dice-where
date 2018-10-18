@@ -111,7 +111,8 @@ public abstract class LineReader {
       boolean retainOriginalLine,
       LineReaderListener readerListener,
       LineProcessorListener processListener,
-      DatabaseBuilderListener buildingListener)
+      DatabaseBuilderListener buildingListener,
+      int workersCount)
       throws IOException {
 
     long before = System.currentTimeMillis();
@@ -131,7 +132,8 @@ public abstract class LineReader {
               serializedLinesBuffer,
               parser(),
               retainOriginalLine,
-              new LineprocessorListenerForProvider(provider(), processListener));
+              new LineprocessorListenerForProvider(provider(), processListener),
+              workersCount);
       DatabaseBuilder databaseBuilder =
           new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener);
 
@@ -153,7 +155,7 @@ public abstract class LineReader {
       readerListener.finished(
           provider(), databaseBuilder.processedLines(), System.currentTimeMillis() - before);
       return databaseBuilder.build();
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (Exception e) {
       throw new RuntimeException("Line reader read failed", e);
     } finally {
       parserExecutorService.shutdown();
