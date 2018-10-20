@@ -59,7 +59,7 @@ public class DatabaseBuilder implements Runnable {
     expectingMore = false;
   }
 
-  public int reimainingLines() {
+  public int remainingLines() {
     return source.size();
   }
 

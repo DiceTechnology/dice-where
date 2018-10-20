@@ -20,9 +20,7 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Optional;
 
-/**
- * Reads Maxmind Anonymous db and identifies VPN entries.
- */
+/** Reads Maxmind Anonymous db and identifies VPN entries. */
 public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorInformation> {
   private static final int BUFFER_SIZE = 1024 * 1024;
   private static final Splitter splitter = Splitter.on(",");
@@ -31,20 +29,26 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
   private boolean ipV4DbExhausted = false;
   private final BufferedReader ipV6AnonymousDatabase;
 
-  public MaxmindVpnDecoratorDbReader(
+  public static DecoratorDbReader<VpnDecoratorInformation> of(
           Path ipV4AnonymousDatabase, Path ipV6AnonymousDatabase) throws IOException {
-    this(LineReader.bufferedReaderForPath(ipV4AnonymousDatabase, BUFFER_SIZE), LineReader.bufferedReaderForPath(ipV6AnonymousDatabase, BUFFER_SIZE));
+    return of(
+            LineReader.bufferedReaderForPath(ipV4AnonymousDatabase, BUFFER_SIZE),
+            LineReader.bufferedReaderForPath(ipV6AnonymousDatabase, BUFFER_SIZE));
   }
 
-  public MaxmindVpnDecoratorDbReader(
-      BufferedReader ipV4AnonymousDatabase, BufferedReader ipV6AnonymousDatabase)
-      throws IOException {
+  public static DecoratorDbReader<VpnDecoratorInformation> of(
+          BufferedReader ipV4AnonymousDatabase, BufferedReader ipV6AnonymousDatabas)
+          throws IOException {
+    MaxmindVpnDecoratorDbReader result =
+            new MaxmindVpnDecoratorDbReader(ipV4AnonymousDatabase, ipV6AnonymousDatabas);
+    result.init();
+    return result;
+  }
 
+  private MaxmindVpnDecoratorDbReader(
+      BufferedReader ipV4AnonymousDatabase, BufferedReader ipV6AnonymousDatabase) {
     this.ipV4AnonymousDatabase = ipV4AnonymousDatabase;
     this.ipV6AnonymousDatabase = ipV6AnonymousDatabase;
-    this.ipV4AnonymousDatabase.readLine(); // first line is header
-    this.ipV6AnonymousDatabase.readLine(); // first line is header
-    this.readNextLine().ifPresent(this::setLastFetched);
   }
 
   private Optional<String> readLine() throws IOException {
@@ -57,6 +61,12 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
       }
     }
     return Optional.ofNullable(ipV6AnonymousDatabase.readLine());
+  }
+
+  @Override
+  protected void prepareDataSource() throws IOException {
+    this.ipV4AnonymousDatabase.readLine(); // first line is header
+    this.ipV6AnonymousDatabase.readLine(); // first line is header
   }
 
   @Override

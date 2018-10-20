@@ -25,8 +25,9 @@ public abstract class LineParser {
     IpInformation parsedInfo = this.parseLine(rawLine, retainOriginalLine);
     try {
       return decorateParsedLine(parsedInfo, rawLine);
-    } catch (UnknownHostException e) {
-      // may be we need another exception here, as this will be triggered by the decorators
+    } catch (Exception e) {
+      // This is very general but because it is running in a separate thread,
+      //many exception will just get swallowed making debugging difficult.
       throw new LineParsingException(e, rawLine);
     }
   }

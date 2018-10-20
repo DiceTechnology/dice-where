@@ -46,15 +46,13 @@ public class DecoratorTestUtils {
           + "1.0.4.0/27,1,1,0,0,0\n"
           + "1.0.5.0/27,1,1,0,0,0\n"
           + "1.0.7.32/28,1,1,0,0,0\n"
-//          + "1.0.7.32/27,1,1,0,0,0\n"
           + "1.0.7.48/28,1,1,0,0,0\n"
           + "1.0.7.72/29,1,1,0,0,0\n"
           + "1.0.7.96/29,1,1,0,0,0\n"
-		  + "1.0.8.32/28,1,1,0,0,0\n"
-//		  + "1.0.8.32/27,1,1,0,0,0\n"
-		  + "1.0.8.48/29,1,1,0,0,0\n"
-		  + "1.0.8.72/29,1,1,0,0,0\n"
-		  + "1.0.8.96/29,1,1,0,0,0";
+          + "1.0.8.32/28,1,1,0,0,0\n"
+          + "1.0.8.48/29,1,1,0,0,0\n"
+          + "1.0.8.72/29,1,1,0,0,0\n"
+          + "1.0.8.96/29,1,1,0,0,0";
 
   public static final String IPv6_LINES_2 =
       "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
@@ -75,7 +73,7 @@ public class DecoratorTestUtils {
   public static VpnDecorator getMaxmindVpnDecorator(
       DecorationStrategy strategy, List<String> ipv4Lines, List<String> ipv6Lines)
       throws IOException {
-    Stream.Builder<MaxmindVpnDecoratorDbReader> builder = Stream.builder();
+    Stream.Builder<DecoratorDbReader<VpnDecoratorInformation>> builder = Stream.builder();
     for (int i = 0; i < ipv4Lines.size(); i++) {
       builder.add(getMaxmindVpnDecorator(ipv4Lines.get(i), ipv6Lines.get(i)));
     }
@@ -85,7 +83,7 @@ public class DecoratorTestUtils {
   public static VpnDecorator getMaxmindVpnDecorator(DecorationStrategy strategy)
       throws IOException {
     return new VpnDecorator(
-        Stream.<MaxmindVpnDecoratorDbReader>builder()
+        Stream.<DecoratorDbReader<VpnDecoratorInformation>>builder()
             .add(getMaxmindVpnDecorator(IPv4_LINES, IPv6_LINES))
             .add(getMaxmindVpnDecorator(IPv4_LINES_2, IPv6_LINES_2))
             .add(getMaxmindVpnDecorator(IPv4_LINES_3, IPv6_LINES_3))
@@ -94,12 +92,12 @@ public class DecoratorTestUtils {
         strategy);
   }
 
-  public static MaxmindVpnDecoratorDbReader getMaxmindVpnDecorator(
+  public static DecoratorDbReader<VpnDecoratorInformation> getMaxmindVpnDecorator(
       String ipv4Lines, String ipv6Lines) throws IOException {
     InputStream streamV4 = new ByteArrayInputStream(ipv4Lines.getBytes());
     BufferedReader bufferedReaderV4 = new BufferedReader(new InputStreamReader(streamV4));
     InputStream streamV6 = new ByteArrayInputStream(ipv6Lines.getBytes());
     BufferedReader bufferedReaderV6 = new BufferedReader(new InputStreamReader(streamV6));
-    return new MaxmindVpnDecoratorDbReader(bufferedReaderV4, bufferedReaderV6);
+    return MaxmindVpnDecoratorDbReader.of(bufferedReaderV4, bufferedReaderV6);
   }
 }

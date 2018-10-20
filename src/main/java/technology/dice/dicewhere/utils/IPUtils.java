@@ -27,7 +27,7 @@ public class IPUtils {
 
 	public static IPAddress from(byte[] bytes) throws UnknownHostException {
 		return new IPAddressString(
-				InetAddress.getByAddress(bytes).getCanonicalHostName())
+				InetAddress.getByAddress(bytes).getHostAddress())
 				.getAddress();
 	}
 

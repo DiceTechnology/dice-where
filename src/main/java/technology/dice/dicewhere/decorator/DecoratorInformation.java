@@ -8,10 +8,12 @@ package technology.dice.dicewhere.decorator;
 
 import technology.dice.dicewhere.api.api.IP;
 
+import java.io.Serializable;
+
 /**
  * Minimum set of information for each decorating object.
  */
-public interface DecoratorInformation {
+public interface DecoratorInformation extends Serializable {
 
   IP getRangeStart();
 

@@ -59,10 +59,24 @@ public abstract class Decorator<T extends DecoratorInformation> {
    */
   public Stream<IpInformation> decorate(IpInformation original) throws UnknownHostException {
     Objects.requireNonNull(original);
-    List<List<T>> extraInformation = databaseReaders.entrySet().stream().map(e -> e.getValue().fetchForRange(original.getStartOfRange(), original.getEndOfRange())).collect(ImmutableList.toImmutableList());
+    //    try {
+    List<List<T>> extraInformation =
+        databaseReaders
+            .entrySet()
+            .stream()
+            .map(
+                e ->
+                    e.getValue()
+                        .fetchForRange(original.getStartOfRange(), original.getEndOfRange()))
+            .collect(ImmutableList.toImmutableList());
 
     return this.mergeIpInfoWithDecoratorInformation(
         original, mergeDecorationRanges(extraInformation));
+    //    } catch (Exception e) {
+    //      // TODO: tidy up debug code
+    //      e.printStackTrace();
+    //      throw new RuntimeException(e);
+    //    }
   }
 
   private List<T> mergeDecorationRanges(Collection<List<T>> found) throws UnknownHostException {
