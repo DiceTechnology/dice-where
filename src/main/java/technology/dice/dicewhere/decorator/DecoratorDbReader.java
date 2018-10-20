@@ -105,7 +105,6 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
       if (entry.get().getValue().getRangeStart().isGreaterThan(rangeBoundEnd)) {
         break;
       }
-
       entry
           .flatMap(e -> fitToRange(e.getValue(), rangeBoundStart, rangeBoundEnd))
           .ifPresent(result::add);
