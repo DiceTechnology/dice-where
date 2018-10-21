@@ -6,8 +6,10 @@
 
 package technology.dice.dicewhere.building;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.protobuf.ByteString;
@@ -31,6 +34,7 @@ import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
 import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.utils.IPUtils;
 import technology.dice.dicewhere.utils.ProtoValueConverter;
 
 public class DatabaseBuilder implements Runnable {
@@ -105,13 +109,12 @@ public class DatabaseBuilder implements Runnable {
             beingProcessed = currentLine;
             decorateEntry(currentLine.getParsedLine().getInfo())
                 .forEach(i -> sink.put(i.getStartOfRange(), buildIpProtobuf(i).toByteArray()));
-            // currentLine.getParsedLine().buildIpProtobuf().toByteArray());
             processedLines++;
             listener.lineAdded(provider, currentLine);
 
           } catch (DBException.NotSorted e) {
             listener.lineOutOfOrder(provider, beingProcessed, e);
-          } catch (UnknownHostException e) {
+          } catch (Exception e) {
             throw new RuntimeException("Database builder interrupted", e);
           }
         }
