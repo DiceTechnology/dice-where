@@ -7,7 +7,12 @@
 package technology.dice.dicewhere.api.exceptions;
 
 public class DecoratorDatabaseOutOfOrderException extends RuntimeException {
-	public DecoratorDatabaseOutOfOrderException(String message) {
-		super(message);
-	}
+
+  public DecoratorDatabaseOutOfOrderException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public DecoratorDatabaseOutOfOrderException(String message) {
+    super(message);
+  }
 }

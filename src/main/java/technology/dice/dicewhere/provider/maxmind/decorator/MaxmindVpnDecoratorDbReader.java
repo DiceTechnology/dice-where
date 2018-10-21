@@ -7,10 +7,12 @@
 package technology.dice.dicewhere.provider.maxmind.decorator;
 
 import com.google.common.base.Splitter;
+import com.google.protobuf.InvalidProtocolBufferException;
 import inet.ipaddr.IPAddressString;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.decorator.DecoratorDbReader;
 import technology.dice.dicewhere.decorator.VpnDecoratorInformation;
+import technology.dice.dicewhere.decorator.serializers.protobuf.VpnDecoratorInformationProtoOuterClass;
 import technology.dice.dicewhere.reading.LineReader;
 import technology.dice.dicewhere.utils.StringUtils;
 
@@ -30,17 +32,17 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
   private final BufferedReader ipV6AnonymousDatabase;
 
   public static DecoratorDbReader<VpnDecoratorInformation> of(
-          Path ipV4AnonymousDatabase, Path ipV6AnonymousDatabase) throws IOException {
+      Path ipV4AnonymousDatabase, Path ipV6AnonymousDatabase) throws IOException {
     return of(
-            LineReader.bufferedReaderForPath(ipV4AnonymousDatabase, BUFFER_SIZE),
-            LineReader.bufferedReaderForPath(ipV6AnonymousDatabase, BUFFER_SIZE));
+        LineReader.bufferedReaderForPath(ipV4AnonymousDatabase, BUFFER_SIZE),
+        LineReader.bufferedReaderForPath(ipV6AnonymousDatabase, BUFFER_SIZE));
   }
 
   public static DecoratorDbReader<VpnDecoratorInformation> of(
-          BufferedReader ipV4AnonymousDatabase, BufferedReader ipV6AnonymousDatabas)
-          throws IOException {
+      BufferedReader ipV4AnonymousDatabase, BufferedReader ipV6AnonymousDatabas)
+      throws IOException {
     MaxmindVpnDecoratorDbReader result =
-            new MaxmindVpnDecoratorDbReader(ipV4AnonymousDatabase, ipV6AnonymousDatabas);
+        new MaxmindVpnDecoratorDbReader(ipV4AnonymousDatabase, ipV6AnonymousDatabas);
     result.init();
     return result;
   }
@@ -90,6 +92,18 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
       return Optional.empty();
     }
     return Optional.empty();
+  }
+
+  @Override
+  protected VpnDecoratorInformation deserializeEntryFromDb(byte[] input) {
+    try {
+      VpnDecoratorInformationProtoOuterClass.VpnDecoratorInformationProto out =
+          VpnDecoratorInformationProtoOuterClass.VpnDecoratorInformationProto.parseFrom(input);
+      return new VpnDecoratorInformation(
+          new IP(out.getStartOfRange().toByteArray()), new IP(out.getEndOfRange().toByteArray()));
+    } catch (InvalidProtocolBufferException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

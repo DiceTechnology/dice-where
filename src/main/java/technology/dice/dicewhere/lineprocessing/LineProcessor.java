@@ -46,6 +46,7 @@ public class LineProcessor implements Runnable {
    * @param parser the parser to use for parsing the line data
    * @param retainOriginalLine indicates if the original line data should be retained alongside the
    *     serialized data
+   * @param workersCount numbers of threads to use whilst reading from the db file.
    * @param progressListener the listener for reporting progress
    */
   public LineProcessor(

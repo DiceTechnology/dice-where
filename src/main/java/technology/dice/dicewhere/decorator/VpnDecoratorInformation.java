@@ -6,7 +6,9 @@
 
 package technology.dice.dicewhere.decorator;
 
+import com.google.protobuf.ByteString;
 import technology.dice.dicewhere.api.api.IP;
+import technology.dice.dicewhere.decorator.serializers.protobuf.VpnDecoratorInformationProtoOuterClass;
 
 import java.util.Objects;
 
@@ -48,6 +50,15 @@ public class VpnDecoratorInformation implements DecoratorInformation {
   @Override
   public VpnDecoratorInformation withNumberOfMatches(int i) {
     return new VpnDecoratorInformation(rangeStart, rangeEnd, i);
+  }
+
+  @Override
+  public byte[] toByteArray() {
+    return VpnDecoratorInformationProtoOuterClass.VpnDecoratorInformationProto
+            .newBuilder()
+            .setStartOfRange(ByteString.copyFrom(rangeStart.getBytes()))
+            .setEndOfRange(ByteString.copyFrom(rangeEnd.getBytes()))
+            .build().toByteArray();
   }
 
   @Override

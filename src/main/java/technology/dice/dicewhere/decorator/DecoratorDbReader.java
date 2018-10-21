@@ -6,10 +6,12 @@
 
 package technology.dice.dicewhere.decorator;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import org.mapdb.DB;
 import org.mapdb.DBException;
 import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.exceptions.DecoratorDatabaseOutOfOrderException;
 import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
@@ -18,6 +20,7 @@ import technology.dice.dicewhere.utils.IPUtils;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
@@ -28,7 +31,7 @@ import java.util.stream.Stream;
  * it reaches the end of the file or the end of the requested ip range;
  */
 public abstract class DecoratorDbReader<T extends DecoratorInformation> {
-  private NavigableMap<IP, T> db;
+  private NavigableMap<IP, byte[]> db;
 
   protected abstract void prepareDataSource() throws IOException;
 
@@ -44,73 +47,82 @@ public abstract class DecoratorDbReader<T extends DecoratorInformation> {
             .fileDeleteAfterClose()
             .make();
 
-    DB.TreeMapSink<IP, T> sink =
-        db.treeMap(
-                this.getClass().getName(),
-                new IPSerializer(),
-                new DecoratorInformationSerializer<T>())
+    DB.TreeMapSink<IP, byte[]> sink =
+        db.treeMap(this.getClass().getName(), new IPSerializer(), Serializer.BYTE_ARRAY)
             .createFromSink();
 
     Optional<T> prevDbValue = Optional.empty();
+    Stopwatch dbInit = Stopwatch.createStarted();
     for (; ; ) {
       Optional<T> nextLine = readNextLine();
+      if (!nextLine.isPresent()) {
+        break;
+      }
       try {
-        if (!nextLine.isPresent()) {
-          break;
-        }
         T dbValue = nextLine.get();
         if (prevDbValue
             .map(pv -> dbValue.getRangeStart().isGreaterThan(pv.getRangeEnd()))
             .orElse(true)) {
           prevDbValue = Optional.of(dbValue);
-          sink.put(dbValue.getRangeStart(), dbValue);
+          sink.put(dbValue.getRangeStart(), dbValue.toByteArray());
         } else {
-          throw new DecoratorDatabaseOutOfOrderException(
-              String.format(
-                  "DB out of order for IP range %s - %s",
-                  IPUtils.from(nextLine.get().getRangeStart()),
-                  IPUtils.from(nextLine.get().getRangeEnd())));
+          throw generateDecoratorDbOrderException(nextLine.get(), null);
         }
       } catch (DBException.NotSorted e) {
-        throw new DecoratorDatabaseOutOfOrderException(
-            String.format(
-                "DB out of order for IP range %s - %s",
-                IPUtils.from(nextLine.get().getRangeStart()),
-                IPUtils.from(nextLine.get().getRangeEnd())));
+        throw generateDecoratorDbOrderException(nextLine.get(), e);
       }
     }
     this.db = sink.create();
+    dbInit.stop();
+    System.out.println(
+        String.format("Decorator DB was prepared in %dms", dbInit.elapsed(TimeUnit.MILLISECONDS)));
   }
 
-  // TODO: javadoc
+  private DecoratorDatabaseOutOfOrderException generateDecoratorDbOrderException(
+      T nextLine, Throwable e) throws UnknownHostException {
+    return new DecoratorDatabaseOutOfOrderException(
+        String.format(
+            "DB out of order for IP range %s - %s",
+            IPUtils.from(nextLine.getRangeStart()), IPUtils.from(nextLine.getRangeEnd())),
+        e);
+  }
+
+  protected abstract T deserializeEntryFromDb(byte[] input);
+
+  /**
+   * @param rangeBoundStart start of the range that is being checked
+   * @param rangeBoundEnd end of the range that is being checked
+   * @return list of IP ranges that fall within the requested range
+   */
   public final List<T> fetchForRange(IP rangeBoundStart, IP rangeBoundEnd) {
     Objects.requireNonNull(db);
     Stream.Builder<T> result = Stream.builder();
     IP seekStart = rangeBoundStart;
-    Optional<Map.Entry<IP, T>> biggestPriorToRange =
-        Optional.ofNullable(this.db.floorEntry(seekStart));
+    Optional<T> biggestPriorToRange =
+        Optional.ofNullable(this.db.floorEntry(seekStart))
+            .map(e -> deserializeEntryFromDb(e.getValue()));
     if (biggestPriorToRange.isPresent()
-        && biggestPriorToRange.get().getValue().getRangeEnd().isGreaterThanOrEqual(seekStart)) {
+        && biggestPriorToRange.get().getRangeEnd().isGreaterThanOrEqual(seekStart)) {
 
-      seekStart = biggestPriorToRange.get().getValue().getRangeEnd();
+      seekStart = biggestPriorToRange.get().getRangeEnd();
       biggestPriorToRange
-          .flatMap(e -> fitToRange(e.getValue(), rangeBoundStart, rangeBoundEnd))
+          .flatMap(e -> fitToRange(e, rangeBoundStart, rangeBoundEnd))
           .ifPresent(result::add);
     }
     for (; ; ) {
-      Optional<Map.Entry<IP, T>> entry = Optional.ofNullable(this.db.ceilingEntry(seekStart));
+      Optional<T> entry =
+          Optional.ofNullable(this.db.ceilingEntry(seekStart))
+              .map(e -> deserializeEntryFromDb(e.getValue()));
       if (!entry.isPresent()) {
         break;
       }
-      if (entry.get().getValue().getRangeStart().isGreaterThan(rangeBoundEnd)) {
+      if (entry.get().getRangeStart().isGreaterThan(rangeBoundEnd)) {
         break;
       }
-      entry
-          .flatMap(e -> fitToRange(e.getValue(), rangeBoundStart, rangeBoundEnd))
-          .ifPresent(result::add);
-      if (entry.get().getValue().getRangeEnd().isGreaterThan(seekStart)) {
+      entry.flatMap(e -> fitToRange(e, rangeBoundStart, rangeBoundEnd)).ifPresent(result::add);
+      if (entry.get().getRangeEnd().isGreaterThan(seekStart)) {
         try {
-          seekStart = IPUtils.increment(entry.get().getValue().getRangeEnd());
+          seekStart = IPUtils.increment(entry.get().getRangeEnd());
         } catch (UnknownHostException e) {
           // This is unlikely but if happens it indicates the DB is corrupted containing invalid
           // data. All records should be in ascending order
