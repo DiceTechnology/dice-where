@@ -112,8 +112,7 @@ public abstract class LineReader {
       LineReaderListener readerListener,
       LineProcessorListener processListener,
       DatabaseBuilderListener buildingListener,
-      int workersCount)
-      throws IOException {
+      int workersCount) {
 
     long before = System.currentTimeMillis();
     ExecutorService parserExecutorService =
@@ -134,8 +133,13 @@ public abstract class LineReader {
               retainOriginalLine,
               new LineprocessorListenerForProvider(provider(), processListener),
               workersCount);
+
       DatabaseBuilder databaseBuilder =
-          new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener);
+          parser()
+              .getDecorator()
+              .map(d -> new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener, d))
+              .orElseGet(
+                  () -> new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener));
 
       Future processorFuture = setupExecutorService.submit(processor);
       Future databaseBuilderFuture = setupExecutorService.submit(databaseBuilder);

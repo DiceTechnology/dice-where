@@ -12,20 +12,14 @@ import technology.dice.dicewhere.parsing.ParsedLine;
 public class SerializedLine {
   private ParsedLine parsedLine;
   private final IP startIp;
-  private final byte[] info;
 
-  public SerializedLine(IP startIp, byte[] info, ParsedLine parsedLine) {
+  public SerializedLine(IP startIp, ParsedLine parsedLine) {
     this.startIp = startIp;
-    this.info = info;
     this.parsedLine = parsedLine;
   }
 
   public IP getStartIp() {
     return startIp;
-  }
-
-  public byte[] getInfo() {
-    return info;
   }
 
   public ParsedLine getParsedLine() {

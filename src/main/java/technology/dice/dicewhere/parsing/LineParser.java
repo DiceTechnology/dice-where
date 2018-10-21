@@ -18,31 +18,16 @@ import java.util.stream.Stream;
 
 public abstract class LineParser {
 
-  protected abstract Optional<Decorator<? extends DecoratorInformation>> getDecorator();
+  public abstract Optional<Decorator<? extends DecoratorInformation>> getDecorator();
 
   public Stream<ParsedLine> parse(RawLine rawLine, boolean retainOriginalLine)
       throws LineParsingException {
     IpInformation parsedInfo = this.parseLine(rawLine, retainOriginalLine);
-    try {
-      return decorateParsedLine(parsedInfo, rawLine);
-    } catch (UnknownHostException e) {
-      // may be we need another exception here, as this will be triggered by the decorators
-      throw new LineParsingException(e, rawLine);
-    }
+    return Stream.of(
+        new ParsedLine(
+            parsedInfo.getStartOfRange(), parsedInfo.getEndOfRange(), parsedInfo, rawLine));
   }
 
   protected abstract IpInformation parseLine(RawLine rawLine, boolean retainOriginalLine)
       throws LineParsingException;
-
-  private Stream<ParsedLine> decorateParsedLine(IpInformation ipInfo, RawLine rawLine)
-      throws UnknownHostException {
-    if (getDecorator().isPresent()) {
-      Stream<IpInformation> decoratedIpInfo = getDecorator().get().decorate(ipInfo);
-      return decoratedIpInfo.map(
-          info -> new ParsedLine(info.getStartOfRange(), info.getEndOfRange(), info, rawLine));
-    } else {
-      return Stream.of(
-          new ParsedLine(ipInfo.getStartOfRange(), ipInfo.getEndOfRange(), ipInfo, rawLine));
-    }
-  }
 }

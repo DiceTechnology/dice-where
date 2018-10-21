@@ -8,10 +8,7 @@ package technology.dice.dicewhere.parsing.provider.maxmind;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
@@ -105,6 +102,7 @@ public class MaxmindLineParserTest {
   }
 
   @Test
+  @Ignore //DECORATION now happens prior to putting it in the DB
   public void shouldIdentifyIpv4RangesWithVpn_whenRangesDoNotOverlap()
       throws LineParsingException, IOException {
     MaxmindLineParser maxmindLineParser = new MaxmindLineParser(locationNames, DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY));

@@ -49,7 +49,7 @@ public class MaxmindLineParser extends LineParser {
   }
 
   @Override
-  protected Optional<Decorator<? extends DecoratorInformation>> getDecorator() {
+  public Optional<Decorator<? extends DecoratorInformation>> getDecorator() {
     return Optional.ofNullable(decorator);
   }
 
