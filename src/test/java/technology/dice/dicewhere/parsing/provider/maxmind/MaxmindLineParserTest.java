@@ -109,7 +109,6 @@ public class MaxmindLineParserTest {
 
   @Test
   public void shouldIdentifyIpv4RangesWithVpn_whenRangesDoNotOverlap() throws IOException {
-
     IPResolver ipdb =
         new IPResolver.Builder()
             .withProvider(
