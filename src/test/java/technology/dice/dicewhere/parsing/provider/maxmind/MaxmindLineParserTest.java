@@ -9,25 +9,31 @@ package technology.dice.dicewhere.parsing.provider.maxmind;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
 import org.junit.*;
+import technology.dice.dicewhere.api.IPResolverTest;
 import technology.dice.dicewhere.api.api.IP;
+import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.decorator.DecorationStrategy;
 import technology.dice.dicewhere.decorator.DecoratorTestUtils;
 import technology.dice.dicewhere.parsing.ParsedLine;
+import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLocarionAndIspLineReader;
 import technology.dice.dicewhere.provider.maxmind.parsing.MaxmindLineParser;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 import technology.dice.dicewhere.reading.RawLine;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class MaxmindLineParserTest {
 
@@ -102,94 +108,37 @@ public class MaxmindLineParserTest {
   }
 
   @Test
-  @Ignore //DECORATION now happens prior to putting it in the DB
   public void shouldIdentifyIpv4RangesWithVpn_whenRangesDoNotOverlap()
-      throws LineParsingException, IOException {
-    MaxmindLineParser maxmindLineParser = new MaxmindLineParser(locationNames, DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY));
+      throws IOException {
 
-    String line = "1.0.2.0/24,3372745,2264397,,0,0,9600-082,37.8000,-25.5833,500";
-    RawLine rawLine = new RawLine(line, 1);
-    List<ParsedLine> parsed = maxmindLineParser.parse(rawLine, false).collect(Collectors.toList());
-    IpInformation.Builder baseInfo =
-        IpInformation.builder()
-            .withCountryCodeAlpha2("PT")
-            .withGeonameId("3372745")
-            .withCity("Rabo De Peixe")
-            .withLeastSpecificDivision("Azores")
-            .withMostSpecificDivision("")
-            .withPostcode("9600-082");
-    List<ParsedLine> expected = new ArrayList<>();
-    expected.add(
-        new ParsedLine(
-            new IP(InetAddresses.forString("1.0.2.0")),
-            new IP(InetAddresses.forString("1.0.2.15")),
-            baseInfo
-                .isVpn(false)
-                .withStartOfRange(new IP(InetAddresses.forString("1.0.2.0")))
-                .withEndOfRange(new IP(InetAddresses.forString("1.0.2.15")))
-                .build(),
-            rawLine));
-    expected.add(
-        new ParsedLine(
-            new IP(InetAddresses.forString("1.0.2.16")),
-            new IP(InetAddresses.forString("1.0.2.31")),
-            baseInfo
-                .isVpn(true)
-                .withStartOfRange(new IP(InetAddresses.forString("1.0.2.16")))
-                .withEndOfRange(new IP(InetAddresses.forString("1.0.2.31")))
-                .build(),
-            rawLine));
-    expected.add(
-        new ParsedLine(
-            new IP(InetAddresses.forString("1.0.2.32")),
-            new IP(InetAddresses.forString("1.0.2.54")),
-            baseInfo
-                .isVpn(false)
-                .withStartOfRange(new IP(InetAddresses.forString("1.0.2.32")))
-                .withEndOfRange(new IP(InetAddresses.forString("1.0.2.54")))
-                .build(),
-            rawLine));
-    expected.add(
-        new ParsedLine(
-            new IP(InetAddresses.forString("1.0.2.55")),
-            new IP(InetAddresses.forString("1.0.2.55")),
-            baseInfo
-                .isVpn(true)
-                .withStartOfRange(new IP(InetAddresses.forString("1.0.2.55")))
-                .withEndOfRange(new IP(InetAddresses.forString("1.0.2.55")))
-                .build(),
-            rawLine));
-    expected.add(
-        new ParsedLine(
-            new IP(InetAddresses.forString("1.0.2.56")),
-            new IP(InetAddresses.forString("1.0.2.63")),
-            baseInfo
-                .isVpn(false)
-                .withStartOfRange(new IP(InetAddresses.forString("1.0.2.56")))
-                .withEndOfRange(new IP(InetAddresses.forString("1.0.2.63")))
-                .build(),
-            rawLine));
-    expected.add(
-            new ParsedLine(
-                    new IP(InetAddresses.forString("1.0.2.64")),
-                    new IP(InetAddresses.forString("1.0.2.79")),
-                    baseInfo
-                            .isVpn(true)
-                            .withStartOfRange(new IP(InetAddresses.forString("1.0.2.64")))
-                            .withEndOfRange(new IP(InetAddresses.forString("1.0.2.79")))
-                            .build(),
-                    rawLine));
-    expected.add(
-            new ParsedLine(
-                    new IP(InetAddresses.forString("1.0.2.80")),
-                    new IP(InetAddresses.forString("1.0.2.255")),
-                    baseInfo
-                            .isVpn(false)
-                            .withStartOfRange(new IP(InetAddresses.forString("1.0.2.80")))
-                            .withEndOfRange(new IP(InetAddresses.forString("1.0.2.255")))
-                            .build(),
-                    rawLine));
-    Assert.assertEquals(expected, parsed);
+
+    IPResolver ipdb = new IPResolver.Builder()
+            .withProvider(
+                    new MaxmindDbReader(
+                            Paths.get(
+                                    IPResolverTest.class
+                                            .getClassLoader()
+                                            .getResource("provider/maxmind/GeoLite2-City-Locations-en.csv.zip")
+                                            .getFile()),
+                            Paths.get(
+                                    IPResolverTest.class
+                                            .getClassLoader()
+                                            .getResource("provider/maxmind/tinyValidV4.csv")
+                                            .getFile()),
+                            Paths.get(
+                                    IPResolverTest.class
+                                            .getClassLoader()
+                                            .getResource("provider/maxmind/tinyValidV6.csv")
+                                            .getFile()),
+                            DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY))
+            )
+            .build();
+
+    Map<ProviderKey, Optional<IpInformation>> resolvedVpnIp = ipdb.resolve("1.0.32.1");
+    Map<ProviderKey, Optional<IpInformation>> resolvedNoneVpnIp = ipdb.resolve("1.0.32.2");
+
+    assertTrue(resolvedVpnIp.values().stream().findFirst().get().get().isVpn().get());
+    assertFalse(resolvedNoneVpnIp.values().stream().findFirst().get().get().isVpn().get());
   }
 
   @Test

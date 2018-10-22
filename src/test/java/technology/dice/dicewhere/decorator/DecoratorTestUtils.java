@@ -30,7 +30,8 @@ public class DecoratorTestUtils {
           + "1.0.5.32/28,1,1,0,0,0\n"
           + "1.0.7.16/29,1,1,0,0,0\n"
           + "1.0.8.16/29,1,1,0,0,0\n"
-          + "1.0.8.32/29,1,1,0,0,0";
+          + "1.0.8.32/29,1,1,0,0,0\n"
+          + "1.0.32.1/32,1,1,0,0,0";
 
   public static final String IPv6_LINES =
       "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
