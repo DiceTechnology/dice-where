@@ -108,30 +108,28 @@ public class MaxmindLineParserTest {
   }
 
   @Test
-  public void shouldIdentifyIpv4RangesWithVpn_whenRangesDoNotOverlap()
-      throws IOException {
+  public void shouldIdentifyIpv4RangesWithVpn_whenRangesDoNotOverlap() throws IOException {
 
-
-    IPResolver ipdb = new IPResolver.Builder()
+    IPResolver ipdb =
+        new IPResolver.Builder()
             .withProvider(
-                    new MaxmindDbReader(
-                            Paths.get(
-                                    IPResolverTest.class
-                                            .getClassLoader()
-                                            .getResource("provider/maxmind/GeoLite2-City-Locations-en.csv.zip")
-                                            .getFile()),
-                            Paths.get(
-                                    IPResolverTest.class
-                                            .getClassLoader()
-                                            .getResource("provider/maxmind/tinyValidV4.csv")
-                                            .getFile()),
-                            Paths.get(
-                                    IPResolverTest.class
-                                            .getClassLoader()
-                                            .getResource("provider/maxmind/tinyValidV6.csv")
-                                            .getFile()),
-                            DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY))
-            )
+                new MaxmindDbReader(
+                    Paths.get(
+                        IPResolverTest.class
+                            .getClassLoader()
+                            .getResource("provider/maxmind/GeoLite2-City-Locations-en.csv.zip")
+                            .getFile()),
+                    Paths.get(
+                        IPResolverTest.class
+                            .getClassLoader()
+                            .getResource("provider/maxmind/tinyValidV4.csv")
+                            .getFile()),
+                    Paths.get(
+                        IPResolverTest.class
+                            .getClassLoader()
+                            .getResource("provider/maxmind/tinyValidV6.csv")
+                            .getFile()),
+                    DecoratorTestUtils.getMaxmindVpnDecorator(DecorationStrategy.ANY)))
             .build();
 
     Map<ProviderKey, Optional<IpInformation>> resolvedVpnIp = ipdb.resolve("1.0.32.1");
