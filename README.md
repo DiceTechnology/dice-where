@@ -6,20 +6,24 @@ It has been designed to load *csv* datasources but can be extended to load data 
 
 # Installation
 
+Add the following repository to your `~/.m2/settings.xml` file or to your `pom.xml` file.
 ```xml
-<repository>
-  <snapshots>
-    <enabled>false</enabled>
-  </snapshots>
-  <id>bintray-<username>-maven</id>
-  <name>bintray</name>
-  <url>https://dl.bintray.com/dicetechnology/dice-where</url>
+ <repository>
+    <snapshots>
+	<enabled>false</enabled>
+    </snapshots>
+    <id>bintray-dicetechnology-dice-where</id>
+    <name>bintray</name>
+    <url>https://dl.bintray.com/dicetechnology/dice-where</url>
 </repository>
-...
+```
+Add the following dependency to your `pom.xml`
+```xml
 <dependency>
   <groupId>technology.dice.open</groupId>
   <artifactId>dice-where</artifactId>
-  <version>1.0.0</version>
+  <version>VERSION</version>
+  <type>pom</type>
 </dependency>
 ```
 
