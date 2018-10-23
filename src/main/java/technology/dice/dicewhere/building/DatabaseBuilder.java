@@ -6,20 +6,36 @@
 
 package technology.dice.dicewhere.building;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.google.protobuf.ByteString;
 import org.mapdb.DB;
 import org.mapdb.DBException;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
 import technology.dice.dicewhere.api.api.IP;
+import technology.dice.dicewhere.api.api.IpInformation;
+import technology.dice.dicewhere.decorator.Decorator;
+import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
+import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
+import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.utils.IPUtils;
+import technology.dice.dicewhere.utils.ProtoValueConverter;
 
 public class DatabaseBuilder implements Runnable {
   private final BlockingQueue<SerializedLine> source;
@@ -28,12 +44,13 @@ public class DatabaseBuilder implements Runnable {
   private final DB.TreeMapSink<IP, byte[]> sink;
   private boolean expectingMore;
   private int processedLines = 0;
+  private final Decorator<? extends DecoratorInformation> decorator;
 
   public DatabaseBuilder(
       ProviderKey provider,
       BlockingQueue<SerializedLine> source,
-      DatabaseBuilderListener listener) {
-
+      DatabaseBuilderListener listener,
+      Decorator<? extends DecoratorInformation> decorator) {
     this.source = source;
     this.expectingMore = true;
     this.listener = listener;
@@ -53,18 +70,31 @@ public class DatabaseBuilder implements Runnable {
                 Objects.requireNonNull(provider).name(), new IPSerializer(), Serializer.BYTE_ARRAY)
             .createFromSink();
     this.sink = sink;
+    this.decorator = decorator;
+  }
+
+  public DatabaseBuilder(
+      ProviderKey provider,
+      BlockingQueue<SerializedLine> source,
+      DatabaseBuilderListener listener) {
+
+    this(provider, source, listener, null);
   }
 
   public void dontExpectMore() {
     expectingMore = false;
   }
 
-  public int reimainingLines() {
+  public int remainingLines() {
     return source.size();
   }
 
   public int processedLines() {
     return processedLines;
+  }
+
+  protected Optional<Decorator<? extends DecoratorInformation>> getDecorator() {
+    return Optional.ofNullable(decorator);
   }
 
   @Override
@@ -77,12 +107,15 @@ public class DatabaseBuilder implements Runnable {
         for (SerializedLine currentLine : availableForAdding) {
           try {
             beingProcessed = currentLine;
-            sink.put(currentLine.getStartIp(), currentLine.getInfo());
+            decorateEntry(currentLine.getParsedLine().getInfo())
+                .forEach(i -> sink.put(i.getStartOfRange(), buildIpProtobuf(i).toByteArray()));
             processedLines++;
             listener.lineAdded(provider, currentLine);
 
           } catch (DBException.NotSorted e) {
             listener.lineOutOfOrder(provider, beingProcessed, e);
+          } catch (Exception e) {
+            throw new RuntimeException("Database builder interrupted", e);
           }
         }
       } catch (InterruptedException e) {
@@ -90,6 +123,32 @@ public class DatabaseBuilder implements Runnable {
         throw new RuntimeException("Database builder interrupted", e);
       }
     }
+  }
+
+  private Stream<IpInformation> decorateEntry(IpInformation entry) throws UnknownHostException {
+    if (getDecorator().isPresent()) {
+      return getDecorator().get().decorate(entry);
+    } else {
+      return Stream.of(entry);
+    }
+  }
+
+  private IPInformationProto.IpInformationProto buildIpProtobuf(IpInformation input) {
+    IPInformationProto.IpInformationProto.Builder messageBuilder =
+        IPInformationProto.IpInformationProto.newBuilder()
+            .setCity(input.getCity().orElse(""))
+            .setGeonameId(input.getGeonameId().orElse(""))
+            .setCountryCodeAlpha2(input.getCountryCodeAlpha2())
+            .setLeastSpecificDivision(input.getLeastSpecificDivision().orElse(""))
+            .setMostSpecificDivision(input.getMostSpecificDivision().orElse(""))
+            .setPostcode(input.getPostcode().orElse(""))
+            .setStartOfRange(ByteString.copyFrom(input.getStartOfRange().getBytes()))
+            .setEndOfRange(ByteString.copyFrom(input.getEndOfRange().getBytes()))
+            .setIsVpn(ProtoValueConverter.toThreeStateValue(input.isVpn().orElse(null)));
+
+    input.getOriginalLine().ifPresent(messageBuilder::setOriginalLine);
+
+    return messageBuilder.build();
   }
 
   public IPDatabase build() {

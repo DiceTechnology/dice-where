@@ -8,13 +8,11 @@ package technology.dice.dicewhere.lineprocessing;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Queues;
-import com.google.protobuf.ByteString;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto.IpInformationProto;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
-import technology.dice.dicewhere.utils.ProtoValueConverter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -135,7 +133,7 @@ public class LineProcessor implements Runnable {
       long started, Collection<RawLine> batch) {
     return batch
         .stream()
-        .flatMap(rawline -> attemptParse(rawline, started))
+        .flatMap(rawLine -> attemptParse(rawLine, started))
         .collect(ImmutableList.toImmutableList());
   }
 
@@ -159,10 +157,8 @@ public class LineProcessor implements Runnable {
 
   private Stream<SerializedLine> attemptSerialize(ParsedLine parsedLine) {
     try {
-      IpInformationProto message = createIpProtobuf(parsedLine);
-
       return Stream.of(
-          new SerializedLine(parsedLine.getStartIp(), message.toByteArray(), parsedLine));
+          new SerializedLine(parsedLine.getStartIp(), parsedLine));
 
     } catch (Exception e) {
       progressListener.serializeError(parsedLine, e);
@@ -170,22 +166,4 @@ public class LineProcessor implements Runnable {
     }
   }
 
-  private IpInformationProto createIpProtobuf(ParsedLine parsedLine) {
-    IpInformationProto.Builder messageBuilder =
-        IpInformationProto.newBuilder()
-            .setCity(parsedLine.getInfo().getCity().orElse(""))
-            .setGeonameId(parsedLine.getInfo().getGeonameId().orElse(""))
-            .setCountryCodeAlpha2(parsedLine.getInfo().getCountryCodeAlpha2())
-            .setLeastSpecificDivision(parsedLine.getInfo().getLeastSpecificDivision().orElse(""))
-            .setMostSpecificDivision(parsedLine.getInfo().getMostSpecificDivision().orElse(""))
-            .setPostcode(parsedLine.getInfo().getPostcode().orElse(""))
-            .setStartOfRange(ByteString.copyFrom(parsedLine.getStartIp().getBytes()))
-            .setEndOfRange(ByteString.copyFrom(parsedLine.getEndIp().getBytes()))
-            .setIsVpn(
-                ProtoValueConverter.toThreeStateValue(parsedLine.getInfo().isVpn().orElse(null)));
-
-    parsedLine.getInfo().getOriginalLine().ifPresent(messageBuilder::setOriginalLine);
-
-    return messageBuilder.build();
-  }
 }
