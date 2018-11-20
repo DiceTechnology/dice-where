@@ -104,7 +104,21 @@ The `IPResolver` is the main entry class for dice-where. It needs at least one `
 * `withBuilderListener` - a listener that is notified of events occurring during the in-memory database building stage
 * `retainOriginalLine` - whether to make the original file line available on query results
 
-An instance of `IPResolver`can be obtained by calling `build()` on the `IPResolver.Builder`instance and the result. This method will trigger the processing of all the configured databases and can take some time, depending on the number of lines to be processed (typically a function of the database granularity). See the benchmark section below for more details.
+An instance of `IPResolver`can be obtained by calling `build()` on the `IPResolver.Builder`instance and the result.
+This method will trigger the processing of all the configured databases and can take some time, depending on the number 
+of lines to be processed (typically a function of the database granularity). See the benchmark section below for more details.
+
+###Inbound VPN/Proxy traffic
+At the moment, there is logic to determine whether an IP originates from a VPN. That logic lives in the `parseDbLine` method
+in the `MaxmindVpnDecoratorDbReader` class. At the moment, the decision is made based on the result value of the 
+`is_anonymous_vpn` database field. The `is_anonymous` field is ignored.
+ 
+#####`is_anonymous`: Whether the IP address belongs to any sort of anonymous network
+#####`is_anonymous_vpn`: Whether the IP address belongs to an anonymous VPN system
+
+There might be a scenario where the IP is coming from a Proxy, in which case that IP would, rightly so, not be deemed a VPN,
+but it is still anonymous. You can choose to handle this scenario by overriding the method `parseDbLine` method and utilize
+the unused field in a way you see fit.
 
 ### Querying
 Once created, it contains methods to query a location by IP.
