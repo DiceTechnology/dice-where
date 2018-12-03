@@ -82,6 +82,7 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
     return Optional.empty();
   }
 
+  /** Update README.MD if this method is moved out or there is a change in behavior **/
   @Override
   protected Optional<VpnDecoratorInformation> parseDbLine(String line) {
     Iterator<String> fieldsIterator = splitter.split(line).iterator();
@@ -93,8 +94,8 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
     }
     IP l = new IP(rangeString.getAddress().getLower().getBytes());
     IP u = new IP(rangeString.getAddress().toMaxHost().getBytes());
-    fieldsIterator.next(); // anonymous
-    boolean isVpn = "1".equalsIgnoreCase(fieldsIterator.next());
+    fieldsIterator.next(); // is_anonymous field ignored
+    boolean isVpn = "1".equals(fieldsIterator.next()); //is_anonymous_vpn field
     if (isVpn) {
       return Optional.of(new VpnDecoratorInformation(l, u));
     } else {

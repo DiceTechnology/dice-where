@@ -104,7 +104,29 @@ The `IPResolver` is the main entry class for dice-where. It needs at least one `
 * `withBuilderListener` - a listener that is notified of events occurring during the in-memory database building stage
 * `retainOriginalLine` - whether to make the original file line available on query results
 
-An instance of `IPResolver`can be obtained by calling `build()` on the `IPResolver.Builder`instance and the result. This method will trigger the processing of all the configured databases and can take some time, depending on the number of lines to be processed (typically a function of the database granularity). See the benchmark section below for more details.
+An instance of `IPResolver`can be obtained by calling `build()` on the `IPResolver.Builder`instance and the result.
+This method will trigger the processing of all the configured databases and can take some time, depending on the number 
+of lines to be processed (typically a function of the database granularity). See the benchmark section below for more details.
+
+###Decorators
+A `Decorator` mechanism has been baked into the library to offer some flexibility with various tasks and enrich
+`IpInformation` objects - based on data from a given `DecoratorDbReader` implementation. A good example are the `VpnDecorator`
+and `MaxmindVpnDecoratorDbReader` implementations. The `VpnDecorator` is responsible for marking all `IpInformation` ranges
+as VPN if certain criteria are met. The `MaxmindVpnDecoratorDbReader` reads the Maxmind 'anonymous' database and identifies
+all the VPN entries. Those decorators can de extended if need be, and new decorators can be created as the user sees fit
+to aid with a specific challenge. Example details below:
+
+#####Inbound VPN/Proxy traffic
+At the moment, there is logic in place to determine whether an IP originates from a VPN. That logic lives in the `parseDbLine` method
+in the `MaxmindVpnDecoratorDbReader` class. The decision is made based on the result value of the 
+`is_anonymous_vpn` database field. The `is_anonymous` field is ignored.
+ 
+#####`is_anonymous`: Whether the IP address belongs to any sort of anonymous network
+#####`is_anonymous_vpn`: Whether the IP address belongs to an anonymous VPN system
+
+There might be a scenario where the IP is coming from a Proxy, in which case that IP would, rightly so, not be deemed a VPN,
+but it is still anonymous. You can choose to handle this scenario by overriding the implementation of the `parseDbLine`
+method in your own implementation of `DecoratorDbReader` and utilize the unused field in a way you see fit.
 
 ### Querying
 Once created, it contains methods to query a location by IP.
