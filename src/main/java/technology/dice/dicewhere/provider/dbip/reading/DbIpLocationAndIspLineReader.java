@@ -12,13 +12,13 @@ import technology.dice.dicewhere.provider.dbip.parsing.DbIpIpToLocationAndIspCSV
 
 import java.nio.file.Path;
 
-public class DbIpLocarionAndIspLineReader extends DbIpLineReader {
+public class DbIpLocationAndIspLineReader extends DbIpLineReader {
 
-  public DbIpLocarionAndIspLineReader(Path csv) {
+  public DbIpLocationAndIspLineReader(Path csv) {
     super(csv);
   }
 
-  public DbIpLocarionAndIspLineReader(
+  public DbIpLocationAndIspLineReader(
       Path csv, Decorator<? extends DecoratorInformation> decorator) {
     super(csv, decorator);
   }

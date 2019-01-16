@@ -18,7 +18,7 @@ import technology.dice.dicewhere.decorator.DecorationStrategy;
 import technology.dice.dicewhere.decorator.DecoratorTestUtils;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.ProviderKey;
-import technology.dice.dicewhere.provider.dbip.reading.DbIpLocarionAndIspLineReader;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLocationAndIspLineReader;
 import technology.dice.dicewhere.provider.maxmind.parsing.MaxmindLineParser;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;

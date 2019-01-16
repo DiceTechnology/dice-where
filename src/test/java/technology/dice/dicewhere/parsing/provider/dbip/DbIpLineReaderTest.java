@@ -17,7 +17,7 @@ import technology.dice.dicewhere.building.IPDatabase;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
 import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
 import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
-import technology.dice.dicewhere.provider.dbip.reading.DbIpLocarionAndIspLineReader;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLocationAndIspLineReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
 
 public class DbIpLineReaderTest {
@@ -32,7 +32,7 @@ public class DbIpLineReaderTest {
     LineReaderListener readerListener = Mockito.mock(LineReaderListener.class);
     LineProcessorListener processorListener = Mockito.mock(LineProcessorListener.class);
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
-    DbIpLineReader dbIpReader = new DbIpLocarionAndIspLineReader(path);
+    DbIpLineReader dbIpReader = new DbIpLocationAndIspLineReader(path);
     IPDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
@@ -76,7 +76,7 @@ public class DbIpLineReaderTest {
     LineReaderListener readerListener = Mockito.mock(LineReaderListener.class);
     LineProcessorListener processorListener = Mockito.mock(LineProcessorListener.class);
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
-    DbIpLineReader dbIpReader = new DbIpLocarionAndIspLineReader(path);
+    DbIpLineReader dbIpReader = new DbIpLocationAndIspLineReader(path);
     IPDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
@@ -120,7 +120,7 @@ public class DbIpLineReaderTest {
     LineReaderListener readerListener = Mockito.mock(LineReaderListener.class);
     LineProcessorListener processorListener = Mockito.mock(LineProcessorListener.class);
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
-    DbIpLineReader dbIpReader = new DbIpLocarionAndIspLineReader(path);
+    DbIpLineReader dbIpReader = new DbIpLocationAndIspLineReader(path);
     IPDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
