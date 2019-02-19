@@ -23,7 +23,7 @@ import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
-import technology.dice.dicewhere.provider.dbip.reading.DbIpLocarionAndIspLineReader;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLocationAndIspLineReader;
 import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 
@@ -38,14 +38,14 @@ public class IPResolverTest {
   public void noProviders() throws IOException {
     new IPResolver.Builder()
         .withProvider(
-            new DbIpLocarionAndIspLineReader(
+            new DbIpLocationAndIspLineReader(
                 Paths.get(
                     IPResolverTest.class
                         .getClassLoader()
                         .getResource("provider/dbip/tinyValid.csv")
                         .getFile())))
         .withProvider(
-            new DbIpLocarionAndIspLineReader(
+            new DbIpLocationAndIspLineReader(
                 Paths.get(
                     IPResolverTest.class
                         .getClassLoader()
@@ -58,7 +58,7 @@ public class IPResolverTest {
   public void resolveWithUnavailableProvider() throws IOException {
     new IPResolver.Builder()
         .withProvider(
-            new DbIpLocarionAndIspLineReader(
+            new DbIpLocationAndIspLineReader(
                 Paths.get(
                     IPResolverTest.class
                         .getClassLoader()
@@ -93,7 +93,7 @@ public class IPResolverTest {
                         .getResource("provider/maxmind/tinyValidV6.csv")
                         .getFile())))
         .withProvider(
-            new DbIpLocarionAndIspLineReader(
+            new DbIpLocationAndIspLineReader(
                 Paths.get(
                     IPResolverTest.class
                         .getClassLoader()
@@ -309,7 +309,7 @@ public class IPResolverTest {
   public void outOfOrderDatabaseDbIp() throws IOException {
     new IPResolver.Builder()
         .withProvider(
-            new DbIpLocarionAndIspLineReader(
+            new DbIpLocationAndIspLineReader(
                 Paths.get(
                     IPResolverTest.class
                         .getClassLoader()

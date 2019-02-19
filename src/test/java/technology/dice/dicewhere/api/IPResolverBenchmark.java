@@ -22,7 +22,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
-import technology.dice.dicewhere.provider.dbip.reading.DbIpLocarionAndIspLineReader;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLocationAndIspLineReader;
 import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
@@ -96,7 +96,7 @@ public class IPResolverBenchmark {
             Paths.get(MAXMIND_RESOURCES_FOLDER + "/GeoIP2-City-Blocks-IPv4.csv"),
             Paths.get(MAXMIND_RESOURCES_FOLDER + "/GeoIP2-City-Blocks-IPv6.csv"));
 
-    DbIpLineReader dbIpLineReader = new DbIpLocarionAndIspLineReader(Paths.get(RESOURCES_FOLDER + "/dbip-full-2018-09.csv"));
+    DbIpLineReader dbIpLineReader = new DbIpLocationAndIspLineReader(Paths.get(RESOURCES_FOLDER + "/dbip-full-2018-09.csv"));
 
     LineReaderListener lineReaderListener =
         new LineReaderListener() {

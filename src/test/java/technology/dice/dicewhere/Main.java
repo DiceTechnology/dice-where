@@ -19,7 +19,7 @@ import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.provider.ProviderKey;
-import technology.dice.dicewhere.provider.dbip.reading.DbIpLocarionAndIspLineReader;
+import technology.dice.dicewhere.provider.dbip.reading.DbIpLocationAndIspLineReader;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
 import technology.dice.dicewhere.reading.RawLine;
@@ -59,7 +59,7 @@ public class Main {
                     Paths.get(
                         "/Users/gluiz/Downloads/GeoIP2-City-CSV_2018070D3/GeoIP2-City-Blocks-IPv6.csv")))
             .withProvider(
-                new DbIpLocarionAndIspLineReader(
+                new DbIpLocationAndIspLineReader(
                     Paths.get(
                         "/Users/gluiz/dev/geoip2-poc/src/test/resources/provider/dbip/dbip-country-2018-07.csv.gz"))
                 // new DbIpLineReader(Paths.get("/Users/gluiz/Downloads/dbip-full-2018-07.csv"))
