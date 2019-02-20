@@ -25,8 +25,9 @@ before_deploy:
 - gpg --import travis.gpg.pem
 - ./cd/version.sh
 
-- provider: script
+deploy:
   skip_cleanup: true
+  provider: script
   script: ./cd/deploy.sh
   on:
     branch: master
