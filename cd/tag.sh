@@ -19,4 +19,4 @@ ARTIFACT_ID_POM=$( mvn help:evaluate -Dexpression=project.artifactId | grep -v '
 git config --global user.email "build@travis-ci.com"
 git config --global user.name "Travis CI"
 
-mvn scm:tag && slack "Tagged $ARTIFACT_ID_POM with version $VERSION_POM"
+mvn scm:tag -Dtag="${VERSION_POM}" && slack "Tagged $ARTIFACT_ID_POM with version $VERSION_POM"
