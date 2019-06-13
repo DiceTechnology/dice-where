@@ -157,7 +157,14 @@ wip
 ## Internals
 wip: stages of processing, threading etc
 ### Line reader
-wip
+
+`Line reader` aka. `Provider` processes the raw data into easy to look up format, to achieve optimal performance. Depends on characteristic of your application you can choose one of many storage types:
+* StorageMode.HEAP
+* StorageMode.HEAP_BYTE_ARRAY
+* StorageMode.OFF_HEAP
+* StorageMode.FILE
+
+Those are directly linked to mapdb modes described [here](http://www.mapdb.org/book/performance/). Default one is `StorageMode.FILE`
 ### Line processor
 wip
 ### Database builder

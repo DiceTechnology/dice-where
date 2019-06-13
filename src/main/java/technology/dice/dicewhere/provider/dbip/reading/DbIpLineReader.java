@@ -6,18 +6,19 @@
 
 package technology.dice.dicewhere.provider.dbip.reading;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import technology.dice.dicewhere.building.DatabaseBuilder;
 import technology.dice.dicewhere.decorator.Decorator;
 import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.provider.ProviderKey;
 import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
 import technology.dice.dicewhere.reading.LineReader;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public abstract class DbIpLineReader extends LineReader {
   private static final int BUFFER_SIZE = 1024 * 1024;
@@ -28,7 +29,16 @@ public abstract class DbIpLineReader extends LineReader {
     this(csv, null);
   }
 
-  public DbIpLineReader(@NotNull Path csv, @Nullable Decorator<? extends DecoratorInformation> decorator) {
+  public DbIpLineReader(
+      @NotNull Path csv, @Nullable Decorator<? extends DecoratorInformation> decorator) {
+    this(csv, decorator, DatabaseBuilder.StorageMode.FILE);
+  }
+
+  public DbIpLineReader(
+      @NotNull Path csv,
+      @Nullable Decorator<? extends DecoratorInformation> decorator,
+      @NotNull DatabaseBuilder.StorageMode storageMode) {
+    super(storageMode);
     lineParser = buildLineParser(decorator);
     this.csv = csv;
   }
