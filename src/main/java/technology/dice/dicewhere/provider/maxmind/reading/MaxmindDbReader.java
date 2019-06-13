@@ -8,6 +8,7 @@ package technology.dice.dicewhere.provider.maxmind.reading;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import technology.dice.dicewhere.building.DatabaseBuilder;
 import technology.dice.dicewhere.decorator.Decorator;
 import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
@@ -40,7 +41,17 @@ public class MaxmindDbReader extends LineReader {
       @NotNull Path ipV6CSV,
       @Nullable Decorator<? extends DecoratorInformation> decorator)
       throws IOException {
+    this(locationNames, ipV4CSV, ipV6CSV, decorator, DatabaseBuilder.StorageMode.FILE);
+  }
 
+  public MaxmindDbReader(
+      @NotNull Path locationNames,
+      @NotNull Path ipV4CSV,
+      @NotNull Path ipV6CSV,
+      @Nullable Decorator<? extends DecoratorInformation> decorator,
+      @NotNull DatabaseBuilder.StorageMode storageMode)
+      throws IOException {
+    super(storageMode);
     ipV4CSVPath = ipV4CSV;
     ipV6CSVPath = ipV6CSV;
     MaxmindLocationsParser locationsParser = new MaxmindLocationsParser();

@@ -9,6 +9,7 @@ package technology.dice.dicewhere.reading;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.jetbrains.annotations.NotNull;
 import technology.dice.dicewhere.building.DatabaseBuilder;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.IPDatabase;
@@ -19,7 +20,13 @@ import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.parsing.LineParser;
 import technology.dice.dicewhere.provider.ProviderKey;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
+import java.io.SequenceInputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +35,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -40,8 +52,17 @@ import java.util.zip.ZipFile;
  */
 public abstract class LineReader {
   private static final int LINES_BUFFER = 100000;
+  private final DatabaseBuilder.StorageMode storageMode;
   public static byte[] MAGIC_ZIP = {'P', 'K', 0x3, 0x4};
   public static int MAGIG_GZIP = 0xff00;
+
+  public LineReader() {
+    this(DatabaseBuilder.StorageMode.FILE);
+  }
+
+  public LineReader(@NotNull DatabaseBuilder.StorageMode storageMode) {
+    this.storageMode = storageMode;
+  }
 
   public abstract ProviderKey provider();
 
@@ -137,9 +158,14 @@ public abstract class LineReader {
       DatabaseBuilder databaseBuilder =
           parser()
               .getDecorator()
-              .map(d -> new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener, d))
+              .map(
+                  d ->
+                      new DatabaseBuilder(
+                          storageMode, provider(), serializedLinesBuffer, buildingListener, d))
               .orElseGet(
-                  () -> new DatabaseBuilder(provider(), serializedLinesBuffer, buildingListener));
+                  () ->
+                      new DatabaseBuilder(
+                          storageMode, provider(), serializedLinesBuffer, buildingListener));
 
       Future processorFuture = setupExecutorService.submit(processor);
       Future databaseBuilderFuture = setupExecutorService.submit(databaseBuilder);

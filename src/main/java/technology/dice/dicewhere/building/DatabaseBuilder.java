@@ -6,21 +6,9 @@
 
 package technology.dice.dicewhere.building;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.google.protobuf.ByteString;
+import org.jetbrains.annotations.NotNull;
 import org.mapdb.DB;
 import org.mapdb.DBException;
 import org.mapdb.DBMaker;
@@ -32,10 +20,17 @@ import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.lineprocessing.SerializedLine;
 import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
 import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
-import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.ProviderKey;
-import technology.dice.dicewhere.utils.IPUtils;
 import technology.dice.dicewhere.utils.ProtoValueConverter;
+
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class DatabaseBuilder implements Runnable {
   private final BlockingQueue<SerializedLine> source;
@@ -51,19 +46,29 @@ public class DatabaseBuilder implements Runnable {
       BlockingQueue<SerializedLine> source,
       DatabaseBuilderListener listener,
       Decorator<? extends DecoratorInformation> decorator) {
+    this(StorageMode.FILE, provider, source, listener, decorator);
+  }
+
+  public DatabaseBuilder(
+      StorageMode storageMode,
+      ProviderKey provider,
+      BlockingQueue<SerializedLine> source,
+      DatabaseBuilderListener listener) {
+
+    this(storageMode, provider, source, listener, null);
+  }
+
+  public DatabaseBuilder(
+      StorageMode storageMode,
+      ProviderKey provider,
+      BlockingQueue<SerializedLine> source,
+      DatabaseBuilderListener listener,
+      Decorator<? extends DecoratorInformation> decorator) {
     this.source = source;
     this.expectingMore = true;
     this.listener = listener;
     this.provider = provider;
-    DB db =
-        DBMaker.tempFileDB()
-            .checksumHeaderBypass()
-            .fileLockDisable()
-            .fileMmapEnable()
-            .fileChannelEnable()
-            .transactionEnable()
-            .fileDeleteAfterClose()
-            .make();
+    DB db = createDB(storageMode);
 
     DB.TreeMapSink<IP, byte[]> sink =
         db.treeMap(
@@ -73,12 +78,33 @@ public class DatabaseBuilder implements Runnable {
     this.decorator = decorator;
   }
 
-  public DatabaseBuilder(
-      ProviderKey provider,
-      BlockingQueue<SerializedLine> source,
-      DatabaseBuilderListener listener) {
-
-    this(provider, source, listener, null);
+  @NotNull
+  private DB createDB(StorageMode storageMode) {
+    DB db;
+    switch (storageMode) {
+      case HEAP:
+        db = DBMaker.heapDB().checksumHeaderBypass().transactionEnable().make();
+        break;
+      case HEAP_BYTE_ARRAY:
+        db = DBMaker.memoryDB().checksumHeaderBypass().transactionEnable().make();
+        break;
+      case OFF_HEAP:
+        db = DBMaker.memoryDirectDB().checksumHeaderBypass().transactionEnable().make();
+        break;
+      case FILE:
+      default:
+        db =
+            DBMaker.tempFileDB()
+                .checksumHeaderBypass()
+                .fileLockDisable()
+                .fileMmapEnable()
+                .fileChannelEnable()
+                .transactionEnable()
+                .fileDeleteAfterClose()
+                .make();
+        break;
+    }
+    return db;
   }
 
   public void dontExpectMore() {
@@ -153,5 +179,12 @@ public class DatabaseBuilder implements Runnable {
 
   public IPDatabase build() {
     return new IPDatabase(sink.create());
+  }
+
+  public enum StorageMode {
+    HEAP,
+    HEAP_BYTE_ARRAY,
+    OFF_HEAP,
+    FILE
   }
 }
