@@ -99,7 +99,6 @@ public class DatabaseBuilder implements Runnable {
                 .fileLockDisable()
                 .fileMmapEnable()
                 .fileChannelEnable()
-                .transactionEnable()
                 .fileDeleteAfterClose()
                 .make();
         break;
