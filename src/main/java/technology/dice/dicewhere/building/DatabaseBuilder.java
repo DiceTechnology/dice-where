@@ -83,13 +83,13 @@ public class DatabaseBuilder implements Runnable {
     DB db;
     switch (storageMode) {
       case HEAP:
-        db = DBMaker.heapDB().checksumHeaderBypass().transactionEnable().make();
+        db = DBMaker.heapDB().checksumHeaderBypass().make();
         break;
       case HEAP_BYTE_ARRAY:
-        db = DBMaker.memoryDB().checksumHeaderBypass().transactionEnable().make();
+        db = DBMaker.memoryDB().checksumHeaderBypass().make();
         break;
       case OFF_HEAP:
-        db = DBMaker.memoryDirectDB().checksumHeaderBypass().transactionEnable().make();
+        db = DBMaker.memoryDirectDB().checksumHeaderBypass().make();
         break;
       case FILE:
       default:
@@ -99,7 +99,6 @@ public class DatabaseBuilder implements Runnable {
                 .fileLockDisable()
                 .fileMmapEnable()
                 .fileChannelEnable()
-                .transactionEnable()
                 .fileDeleteAfterClose()
                 .make();
         break;
