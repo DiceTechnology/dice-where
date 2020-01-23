@@ -8,21 +8,18 @@ package technology.dice.dicewhere.provider.dbip.parsing;
 
 import com.google.common.base.Splitter;
 import com.google.common.net.InetAddresses;
+import java.net.InetAddress;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.decorator.Decorator;
 import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.reading.RawLine;
 import technology.dice.dicewhere.utils.StringUtils;
-
-import java.net.InetAddress;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Parser for DB-Ip's <a href="https://db-ip.com/db/ip-to-location-isp">IP to Location + ISP</a> db
