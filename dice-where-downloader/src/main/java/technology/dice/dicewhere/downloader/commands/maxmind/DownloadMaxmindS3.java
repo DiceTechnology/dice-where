@@ -37,7 +37,7 @@ public class DownloadMaxmindS3 extends MaxmindBaseCommand {
   String destination;
 
   @Override
-  public Integer execute() {
+  public int execute() {
     final ObjectPath objectPath = ObjectPath.of(prefix);
     S3Client s3Client = S3Client.create();
     Optional<String> optionalKey = latestKeyForDatabase(s3Client, objectPath);

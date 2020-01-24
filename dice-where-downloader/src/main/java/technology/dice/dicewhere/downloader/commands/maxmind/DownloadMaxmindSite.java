@@ -27,7 +27,7 @@ public class DownloadMaxmindSite extends MaxmindBaseCommand {
   String destination;
 
   @Override
-  public Integer execute() {
+  public int execute() {
     MaxmindSiteSource maxmindSource =
         new MaxmindSiteSource(this.buildContentRemotePath(), this.buildMd5RemotePath());
 

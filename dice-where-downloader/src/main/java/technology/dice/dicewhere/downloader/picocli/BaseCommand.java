@@ -110,7 +110,7 @@ public abstract class BaseCommand implements Callable<Integer> {
     return this.execute();
   }
 
-  protected abstract Integer execute();
+  protected abstract int execute();
 
   protected String[] necessaryEnvironmentVariables() {
     return new String[] {};
