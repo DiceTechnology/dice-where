@@ -96,6 +96,7 @@
     <mockito.version>2.7.22</mockito.version>
     <jococo.version>0.8.1</jococo.version>
     <jmh.version>1.21</jmh.version>
+    <maxmind.geoip2.version>2.13.0</maxmind.geoip2.version>
   </properties>
 
   <build>

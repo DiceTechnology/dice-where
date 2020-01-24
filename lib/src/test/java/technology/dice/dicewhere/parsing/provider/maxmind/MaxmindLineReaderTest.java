@@ -6,19 +6,24 @@
 
 package technology.dice.dicewhere.parsing.provider.maxmind;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
-import technology.dice.dicewhere.building.IPDatabase;
+import technology.dice.dicewhere.building.navigablemap.NavigableMapIpDatabase;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
 import technology.dice.dicewhere.provider.maxmind.MaxmindProviderKey;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.mockito.Mockito.*;
 
 public class MaxmindLineReaderTest {
   private LineReaderListener readerListener = mock(LineReaderListener.class);
@@ -32,7 +37,7 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
+    NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     Assert.assertEquals(18, dbSize);
@@ -51,7 +56,7 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
+    NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     Assert.assertEquals(11, dbSize);
@@ -70,7 +75,7 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    IPDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
+    NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     Assert.assertEquals(9, dbSize);

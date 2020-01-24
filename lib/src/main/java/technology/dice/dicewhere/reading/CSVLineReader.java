@@ -9,17 +9,6 @@ package technology.dice.dicewhere.reading;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.jetbrains.annotations.NotNull;
-import technology.dice.dicewhere.building.DatabaseBuilder;
-import technology.dice.dicewhere.building.DatabaseBuilderListener;
-import technology.dice.dicewhere.building.IPDatabase;
-import technology.dice.dicewhere.lineprocessing.LineProcessor;
-import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
-import technology.dice.dicewhere.lineprocessing.LineprocessorListenerForProvider;
-import technology.dice.dicewhere.lineprocessing.SerializedLine;
-import technology.dice.dicewhere.parsing.LineParser;
-import technology.dice.dicewhere.provider.ProviderKey;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,22 +34,33 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
+import org.jetbrains.annotations.NotNull;
+import technology.dice.dicewhere.building.navigablemap.MapDbDatabaseBuilder;
+import technology.dice.dicewhere.building.DatabaseBuilderListener;
+import technology.dice.dicewhere.building.IPDatabase;
+import technology.dice.dicewhere.building.navigablemap.NavigableMapIpDatabase;
+import technology.dice.dicewhere.lineprocessing.LineProcessor;
+import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
+import technology.dice.dicewhere.lineprocessing.LineprocessorListenerForProvider;
+import technology.dice.dicewhere.lineprocessing.SerializedLine;
+import technology.dice.dicewhere.parsing.LineParser;
+import technology.dice.dicewhere.provider.ProviderKey;
 
 /**
  * Base class providing data transformation between external IP data format provided by {@link
  * #lines()} method, returning standardised {@link IPDatabase}
  */
-public abstract class LineReader {
+public abstract class CSVLineReader implements SourceReader {
   private static final int LINES_BUFFER = 100000;
-  private final DatabaseBuilder.StorageMode storageMode;
+  private final MapDbDatabaseBuilder.StorageMode storageMode;
   public static byte[] MAGIC_ZIP = {'P', 'K', 0x3, 0x4};
   public static int MAGIG_GZIP = 0xff00;
 
-  public LineReader() {
-    this(DatabaseBuilder.StorageMode.FILE);
+  public CSVLineReader() {
+    this(MapDbDatabaseBuilder.StorageMode.FILE);
   }
 
-  public LineReader(@NotNull DatabaseBuilder.StorageMode storageMode) {
+  public CSVLineReader(@NotNull MapDbDatabaseBuilder.StorageMode storageMode) {
     this.storageMode = storageMode;
   }
 
@@ -128,7 +128,7 @@ public abstract class LineReader {
     return br;
   }
 
-  public final IPDatabase read(
+  public final NavigableMapIpDatabase read(
       boolean retainOriginalLine,
       LineReaderListener readerListener,
       LineProcessorListener processListener,
@@ -155,16 +155,16 @@ public abstract class LineReader {
               new LineprocessorListenerForProvider(provider(), processListener),
               workersCount);
 
-      DatabaseBuilder databaseBuilder =
+      MapDbDatabaseBuilder databaseBuilder =
           parser()
               .getDecorator()
               .map(
                   d ->
-                      new DatabaseBuilder(
+                      new MapDbDatabaseBuilder(
                           storageMode, provider(), serializedLinesBuffer, buildingListener, d))
               .orElseGet(
                   () ->
-                      new DatabaseBuilder(
+                      new MapDbDatabaseBuilder(
                           storageMode, provider(), serializedLinesBuffer, buildingListener));
 
       Future processorFuture = setupExecutorService.submit(processor);

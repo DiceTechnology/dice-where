@@ -5,7 +5,7 @@
  */
 package technology.dice.dicewhere.provider.dbip.reading;
 
-import technology.dice.dicewhere.building.DatabaseBuilder;
+import technology.dice.dicewhere.building.navigablemap.MapDbDatabaseBuilder;
 import technology.dice.dicewhere.decorator.Decorator;
 import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.parsing.LineParser;
@@ -21,13 +21,13 @@ public class DbIpLocationAndIspLineReader extends DbIpLineReader {
 
   public DbIpLocationAndIspLineReader(
       Path csv, Decorator<? extends DecoratorInformation> decorator) {
-    this(csv, decorator, DatabaseBuilder.StorageMode.FILE);
+    this(csv, decorator, MapDbDatabaseBuilder.StorageMode.FILE);
   }
 
   public DbIpLocationAndIspLineReader(
       Path csv,
       Decorator<? extends DecoratorInformation> decorator,
-      DatabaseBuilder.StorageMode storageMode) {
+      MapDbDatabaseBuilder.StorageMode storageMode) {
     super(csv, decorator, storageMode);
   }
 

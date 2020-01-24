@@ -237,6 +237,12 @@
       <version>${jmh.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.maxmind.geoip2</groupId>
+      <artifactId>geoip2</artifactId>
+      <version>${maxmind.geoip2.version}</version>
+    </dependency>
+
   </dependencies>
 
 </project>
