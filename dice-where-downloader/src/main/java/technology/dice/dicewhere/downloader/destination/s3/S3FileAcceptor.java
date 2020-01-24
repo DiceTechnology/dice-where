@@ -80,10 +80,10 @@ public class S3FileAcceptor implements FileAcceptor<Void, MD5Checksum> {
 
     try {
       client.headObject(headObjectRequest);
+      return true;
     } catch (NoSuchKeyException e) {
       return false;
     }
-    return true;
   }
 
   @Override
