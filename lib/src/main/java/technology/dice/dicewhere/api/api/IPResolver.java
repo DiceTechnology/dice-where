@@ -7,10 +7,8 @@
 package technology.dice.dicewhere.api.api;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,11 +23,10 @@ import technology.dice.dicewhere.api.exceptions.NoProvidersException;
 import technology.dice.dicewhere.api.exceptions.ProviderNotAvailableException;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.IPDatabase;
-import technology.dice.dicewhere.lineprocessing.LineProcessor;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
 import technology.dice.dicewhere.provider.ProviderKey;
-import technology.dice.dicewhere.reading.LineReader;
 import technology.dice.dicewhere.reading.LineReaderListener;
+import technology.dice.dicewhere.reading.SourceReader;
 
 public class IPResolver {
   private static final int DEFAULT_LINE_PROCESSOR_WORKERS_COUNT = 4;
@@ -86,9 +83,7 @@ public class IPResolver {
   public CompletionStage<Map<ProviderKey, Optional<IpInformation>>> resolveAsync(@Nonnull IP ip) {
 
     Map<ProviderKey, CompletableFuture<Optional<IpInformation>>> resolution =
-        databases
-            .entrySet()
-            .stream()
+        databases.entrySet().stream()
             .collect(
                 ImmutableMap.toImmutableMap(
                     Map.Entry::getKey,
@@ -99,9 +94,7 @@ public class IPResolver {
     return CompletableFuture.allOf(resolution.values().toArray(new CompletableFuture<?>[0]))
         .thenApply(
             res ->
-                resolution
-                    .entrySet()
-                    .stream()
+                resolution.entrySet().stream()
                     .collect(
                         ImmutableMap.toImmutableMap(
                             Map.Entry::getKey, entry -> entry.getValue().join())));
@@ -127,9 +120,7 @@ public class IPResolver {
   public Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolveAsync(
       @Nonnull IP ip, @Nonnull ExecutorService executorService) {
     Map<ProviderKey, CompletionStage<Optional<IpInformation>>> resolution =
-        databases
-            .entrySet()
-            .stream()
+        databases.entrySet().stream()
             .collect(
                 Collectors.toMap(
                     Map.Entry::getKey,
@@ -144,9 +135,7 @@ public class IPResolver {
 
   public Map<ProviderKey, Optional<IpInformation>> resolve(@Nonnull IP ip) {
     Map<ProviderKey, Optional<IpInformation>> resolution =
-        databases
-            .entrySet()
-            .stream()
+        databases.entrySet().stream()
             .collect(
                 Collectors.toMap(
                     Map.Entry::getKey,
@@ -158,7 +147,7 @@ public class IPResolver {
   }
 
   public static class Builder {
-    private final Map<ProviderKey, LineReader> providers;
+    private final Map<ProviderKey, SourceReader> providers;
     private boolean retainOriginalLine = false;
     private int workersCount = DEFAULT_LINE_PROCESSOR_WORKERS_COUNT;
     private LineReaderListener readerListener = new LineReaderListener() {};
@@ -174,7 +163,7 @@ public class IPResolver {
       return this;
     }
 
-    public Builder withProvider(@Nonnull LineReader lineReader) {
+    public Builder withProvider(@Nonnull SourceReader lineReader) {
       if (providers.containsKey(Objects.requireNonNull(lineReader).provider())) {
         throw new DuplicateProviderException(
             String.format("Provider %s has already been added", lineReader.provider().name()));
@@ -203,10 +192,10 @@ public class IPResolver {
       return this;
     }
 
-    public IPResolver build() throws IOException {
+    public IPResolver build() {
       checkSanity();
       Map<ProviderKey, IPDatabase> databases = new HashMap<>(providers.size());
-      for (LineReader reader : providers.values()) {
+      for (SourceReader reader : providers.values()) {
         databases.put(
             reader.provider(),
             reader.read(

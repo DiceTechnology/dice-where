@@ -11,7 +11,7 @@ import inet.ipaddr.IPAddressString;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.decorator.DecoratorDbReader;
 import technology.dice.dicewhere.decorator.VpnDecoratorInformation;
-import technology.dice.dicewhere.reading.LineReader;
+import technology.dice.dicewhere.reading.CSVLineReader;
 import technology.dice.dicewhere.utils.StringUtils;
 
 import java.io.BufferedReader;
@@ -33,7 +33,8 @@ public class MaxmindVpnDecoratorDbReader extends DecoratorDbReader<VpnDecoratorI
 
   public MaxmindVpnDecoratorDbReader(
           Path ipV4AnonymousDatabase, Path ipV6AnonymousDatabase) throws IOException {
-    this(LineReader.bufferedReaderForPath(ipV4AnonymousDatabase, BUFFER_SIZE), LineReader.bufferedReaderForPath(ipV6AnonymousDatabase, BUFFER_SIZE));
+    this(CSVLineReader.bufferedReaderForPath(ipV4AnonymousDatabase, BUFFER_SIZE), CSVLineReader
+        .bufferedReaderForPath(ipV6AnonymousDatabase, BUFFER_SIZE));
   }
 
   public MaxmindVpnDecoratorDbReader(

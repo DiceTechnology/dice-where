@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
-import technology.dice.dicewhere.building.IPDatabase;
+import technology.dice.dicewhere.building.navigablemap.NavigableMapIpDatabase;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
 import technology.dice.dicewhere.provider.dbip.DbIpProviderKey;
 import technology.dice.dicewhere.provider.dbip.reading.DbIpLineReader;
@@ -33,7 +33,7 @@ public class DbIpLineReaderTest {
     LineProcessorListener processorListener = Mockito.mock(LineProcessorListener.class);
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
     DbIpLineReader dbIpReader = new DbIpLocationAndIspLineReader(path);
-    IPDatabase database =
+    NavigableMapIpDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
     Assert.assertEquals(22, dbSize);
@@ -77,7 +77,7 @@ public class DbIpLineReaderTest {
     LineProcessorListener processorListener = Mockito.mock(LineProcessorListener.class);
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
     DbIpLineReader dbIpReader = new DbIpLocationAndIspLineReader(path);
-    IPDatabase database =
+    NavigableMapIpDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
     Assert.assertEquals(16, dbSize);
@@ -121,7 +121,7 @@ public class DbIpLineReaderTest {
     LineProcessorListener processorListener = Mockito.mock(LineProcessorListener.class);
     DatabaseBuilderListener builderListener = Mockito.mock(DatabaseBuilderListener.class);
     DbIpLineReader dbIpReader = new DbIpLocationAndIspLineReader(path);
-    IPDatabase database =
+    NavigableMapIpDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
     Assert.assertEquals(3, dbSize);

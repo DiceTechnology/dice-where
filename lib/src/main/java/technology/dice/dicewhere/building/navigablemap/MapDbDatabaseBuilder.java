@@ -4,25 +4,10 @@
  * Please see distribution for license.
  */
 
-package technology.dice.dicewhere.building;
+package technology.dice.dicewhere.building.navigablemap;
 
 import com.google.common.collect.Queues;
 import com.google.protobuf.ByteString;
-import org.jetbrains.annotations.NotNull;
-import org.mapdb.DB;
-import org.mapdb.DBException;
-import org.mapdb.DBMaker;
-import org.mapdb.Serializer;
-import technology.dice.dicewhere.api.api.IP;
-import technology.dice.dicewhere.api.api.IpInformation;
-import technology.dice.dicewhere.decorator.Decorator;
-import technology.dice.dicewhere.decorator.DecoratorInformation;
-import technology.dice.dicewhere.lineprocessing.SerializedLine;
-import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
-import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
-import technology.dice.dicewhere.provider.ProviderKey;
-import technology.dice.dicewhere.utils.ProtoValueConverter;
-
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +16,23 @@ import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
+import org.mapdb.DB;
+import org.mapdb.DBException;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
+import technology.dice.dicewhere.api.api.IP;
+import technology.dice.dicewhere.api.api.IpInformation;
+import technology.dice.dicewhere.building.DatabaseBuilderListener;
+import technology.dice.dicewhere.decorator.Decorator;
+import technology.dice.dicewhere.decorator.DecoratorInformation;
+import technology.dice.dicewhere.lineprocessing.SerializedLine;
+import technology.dice.dicewhere.lineprocessing.serializers.IPSerializer;
+import technology.dice.dicewhere.lineprocessing.serializers.protobuf.IPInformationProto;
+import technology.dice.dicewhere.provider.ProviderKey;
+import technology.dice.dicewhere.utils.ProtoValueConverter;
 
-public class DatabaseBuilder implements Runnable {
+public class MapDbDatabaseBuilder implements Runnable {
   private final BlockingQueue<SerializedLine> source;
   private final DatabaseBuilderListener listener;
   private final ProviderKey provider;
@@ -41,7 +41,7 @@ public class DatabaseBuilder implements Runnable {
   private int processedLines = 0;
   private final Decorator<? extends DecoratorInformation> decorator;
 
-  public DatabaseBuilder(
+  public MapDbDatabaseBuilder(
       ProviderKey provider,
       BlockingQueue<SerializedLine> source,
       DatabaseBuilderListener listener,
@@ -49,7 +49,7 @@ public class DatabaseBuilder implements Runnable {
     this(StorageMode.FILE, provider, source, listener, decorator);
   }
 
-  public DatabaseBuilder(
+  public MapDbDatabaseBuilder(
       StorageMode storageMode,
       ProviderKey provider,
       BlockingQueue<SerializedLine> source,
@@ -58,7 +58,7 @@ public class DatabaseBuilder implements Runnable {
     this(storageMode, provider, source, listener, null);
   }
 
-  public DatabaseBuilder(
+  public MapDbDatabaseBuilder(
       StorageMode storageMode,
       ProviderKey provider,
       BlockingQueue<SerializedLine> source,
@@ -176,8 +176,8 @@ public class DatabaseBuilder implements Runnable {
     return messageBuilder.build();
   }
 
-  public IPDatabase build() {
-    return new IPDatabase(sink.create());
+  public NavigableMapIpDatabase build() {
+    return new NavigableMapIpDatabase(sink.create());
   }
 
   public enum StorageMode {
