@@ -7,3 +7,4 @@ scripts/db_downloaders/maxmind_anonymous/config
 *.iml
 .DS_Store
 *.mmdb
+localdata/
