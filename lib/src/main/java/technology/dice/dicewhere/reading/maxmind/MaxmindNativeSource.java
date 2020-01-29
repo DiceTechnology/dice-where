@@ -21,19 +21,19 @@ import technology.dice.dicewhere.reading.SourceReader;
 
 public class MaxmindNativeSource implements SourceReader {
 
-  private final DatabaseReader city;
+  private final DatabaseReader location;
   private final Optional<DatabaseReader> anonymous;
 
-  public MaxmindNativeSource(Path city, Path anonymous) throws IOException {
-    this(city, Optional.of(anonymous));
+  public MaxmindNativeSource(Path location, Path anonymous) throws IOException {
+    this(location, Optional.of(anonymous));
   }
 
-  public MaxmindNativeSource(Path city) throws IOException {
-    this(city, Optional.empty());
+  public MaxmindNativeSource(Path location) throws IOException {
+    this(location, Optional.empty());
   }
 
-  private MaxmindNativeSource(Path city, Optional<Path> anonymous) throws IOException {
-    this.city = new DatabaseReader.Builder(city.toFile()).withCache(new CHMCache()).build();
+  public MaxmindNativeSource(Path location, Optional<Path> anonymous) throws IOException {
+    this.location = new DatabaseReader.Builder(location.toFile()).withCache(new CHMCache()).build();
     if (anonymous.isPresent()) {
       this.anonymous =
           Optional.of(
@@ -53,7 +53,7 @@ public class MaxmindNativeSource implements SourceReader {
       DatabaseBuilderListener buildingListener,
       int workersCount) {
     final MaxmindNativeDatabase maxmindNativeDatabase =
-        new MaxmindNativeDatabase(this.city, this.anonymous);
+        new MaxmindNativeDatabase(this.location, this.anonymous);
     return maxmindNativeDatabase;
   }
 
