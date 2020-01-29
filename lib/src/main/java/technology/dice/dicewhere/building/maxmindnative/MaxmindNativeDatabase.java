@@ -23,6 +23,11 @@ public class MaxmindNativeDatabase implements IPDatabase {
   private final DatabaseReader location;
   private final Optional<DatabaseReader> anonymous;
 
+  /**
+   * Builds a maxmind native database
+   * @param location a location database. GeoIP2 City and Country are supported
+   * @param anonymous an optional GeopIP anonymous database
+   */
   public MaxmindNativeDatabase(DatabaseReader location, Optional<DatabaseReader> anonymous) {
     this.location = location;
     this.anonymous = anonymous;
