@@ -24,8 +24,6 @@ before_deploy:
   -in travis.pem.enc -out travis.pem -d
 - gpg --import travis.gpg.pem
 - ssh-add travis.pem
-- "./cd/version.sh"
-- "./cd/tag.sh"
 deploy:
   skip_cleanup: true
   provider: script
