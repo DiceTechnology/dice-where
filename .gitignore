@@ -7,4 +7,5 @@ scripts/db_downloaders/maxmind_anonymous/config
 *.iml
 .DS_Store
 *.mmdb
+localData/
 dice-where-downloader/dependency-reduced-pom.xml
