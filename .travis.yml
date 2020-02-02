@@ -23,8 +23,7 @@ before_deploy:
 - openssl aes-256-cbc -K $encrypted_9dd2761de049_key -iv $encrypted_9dd2761de049_iv
   -in travis.pem.enc -out travis.pem -d
 - gpg --import travis.gpg.pem
-- "./cd/version.sh"
-- "./cd/tag.sh"
+- ssh-add travis.pem
 deploy:
   skip_cleanup: true
   provider: script
