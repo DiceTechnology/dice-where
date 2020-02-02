@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import technology.dice.dicewhere.downloader.ObjectMapperInstance;
+import technology.dice.dicewhere.downloader.commands.CommandExecutionResult;
 import technology.dice.dicewhere.downloader.commands.PathUtils;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
 import technology.dice.dicewhere.downloader.destination.FileAcceptorFactory;
@@ -36,14 +37,38 @@ public class DownloadMaxmindS3 extends MaxmindBaseCommand {
           "The destination of the file. Must start with the scheme (s3:// or file://). S3 destinations require credentials to be provided through the default chain for AWS Java SDK. See https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/credentials.html for more details")
   String destination;
 
+  /**
+   * Default constructor to be used by picocli when running from the command line
+   */
+  public DownloadMaxmindS3() {
+    super();
+  }
+
+  /**
+   * Constructor to be used when running programmatically
+   */
+  public DownloadMaxmindS3(
+      boolean noCheckMd5,
+      boolean overwrite,
+      boolean verbose,
+      MaxmindEdition edition,
+      MaxmindDatabase database,
+      MaxmindFormat format,
+      String prefix,
+      String destination) {
+    super(noCheckMd5, overwrite, verbose, edition, database, format);
+    this.prefix = prefix;
+    this.destination = destination;
+  }
+
   @Override
-  public int execute() {
+  public CommandExecutionResult execute() {
     final ObjectPath objectPath = ObjectPath.of(prefix);
     S3Client s3Client = S3Client.create();
     Optional<String> optionalKey = latestKeyForDatabase(s3Client, objectPath);
     if (!optionalKey.isPresent()) {
       LOG.error("Could not find the latest version of the database at the source");
-      return 1;
+      return new CommandExecutionResult(false, false);
     }
 
     String key = optionalKey.get();

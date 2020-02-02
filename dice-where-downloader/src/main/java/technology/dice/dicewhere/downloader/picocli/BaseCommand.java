@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Option;
+import technology.dice.dicewhere.downloader.commands.CommandExecutionResult;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
 import technology.dice.dicewhere.downloader.exception.DownloaderException;
 import technology.dice.dicewhere.downloader.md5.MD5Checksum;
@@ -30,7 +31,15 @@ public abstract class BaseCommand implements Callable<Integer> {
   @Option(names = "-v", required = false, description = "Increases the verbosity of the output.")
   boolean verbose;
 
-  protected int process(FileAcceptor<?, ?> acceptor, FileSource fileSource)
+  public BaseCommand() {}
+
+  public BaseCommand(boolean noCheckMd5, boolean overwrite, boolean verbose) {
+    this.noCheckMd5 = noCheckMd5;
+    this.overwrite = overwrite;
+    this.verbose = verbose;
+  }
+
+  protected CommandExecutionResult process(FileAcceptor<?, ?> acceptor, FileSource fileSource)
       throws DownloaderException {
     LOG.debug("Acceptor: " + acceptor.getClass().getSimpleName());
     boolean pathWritable = acceptor.destinationWritable();
@@ -38,64 +47,72 @@ public abstract class BaseCommand implements Callable<Integer> {
     boolean fileExists = acceptor.destinationExists();
     LOG.debug("Existing file: " + fileExists);
     if (fileExists) {
-
       LOG.info("File exists in " + acceptor.getUri().toString());
-      if (overwrite) {
-        LOG.info("Overwrite option is enabled. Destination will be overwritten");
-      }
-
-      if (!overwrite) {
-        if (!noCheckMd5) {
-          Optional<MD5Checksum> existingMd5 = acceptor.existingFileMd5();
-          boolean checksumMatches =
-              existingMd5
-                  .map(md5 -> md5.matches(fileSource.fileInfo().getMd5Checksum()))
-                  .orElse(false);
-          if (!checksumMatches) {
-            LOG.warn(
-                "Local and remote files' MD5 do not match: "
-                    + existingMd5.map(md5 -> md5.stringFormat()).orElse("?")
-                    + " Vs. "
-                    + fileSource.fileInfo().getMd5Checksum().stringFormat());
-          } else {
-            LOG.info("MD5 matches that of the remote file");
-          }
-          return checksumMatches ? 0 : 1;
-        } else {
-          return 0;
-        }
-      }
-    }
-
-    if (!fileExists) {
+      return processFileExists(acceptor, fileSource, pathWritable);
+    } else {
       LOG.info("File not found in destination " + acceptor.getUri().toString());
+      return processFileDoesNotExist(acceptor, fileSource, pathWritable);
     }
+  }
 
-    if ((!fileExists) || overwrite) {
-      if (pathWritable) {
-        final MD5Checksum md5Checksum = fileSource.produce(acceptor);
-        LOG.info("File successfully transferred");
-        if (!noCheckMd5) {
-          boolean checksumMatches = md5Checksum.matches(fileSource.fileInfo().getMd5Checksum());
-          if (!checksumMatches) {
-            LOG.warn(
-                "Local and remote files' MD5 do not match: "
-                    + md5Checksum.stringFormat()
-                    + " Vs. "
-                    + fileSource.fileInfo().getMd5Checksum().stringFormat());
-          } else {
-            LOG.info("MD5 matches that of the remote file");
-          }
-          return checksumMatches ? 0 : 1;
+  private CommandExecutionResult processFileDoesNotExist(
+      FileAcceptor<?, ?> acceptor, FileSource fileSource, boolean pathWritable) {
+
+    if (pathWritable) {
+      final MD5Checksum md5Checksum = fileSource.produce(acceptor);
+      LOG.info("File successfully transferred");
+      if (!noCheckMd5) {
+        boolean checksumMatches = md5Checksum.matches(fileSource.fileInfo().getMd5Checksum());
+        if (!checksumMatches) {
+          LOG.warn(
+              "Local and remote files' MD5 do not match: "
+                  + md5Checksum.stringFormat()
+                  + " Vs. "
+                  + fileSource.fileInfo().getMd5Checksum().stringFormat());
         } else {
-          return 0;
+          LOG.info("MD5 matches that of the remote file");
         }
+        return new CommandExecutionResult(true, checksumMatches, md5Checksum, checksumMatches);
       } else {
-        throw new DownloaderException(
-            "Path at " + acceptor.getUri().toString() + " is not writable");
+        return new CommandExecutionResult(true, true);
       }
+    } else {
+      throw new DownloaderException("Path at " + acceptor.getUri().toString() + " is not writable");
     }
-    return 0;
+  }
+
+  private CommandExecutionResult processFileExists(
+      FileAcceptor<?, ?> acceptor, FileSource fileSource, boolean pathWritable) {
+    if (overwrite) {
+      LOG.info("Overwrite option is enabled. Destination will be overwritten");
+    }
+    if (!overwrite) {
+      if (!noCheckMd5) {
+        Optional<MD5Checksum> existingMd5 = acceptor.existingFileMd5();
+        boolean checksumMatches =
+            existingMd5
+                .map(md5 -> md5.matches(fileSource.fileInfo().getMd5Checksum()))
+                .orElse(false);
+        if (!checksumMatches) {
+          LOG.warn(
+              "Local and remote files' MD5 do not match: "
+                  + existingMd5.map(md5 -> md5.stringFormat()).orElse("?")
+                  + " Vs. "
+                  + fileSource.fileInfo().getMd5Checksum().stringFormat());
+        } else {
+          LOG.info("MD5 matches that of the remote file");
+        }
+        return new CommandExecutionResult(
+            true,
+            existingMd5.map(unused -> checksumMatches).orElse(null),
+            existingMd5.orElse(null),
+            checksumMatches);
+      } else {
+        return new CommandExecutionResult(false, null, null, true);
+      }
+    } else {
+      return this.processFileDoesNotExist(acceptor, fileSource, pathWritable);
+    }
   }
 
   @Override
@@ -107,10 +124,10 @@ public abstract class BaseCommand implements Callable<Integer> {
       root.setLevel(Level.DEBUG);
     }
     this.checkNecessaryEnvironmentVariables();
-    return this.execute();
+    return this.execute().isSuccessfull() ? 0 : 1;
   }
 
-  protected abstract int execute();
+  protected abstract CommandExecutionResult execute();
 
   protected String[] necessaryEnvironmentVariables() {
     return new String[] {};

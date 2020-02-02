@@ -25,6 +25,23 @@ public abstract class MaxmindBaseCommand extends BaseCommand {
       description = "The database format to download. Valid values: ${COMPLETION-CANDIDATES}")
   MaxmindFormat format;
 
+  /** Default constructor to be used by picocli when running from the command line */
+  public MaxmindBaseCommand() {}
+
+  /** Constructor to be used when running programmatically */
+  public MaxmindBaseCommand(
+      boolean noCheckMd5,
+      boolean overwrite,
+      boolean verbose,
+      MaxmindEdition edition,
+      MaxmindDatabase database,
+      MaxmindFormat format) {
+    super(noCheckMd5, overwrite, verbose);
+    this.edition = edition;
+    this.database = database;
+    this.format = format;
+  }
+
   protected URI uriForTarget(String destinationBase, String fileName) {
     return URI.create(
         (PathUtils.removeTrailingCharacter(destinationBase, "/") + "/maxmind/")
