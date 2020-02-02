@@ -108,7 +108,7 @@ public abstract class BaseCommand implements Callable<Integer> {
             existingMd5.orElse(null),
             checksumMatches);
       } else {
-        return new CommandExecutionResult(false, null, null, true);
+        return new CommandExecutionResult(false, Optional.empty(), Optional.empty(), true);
       }
     } else {
       return this.processFileDoesNotExist(acceptor, fileSource, pathWritable);
@@ -128,10 +128,6 @@ public abstract class BaseCommand implements Callable<Integer> {
   }
 
   protected abstract CommandExecutionResult execute();
-
-  protected String[] necessaryEnvironmentVariables() {
-    return new String[] {};
-  }
-
+  
   protected void checkNecessaryEnvironmentVariables() {}
 }

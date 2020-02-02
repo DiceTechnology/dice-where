@@ -1,6 +1,5 @@
 package technology.dice.dicewhere.downloader.commands;
 
-import com.sun.istack.internal.Nullable;
 import java.util.Optional;
 import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 
@@ -12,8 +11,19 @@ public class CommandExecutionResult {
 
   public CommandExecutionResult(
       boolean newFileDownloaded,
-      @Nullable Boolean md5MatchesSource,
-      @Nullable MD5Checksum targetFileMd5,
+      Optional<Boolean> md5MatchesSource,
+      Optional<MD5Checksum> targetFileMd5,
+      boolean successfull) {
+    this.newFileDownloaded = newFileDownloaded;
+    this.md5MatchesSource = md5MatchesSource;
+    this.targetFileMd5 = targetFileMd5;
+    this.successfull = successfull;
+  }
+
+  public CommandExecutionResult(
+      boolean newFileDownloaded,
+      Boolean md5MatchesSource,
+      MD5Checksum targetFileMd5,
       boolean successfull) {
     this.newFileDownloaded = newFileDownloaded;
     this.md5MatchesSource = Optional.ofNullable(md5MatchesSource);
@@ -22,7 +32,7 @@ public class CommandExecutionResult {
   }
 
   public CommandExecutionResult(boolean newFileDownloaded, boolean successfull) {
-    this(newFileDownloaded, null, null, successfull);
+    this(newFileDownloaded, Optional.empty(), Optional.empty(), successfull);
   }
 
   public boolean isNewFileDownloaded() {
