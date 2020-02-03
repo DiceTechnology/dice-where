@@ -128,6 +128,6 @@ public abstract class BaseCommand implements Callable<Integer> {
   }
 
   protected abstract CommandExecutionResult execute();
-  
+
   protected void checkNecessaryEnvironmentVariables() {}
 }

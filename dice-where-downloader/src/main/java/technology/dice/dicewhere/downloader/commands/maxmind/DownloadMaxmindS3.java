@@ -54,10 +54,10 @@ public class DownloadMaxmindS3 extends MaxmindBaseCommand {
       MaxmindEdition edition,
       MaxmindDatabase database,
       MaxmindFormat format,
-      String prefix,
+      String s3BucketPrefix,
       String destination) {
     super(noCheckMd5, overwrite, verbose, edition, database, format);
-    this.prefix = prefix;
+    this.prefix = s3BucketPrefix;
     this.destination = destination;
   }
 
