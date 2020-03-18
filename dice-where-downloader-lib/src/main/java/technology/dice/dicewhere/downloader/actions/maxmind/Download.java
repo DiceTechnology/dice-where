@@ -101,17 +101,6 @@ public abstract class Download {
     }
   }
 
-  //  public final Integer call() {
-  //    ch.qos.logback.classic.Logger root =
-  //        (ch.qos.logback.classic.Logger)
-  //            LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-  //    if (verbose) {
-  //      root.setLevel(Level.DEBUG);
-  //    }
-  //    this.checkNecessaryEnvironmentVariables();
-  //    return this.execute().isSuccessful() ? 0 : 1;
-  //  }
-
   protected abstract DownloadExecutionResult execute();
 
   protected void checkNecessaryEnvironmentVariables() {}
