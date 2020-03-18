@@ -10,7 +10,6 @@ branches:
   - "/^hotfix.*$/"
 script:
 - mvn clean install -q || travis_terminate 1
-
 env:
   global:
   - secure: C6ZJeZwi7NtZrMD+MFn809/onkLR5N0QdUNUL5Vp4xeIEpJH/RvLQOfTVrIHk9ZxslMczlrIhOW3z1rNX6pDpnmNneWdfy4qTebWMGX9IskIFfOdcsdILE3VOd1kwNAMIreySygzVAgmcYQ4ppadmcvfwGGEMfIBbGyHVYfiXHd20/V2NlzlPqpP+MaFpgDEGfmxPhdjo5+kbQ308USseOssDdRChT9eDcd9hOA/cC0UC+XymHEhVoOB9Bf31pbGOGhcWgtIM4wAyaLQCPqoVRpQeGEe1AKdP9JMQoI3RmwrqtWNtRUj0Djbb+KwLHEU2F/DeOkXfqH20wFr3SFR3RXm/5n1cp2SiJBap4pwMc2GtJTjRK+NZvRj8AIUTDVti3VlUrVfLb9koobsviY0Vb7GsW9a72+nSH4sm544MLoNf9ktvCj2xiL1WJShN9d5lca9Jq/2YuLFexUjtP9LgmBTKDcGxoPLa70/uKlwSrxTfF7OZvjzb/JG1Cu0X3B71QzCK5tx1G/S0AHGBVVGFLeNiQYUsdiiPy8KP7T/iZZCIDMikVMaiBjy4oH5WVzZKojBNZ6YtQiqqiQq+eVgkJFRfbsZVgYvp7WNDIXsd1Qd5mnQsYmtFqJ4OKYso2IKs2BFhYXQ+/lTvq+9LyeAqfvYwrQiHKWnixWs50EqFeg=
@@ -18,17 +17,16 @@ env:
 cache:
   directories:
   - "~/.m2/repository"
-
 before_deploy:
 - openssl aes-256-cbc -K $encrypted_9dd2761de049_key -iv $encrypted_9dd2761de049_iv
   -in travis.gpg.pem.enc -out travis.gpg.pem -d
+- openssl aes-256-cbc -K $encrypted_9dd2761de049_key -iv $encrypted_9dd2761de049_iv
+  -in travis.pem.enc -out travis.pem -d
 - gpg --import travis.gpg.pem
-- ./cd/version.sh
-- ./cd/tag.sh
-
+- ssh-add travis.pem
 deploy:
   skip_cleanup: true
   provider: script
-  script: ./cd/deploy.sh
+  script: "./cd/deploy.sh"
   on:
     branch: master
