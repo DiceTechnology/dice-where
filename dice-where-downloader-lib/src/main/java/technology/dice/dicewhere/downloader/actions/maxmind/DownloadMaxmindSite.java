@@ -14,7 +14,6 @@ public class DownloadMaxmindSite extends
   protected final String key;
   protected final String destination;
 
-  /** Constructor to be used when running programmatically */
   public DownloadMaxmindSite(
       boolean noCheckMd5,
       boolean overwrite,
