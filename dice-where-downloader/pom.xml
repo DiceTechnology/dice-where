@@ -15,17 +15,16 @@
 
   <properties>
     <picolli.version>4.1.4</picolli.version>
-    <slf4j.version>1.7.30</slf4j.version>
-    <logback.version>1.2.3</logback.version>
     <dockerfile.maven.version>1.4.13</dockerfile.maven.version>
-    <jackson.version>2.10.0</jackson.version>
   </properties>
 
   <distributionManagement>
     <repository>
       <id>bintray-dicetechnology-dice-where</id>
       <name>dicetechnology-dice-where</name>
-      <url>https://api.bintray.com/maven/dicetechnology/dice-where/dice-where-downloader/;publish=1</url>
+      <url>
+        https://api.bintray.com/maven/dicetechnology/dice-where/dice-where-downloader/;publish=1
+      </url>
     </repository>
   </distributionManagement>
 
@@ -109,44 +108,9 @@
     </dependency>
 
     <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>s3</artifactId>
-      <version>2.10.50</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>${logback.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>${jackson.version}</version>
+      <groupId>technology.dice.open</groupId>
+      <artifactId>dice-where-downloader-lib</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
   </dependencies>
