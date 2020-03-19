@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to tag the GIT repository with a specific version taken from the POM file
 
-#set -x
+set -x
 
 function slack {
   local PAYLOAD="payload={\"channel\": \"dice-opensource\", \"text\":\" $1 \", \"username\": \"Travis\", \"icon_url\": \"https://fst.slack-edge.com/66f9/img/services/travis_36.png\"}"

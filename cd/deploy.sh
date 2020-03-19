@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x 
 if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   cd dice-where
   ../cd/version.sh
