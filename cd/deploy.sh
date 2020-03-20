@@ -14,7 +14,7 @@ if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; the
   ./version.sh
   cd ..
 
-  mvn deploy -P bintray --settings ../cd/mvnsettings.xml
+  mvn deploy -P bintray --settings cd/mvnsettings.xml
   cd dice-where
   mvn deploy -P bintray --settings ../cd/mvnsettings.xml
   cd ../dice-where-downloader-lib
