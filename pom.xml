@@ -94,6 +94,60 @@
     <maxmind.geoip2.version>2.13.0</maxmind.geoip2.version>
   </properties>
 
+  <distributionManagement>
+    <repository>
+      <id>bintray-dicetechnology-dice-where</id>
+      <name>dicetechnology-dice-where</name>
+      <url>
+        https://api.bintray.com/maven/dicetechnology/dice-where/dice-where-build/;publish=1
+      </url>
+    </repository>
+  </distributionManagement>
+
+  <profiles>
+    <profile>
+      <id>bintray</id>
+      <repositories>
+        <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>bintray-dicetechnology-dice-where</id>
+          <name>bintray</name>
+          <url>https://dl.bintray.com/dicetechnology/dice-where</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>bintray-dicetechnology-dice-where</id>
+          <name>bintray-plugins</name>
+          <url>https://dl.bintray.com/dicetechnology/dice-where</url>
+        </pluginRepository>
+      </pluginRepositories>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
     <plugins>
       <plugin>
