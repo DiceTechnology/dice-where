@@ -10,11 +10,11 @@
     <version>1.2.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>technology.dice.open</groupId>
   <artifactId>dice-where-downloader</artifactId>
 
   <properties>
     <picolli.version>4.1.4</picolli.version>
+    <logback.version>1.2.3</logback.version>
     <dockerfile.maven.version>1.4.13</dockerfile.maven.version>
   </properties>
 
@@ -64,12 +64,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
+        <version>3.2.1</version>
         <configuration>
           <filters>
             <filter>
               <artifact>*:*</artifact>
               <excludes>
+                <exclude>module-info.class</exclude>
                 <exclude>META-INF/*.SF</exclude>
                 <exclude>META-INF/*.DSA</exclude>
                 <exclude>META-INF/*.RSA</exclude>
@@ -157,6 +158,11 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
   </dependencies>
 
 </project>
