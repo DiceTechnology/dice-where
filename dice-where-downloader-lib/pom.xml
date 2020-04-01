@@ -13,7 +13,6 @@
 
   <properties>
     <slf4j.version>1.7.30</slf4j.version>
-    <logback.version>1.2.3</logback.version>
     <jackson.version>2.10.0</jackson.version>
   </properties>
 
@@ -43,18 +42,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>${logback.version}</version>
     </dependency>
 
     <dependency>
