@@ -5,49 +5,62 @@
  */
 package technology.dice.dicewhere.building.maxmindnative;
 
+import com.google.common.collect.ImmutableSet;
 import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.model.AbstractCountryResponse;
 import com.maxmind.geoip2.model.AnonymousIpResponse;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
 import java.net.InetAddress;
 import java.util.Optional;
+import java.util.Set;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.api.IpInformation.Builder;
 import technology.dice.dicewhere.building.IPDatabase;
 
 public class MaxmindNativeDatabase implements IPDatabase {
-  private static final String cityType = "GeoLite2-City";
-  private static final String countryType = "GeoLite2-Country";
+  private static final Set<String> cityTypes = ImmutableSet.of("GeoLite2-City", "GeoIP2-City");
+  private static final Set<String> countryTypes =
+      ImmutableSet.of("GeoLite2-Country", "GeoIP2-Country");
   private final DatabaseReader location;
   private final Optional<DatabaseReader> anonymous;
+  private final NativeDatabaseType nativeDatabaseType;
 
   /**
    * Builds a maxmind native database
+   *
    * @param location a location database. GeoIP2 City and Country are supported
    * @param anonymous an optional GeopIP anonymous database
    */
   public MaxmindNativeDatabase(DatabaseReader location, Optional<DatabaseReader> anonymous) {
     this.location = location;
     this.anonymous = anonymous;
+    final String databaseType = location.getMetadata().getDatabaseType();
+    if (cityTypes.contains(databaseType)) {
+      this.nativeDatabaseType = NativeDatabaseType.CITY;
+    } else if (countryTypes.contains(databaseType)) {
+      this.nativeDatabaseType = NativeDatabaseType.COUNTRY;
+    } else {
+      throw new RuntimeException("Database type " + databaseType + " not supported.");
+    }
   }
 
   @Override
   public Optional<IpInformation> get(IP ip) {
     try {
       final InetAddress inetAddress = InetAddress.getByAddress(ip.getBytes());
-      final String databaseType = location.getMetadata().getDatabaseType();
       Builder ipInformationBuilder =
           IpInformation.builder().withStartOfRange(ip).withEndOfRange(ip);
-      if (cityType.equalsIgnoreCase(databaseType)) {
+      if (this.nativeDatabaseType == NativeDatabaseType.CITY) {
         final CityResponse cityResponse = location.city(inetAddress);
         if (cityResponse != null) {
           this.populateWithCityResponse(cityResponse, ipInformationBuilder);
         } else {
           return Optional.empty();
         }
-      } else if (countryType.equalsIgnoreCase(databaseType)) {
+      } else if (this.nativeDatabaseType == NativeDatabaseType.COUNTRY) {
         CountryResponse countryResponse = location.country(inetAddress);
         if (countryResponse != null) {
           this.populateWithCountryResponse(countryResponse, ipInformationBuilder);
@@ -55,7 +68,8 @@ public class MaxmindNativeDatabase implements IPDatabase {
           return Optional.empty();
         }
       } else {
-        throw new RuntimeException("Database type " + databaseType + " not supported.");
+        throw new RuntimeException(
+            "Database type " + this.nativeDatabaseType.name() + " not supported.");
       }
 
       if (anonymous.isPresent()) {
@@ -65,6 +79,8 @@ public class MaxmindNativeDatabase implements IPDatabase {
         }
       }
       return Optional.of(ipInformationBuilder.build());
+    } catch (AddressNotFoundException e) {
+      return Optional.empty();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
