@@ -55,14 +55,18 @@ public class MaxmindNativeDatabase implements IPDatabase {
           IpInformation.builder().withStartOfRange(ip).withEndOfRange(ip);
       if (this.nativeDatabaseType == NativeDatabaseType.CITY) {
         final CityResponse cityResponse = location.city(inetAddress);
-        if (cityResponse != null) {
+        if (cityResponse != null
+            && cityResponse.getCountry() != null
+            && cityResponse.getCountry().getIsoCode() != null) {
           this.populateWithCityResponse(cityResponse, ipInformationBuilder);
         } else {
           return Optional.empty();
         }
       } else if (this.nativeDatabaseType == NativeDatabaseType.COUNTRY) {
         CountryResponse countryResponse = location.country(inetAddress);
-        if (countryResponse != null) {
+        if (countryResponse != null
+            && countryResponse.getCountry() != null
+            && countryResponse.getCountry().getIsoCode() != null) {
           this.populateWithCountryResponse(countryResponse, ipInformationBuilder);
         } else {
           return Optional.empty();
