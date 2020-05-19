@@ -272,7 +272,7 @@ public class IpInformation {
       return this;
     }
 
-    public Builder isHostingProvider(boolean isHostingProvider) {
+    public Builder isHostingProvider(Boolean isHostingProvider) {
       this.isHostingProvider = isHostingProvider;
       return this;
     }
