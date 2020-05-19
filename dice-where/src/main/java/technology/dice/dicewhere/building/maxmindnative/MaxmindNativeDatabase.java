@@ -79,6 +79,7 @@ public class MaxmindNativeDatabase implements IPDatabase {
       if (anonymous.isPresent()) {
         final AnonymousIpResponse anonymousIpResponse = anonymous.get().anonymousIp(inetAddress);
         if (anonymousIpResponse != null) {
+          ipInformationBuilder.isHostingProvider(anonymousIpResponse.isHostingProvider());
           ipInformationBuilder.isVpn(anonymousIpResponse.isAnonymousVpn());
         }
       }
