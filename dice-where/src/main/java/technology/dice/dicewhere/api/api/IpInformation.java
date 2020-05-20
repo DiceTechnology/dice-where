@@ -24,6 +24,7 @@ public class IpInformation {
   private final String mostSpecificDivision;
   private final String postcode;
   private final Boolean isVpn;
+  private final Boolean isHostingProvider;
   private final IP startOfRange;
   private final IP endOfRange;
 
@@ -54,7 +55,8 @@ public class IpInformation {
       @Nonnull IP startOfRange,
       @Nonnull IP endOfRange,
       @Nullable String originalLine,
-      @Nullable Boolean isVpn) {
+      @Nullable Boolean isVpn,
+      @Nullable Boolean isHostingProvider) {
     this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
     this.geonameId = geonameId;
     this.city = city;
@@ -65,6 +67,7 @@ public class IpInformation {
     this.endOfRange = Objects.requireNonNull(endOfRange);
     this.originalLine = originalLine;
     this.isVpn = isVpn;
+    this.isHostingProvider = isHostingProvider;
   }
 
   public String getCountryCodeAlpha2() {
@@ -105,6 +108,10 @@ public class IpInformation {
 
   public Optional<Boolean> isVpn() {
     return Optional.ofNullable(isVpn);
+  }
+
+  public Optional<Boolean> isHostingProvider() {
+    return Optional.ofNullable(isHostingProvider);
   }
 
   @Override
@@ -191,6 +198,7 @@ public class IpInformation {
         .withPostcode(info.getPostcode().orElse(null))
         .withMostSpecificDivision(info.getMostSpecificDivision().orElse(null))
         .withOriginalLine(info.getOriginalLine().orElse(null))
+        .isHostingProvider(info.isHostingProvider().orElse(null))
         .isVpn(info.isVpn());
   }
 
@@ -205,6 +213,7 @@ public class IpInformation {
     private IP endOfRange;
     private String originalLine;
     private Boolean isVpn;
+    private Boolean isHostingProvider;
 
     private Builder() {}
 
@@ -263,6 +272,11 @@ public class IpInformation {
       return this;
     }
 
+    public Builder isHostingProvider(Boolean isHostingProvider) {
+      this.isHostingProvider = isHostingProvider;
+      return this;
+    }
+
     public Builder isVpn(ThreeStateValueProto.ThreeStateValue isVpn) {
       this.isVpn = ProtoValueConverter.parseThreeStateProto(isVpn).orElse(null);
       return this;
@@ -279,7 +293,8 @@ public class IpInformation {
           Objects.requireNonNull(startOfRange),
           Objects.requireNonNull(endOfRange),
           originalLine,
-          isVpn);
+          isVpn,
+          isHostingProvider);
     }
   }
 }
