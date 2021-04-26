@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/DiceTechnology/dice-where.svg?token=F6ktiNWbNbvGRbN5NmqA&branch=master)](https://travis-ci.com/DiceTechnology/dice-where)[ ![Download](https://api.bintray.com/packages/dicetechnology/dice-where/dice-where/images/download.svg) ](https://bintray.com/dicetechnology/dice-where/dice-where/_latestVersion)
+[![Build Status](https://travis-ci.com/DiceTechnology/dice-where.svg?token=F6ktiNWbNbvGRbN5NmqA&branch=master)](https://travis-ci.com/DiceTechnology/dice-where)[ ![Download](https://maven-badges.herokuapp.com/maven-central/technology.dice.open/dice-where/badge.svg) ](https://maven-badges.herokuapp.com/maven-central/technology.dice.open/dice-where)[![codecov](https://codecov.io/gh/DiceTechnology/dice-where/branch/master/graph/badge.svg)](https://codecov.io/gh/DiceTechnology/dice-where)
 
 dice-where is a low memory footprint, highly efficient Geo IP lookup library that relies on locally available data. 
 The library pre-processes all the data from a list of databases and allows the client application to lookup one or all of them in a blocking or non-blocking way.
@@ -6,18 +6,9 @@ It has been designed to load *csv* datasources but can be extended to load data 
 
 # Installation
 
-Add the following repository to your `~/.m2/settings.xml` file or to your `pom.xml` file.
-```xml
- <repository>
-    <snapshots>
-	<enabled>false</enabled>
-    </snapshots>
-    <id>bintray-dicetechnology-dice-where</id>
-    <name>bintray</name>
-    <url>https://dl.bintray.com/dicetechnology/dice-where</url>
-</repository>
-```
-Add the following dependency to your `pom.xml`
+dice-where is available from [Maven Central](https://search.maven.org/artifact/technology.dice.open/dice-where), with the coordinates `technology.dice.open:dice-where`.
+
+ If you are using Maven, just add the following dependency to your `pom.xml`:
 ```xml
 <dependency>
   <groupId>technology.dice.open</groupId>
