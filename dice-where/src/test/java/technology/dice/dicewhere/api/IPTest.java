@@ -6,28 +6,25 @@
 
 package technology.dice.dicewhere.api;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Iterator;
-
-import inet.ipaddr.IPAddress;
-import inet.ipaddr.IPAddressString;
-import inet.ipaddr.ipv6.IPv6Address;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import technology.dice.dicewhere.api.api.IP;
 
-//TODO: add ipv6 tests
+// TODO: add ipv6 tests
 public class IPTest {
-  @Test(expected = NullPointerException.class)
+  @Test
   public void bytesCtorNull() {
-    new IP((byte[]) null);
+    assertThrows(NullPointerException.class, () -> new IP((byte[]) null));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void inetAddressCtorNull() {
-    new IP((InetAddress) null);
+    assertThrows(NullPointerException.class, () -> new IP((InetAddress) null));
   }
 
   @Test
@@ -44,27 +41,27 @@ public class IPTest {
   public void isLower() {
     IP anIP = new IP(InetAddresses.forString("1.1.1.1"));
     IP lowerIp = new IP(InetAddresses.forString("1.1.1.0"));
-    Assert.assertTrue(lowerIp.isLowerThan(anIP));
-    Assert.assertFalse(anIP.isLowerThan(lowerIp));
-    Assert.assertFalse(anIP.equals(lowerIp));
+    assertTrue(lowerIp.isLowerThan(anIP));
+    assertFalse(anIP.isLowerThan(lowerIp));
+    assertFalse(anIP.equals(lowerIp));
   }
 
   @Test
   public void isHigher() {
     IP anIP = new IP(InetAddresses.forString("1.1.1.1"));
     IP higherIp = new IP(InetAddresses.forString("1.1.1.2"));
-    Assert.assertTrue(higherIp.isGreaterThan(anIP));
-    Assert.assertFalse(anIP.isGreaterThan(higherIp));
-    Assert.assertFalse(anIP.equals(higherIp));
+    assertTrue(higherIp.isGreaterThan(anIP));
+    assertFalse(anIP.isGreaterThan(higherIp));
+    assertFalse(anIP.equals(higherIp));
   }
-//
-//  @Test
-//  public void ipv6Bounds() {
-//    IPAddressString rangeStringStr = new IPAddressString("2001:470:7:a00::/53");
-//    IPv6Address rangeString = rangeStringStr.getAddress().toPrefixBlock().toIPv6();
-//    System.out.println(rangeString.getLower().toString()); // produces 2001:470:7:800:0:0:0:0/53
-//    System.out.println(rangeString.getUpper().toString()); // produces 2001:470:7:fff:ffff:ffff:ffff:ffff/53
-//  }
-
+  //
+  //  @Test
+  //  public void ipv6Bounds() {
+  //    IPAddressString rangeStringStr = new IPAddressString("2001:470:7:a00::/53");
+  //    IPv6Address rangeString = rangeStringStr.getAddress().toPrefixBlock().toIPv6();
+  //    System.out.println(rangeString.getLower().toString()); // produces 2001:470:7:800:0:0:0:0/53
+  //    System.out.println(rangeString.getUpper().toString()); // produces
+  // 2001:470:7:fff:ffff:ffff:ffff:ffff/53
+  //  }
 
 }

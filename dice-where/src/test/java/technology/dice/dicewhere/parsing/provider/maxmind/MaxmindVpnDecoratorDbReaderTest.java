@@ -6,62 +6,65 @@
 
 package technology.dice.dicewhere.parsing.provider.maxmind;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.common.collect.ImmutableList;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.exceptions.DecoratorDatabaseOutOfOrderException;
 import technology.dice.dicewhere.decorator.VpnDecoratorInformation;
 import technology.dice.dicewhere.provider.maxmind.decorator.MaxmindVpnDecoratorDbReader;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
 public class MaxmindVpnDecoratorDbReaderTest {
-
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
   @Test
   public void shouldThrowException_rangesOurOfOrders() throws IOException {
-    exception.expect(DecoratorDatabaseOutOfOrderException.class);
-    exception.expectMessage("Ranges out of line for 1.0.7.32 - 1.0.7.63");
-
-    String ipv4Lines =
-        "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
-            + "1.0.2.32/28,1,0,0,0,0\n"
-            + "1.0.2.55/32,1,1,0,0,0\n"
-            + "1.0.2.64/28,1,1,0,0,0\n"
-            + "1.0.4.0/27,1,1,0,0,0\n"
-            + "1.0.5.0/27,1,1,0,0,0\n"
-            + "1.0.7.32/28,1,1,0,0,0\n"
-            + "1.0.7.32/27,1,1,0,0,0\n"
-            + "1.0.7.48/28,1,1,0,0,0\n"
-            + "1.0.7.72/29,1,1,0,0,0\n"
-            + "1.0.7.96/29,1,1,0,0,0\n"
-            + "1.0.8.32/28,1,1,0,0,0\n"
-            + "1.0.8.32/27,1,1,0,0,0\n"
-            + "1.0.8.48/29,1,1,0,0,0\n"
-            + "1.0.8.72/29,1,1,0,0,0\n"
-            + "1.0.8.96/29,1,1,0,0,0";
-    String ipv6Lines =
-            "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
-    InputStream streamV4 = new ByteArrayInputStream(ipv4Lines.getBytes());
-    BufferedReader bufferedReaderV4 = new BufferedReader(new InputStreamReader(streamV4));
-    InputStream streamV6 = new ByteArrayInputStream(ipv6Lines.getBytes());
-    BufferedReader bufferedReaderV6 = new BufferedReader(new InputStreamReader(streamV6));
-    MaxmindVpnDecoratorDbReader parser =
-            new MaxmindVpnDecoratorDbReader(bufferedReaderV4, bufferedReaderV6);
-    IPAddress inputAddress = new IPAddressString("1.0.7.0/24").getAddress();
-    List<VpnDecoratorInformation> parsedLines =
-            parser.fetchForRange(
-                    new IP(inputAddress.getLower().getBytes()),
-                    new IP(inputAddress.toMaxHost().getBytes()));
+    assertThrows(
+        DecoratorDatabaseOutOfOrderException.class,
+        () -> {
+          String ipv4Lines =
+              "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node\n"
+                  + "1.0.2.32/28,1,0,0,0,0\n"
+                  + "1.0.2.55/32,1,1,0,0,0\n"
+                  + "1.0.2.64/28,1,1,0,0,0\n"
+                  + "1.0.4.0/27,1,1,0,0,0\n"
+                  + "1.0.5.0/27,1,1,0,0,0\n"
+                  + "1.0.7.32/28,1,1,0,0,0\n"
+                  + "1.0.7.32/27,1,1,0,0,0\n"
+                  + "1.0.7.48/28,1,1,0,0,0\n"
+                  + "1.0.7.72/29,1,1,0,0,0\n"
+                  + "1.0.7.96/29,1,1,0,0,0\n"
+                  + "1.0.8.32/28,1,1,0,0,0\n"
+                  + "1.0.8.32/27,1,1,0,0,0\n"
+                  + "1.0.8.48/29,1,1,0,0,0\n"
+                  + "1.0.8.72/29,1,1,0,0,0\n"
+                  + "1.0.8.96/29,1,1,0,0,0";
+          String ipv6Lines =
+              "network,is_anonymous,is_anonymous_vpn,is_hosting_provider,is_public_proxy,is_tor_exit_node";
+          InputStream streamV4 = new ByteArrayInputStream(ipv4Lines.getBytes());
+          BufferedReader bufferedReaderV4 = new BufferedReader(new InputStreamReader(streamV4));
+          InputStream streamV6 = new ByteArrayInputStream(ipv6Lines.getBytes());
+          BufferedReader bufferedReaderV6 = new BufferedReader(new InputStreamReader(streamV6));
+          MaxmindVpnDecoratorDbReader parser =
+              new MaxmindVpnDecoratorDbReader(bufferedReaderV4, bufferedReaderV6);
+          IPAddress inputAddress = new IPAddressString("1.0.7.0/24").getAddress();
+          List<VpnDecoratorInformation> parsedLines =
+              parser.fetchForRange(
+                  new IP(inputAddress.getLower().getBytes()),
+                  new IP(inputAddress.toMaxHost().getBytes()));
+        },
+        "Ranges out of line for 1.0.7.32 - 1.0.7.63");
   }
 
   @Test
@@ -101,7 +104,7 @@ public class MaxmindVpnDecoratorDbReaderTest {
         new VpnDecoratorInformation(
             getLowerFromIP("1.0.2.64/28"), getMaxHostFromIP("1.0.2.64/28")));
 
-    Assert.assertEquals(expected, parsedLines);
+    assertEquals(expected, parsedLines);
   }
 
   @Test
@@ -134,7 +137,7 @@ public class MaxmindVpnDecoratorDbReaderTest {
         new VpnDecoratorInformation(
             getLowerFromIP("1.0.2.64/28"), getMaxHostFromIP("1.0.2.64/28")));
 
-    Assert.assertEquals(expected, parsedLines);
+    assertEquals(expected, parsedLines);
   }
 
   @Test
@@ -162,7 +165,7 @@ public class MaxmindVpnDecoratorDbReaderTest {
             new IP(inputAddress.getLower().getBytes()),
             new IP(inputAddress.toMaxHost().getBytes()));
 
-    Assert.assertTrue(parsedLines.isEmpty());
+    assertTrue(parsedLines.isEmpty());
   }
 
   @Test
@@ -201,7 +204,7 @@ public class MaxmindVpnDecoratorDbReaderTest {
         new VpnDecoratorInformation(
             getLowerFromIP("2001:470:7:b70::/62"), getMaxHostFromIP("2001:470:7:b70::/62")));
 
-    Assert.assertEquals(expected, parsedLines);
+    assertEquals(expected, parsedLines);
   }
 
   @Test
@@ -254,7 +257,7 @@ public class MaxmindVpnDecoratorDbReaderTest {
         new VpnDecoratorInformation(
             getLowerFromIP("1.0.3.16/28"), getMaxHostFromIP("1.0.3.16/28")));
 
-    Assert.assertEquals(expected, parsedLines);
+    assertEquals(expected, parsedLines);
   }
 
   IP getLowerFromIP(String input) {

@@ -6,6 +6,7 @@
 
 package technology.dice.dicewhere.parsing.provider.maxmind;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.eq;
@@ -16,8 +17,7 @@ import static org.mockito.Mockito.verify;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.navigablemap.NavigableMapIpDatabase;
 import technology.dice.dicewhere.lineprocessing.LineProcessorListener;
@@ -40,7 +40,7 @@ public class MaxmindLineReaderTest {
     NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
-    Assert.assertEquals(18, dbSize);
+    assertEquals(18, dbSize);
     verify(readerListener, times((int) dbSize)).lineRead(eq(MaxmindProviderKey.of()), any(), anyLong());
     verify(builderListener, never()).lineOutOfOrder(any(), any(), any());
     verify(processorListener, never()).parseError(any(), any(), any());
@@ -59,7 +59,7 @@ public class MaxmindLineReaderTest {
     NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
-    Assert.assertEquals(11, dbSize);
+    assertEquals(11, dbSize);
     verify(readerListener, times(18)).lineRead(eq(MaxmindProviderKey.of()), any(), anyLong());
     verify(processorListener, times(7)).parseError(eq(MaxmindProviderKey.of()), any(), any());
     verify(builderListener, never()).lineOutOfOrder(any(), any(), any());
@@ -78,7 +78,7 @@ public class MaxmindLineReaderTest {
     NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
-    Assert.assertEquals(9, dbSize);
+    assertEquals(9, dbSize);
     verify(readerListener, times(11)).lineRead(eq(MaxmindProviderKey.of()), any(), anyLong());
     verify(builderListener, times(2)).lineOutOfOrder(eq(MaxmindProviderKey.of()), any(), any());
     verify(processorListener, never()).parseError(any(), any(), any());

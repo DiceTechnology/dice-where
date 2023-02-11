@@ -6,9 +6,21 @@
 
 package technology.dice.dicewhere.parsing.provider.maxmind;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
-import org.junit.*;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import technology.dice.dicewhere.api.IPResolverTest;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IPResolver;
@@ -18,29 +30,17 @@ import technology.dice.dicewhere.decorator.DecorationStrategy;
 import technology.dice.dicewhere.decorator.DecoratorTestUtils;
 import technology.dice.dicewhere.parsing.ParsedLine;
 import technology.dice.dicewhere.provider.ProviderKey;
-import technology.dice.dicewhere.provider.dbip.reading.DbIpLocationAndIspLineReader;
 import technology.dice.dicewhere.provider.maxmind.parsing.MaxmindLineParser;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindDbReader;
 import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
 import technology.dice.dicewhere.reading.RawLine;
-
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.Assert.*;
 
 public class MaxmindLineParserTest {
 
   private static Map<String, MaxmindLocation> locationNames;
   private MaxmindLineParser maxmindLineParser;
 
-  @BeforeClass
+  @BeforeAll
   public static void beforeClass() {
     locationNames =
         ImmutableMap.<String, MaxmindLocation>builder()
@@ -51,7 +51,7 @@ public class MaxmindLineParserTest {
             .build();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     maxmindLineParser = new MaxmindLineParser(locationNames);
   }

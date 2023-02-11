@@ -1,13 +1,15 @@
 package technology.dice.dicewhere.building.maxmindnative;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import technology.dice.dicewhere.api.api.IP;
 import technology.dice.dicewhere.api.api.IPResolver;
 import technology.dice.dicewhere.api.api.IPResolver.Builder;
@@ -38,15 +40,15 @@ public class MaxmindNativeDatabaseTestIT {
     final IPResolver build =
         new Builder().withProvider(new MaxmindNativeSource(countryDatabase)).build();
     final Map<ProviderKey, Optional<IpInformation>> resolve = build.resolve(ipToLookup);
-    Assert.assertEquals(1, resolve.size());
-    Assert.assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
+    assertEquals(1, resolve.size());
+    assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
     final IpInformation expected =
         IpInformation.builder()
             .withCountryCodeAlpha2("US")
             .withStartOfRange(ipToLookup)
             .withEndOfRange(ipToLookup)
             .build();
-    Assert.assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
+    assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
   }
 
   @Test
@@ -57,8 +59,8 @@ public class MaxmindNativeDatabaseTestIT {
             .withProvider(new MaxmindNativeSource(countryDatabase, anonymousDatabase))
             .build();
     final Map<ProviderKey, Optional<IpInformation>> resolve = build.resolve(ipToLookup);
-    Assert.assertEquals(1, resolve.size());
-    Assert.assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
+    assertEquals(1, resolve.size());
+    assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
     final IpInformation expected =
         IpInformation.builder()
             .withCountryCodeAlpha2("US")
@@ -66,7 +68,7 @@ public class MaxmindNativeDatabaseTestIT {
             .withStartOfRange(ipToLookup)
             .withEndOfRange(ipToLookup)
             .build();
-    Assert.assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
+    assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
   }
 
   @Test
@@ -75,8 +77,8 @@ public class MaxmindNativeDatabaseTestIT {
     final IPResolver build =
         new Builder().withProvider(new MaxmindNativeSource(cityDatabase)).build();
     final Map<ProviderKey, Optional<IpInformation>> resolve = build.resolve(ipToLookup);
-    Assert.assertEquals(1, resolve.size());
-    Assert.assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
+    assertEquals(1, resolve.size());
+    assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
     final IpInformation expected =
         IpInformation.builder()
             .withCountryCodeAlpha2("PT")
@@ -88,7 +90,7 @@ public class MaxmindNativeDatabaseTestIT {
             .withStartOfRange(ipToLookup)
             .withEndOfRange(ipToLookup)
             .build();
-    Assert.assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
+    assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
   }
 
   @Test
@@ -99,8 +101,8 @@ public class MaxmindNativeDatabaseTestIT {
             .withProvider(new MaxmindNativeSource(cityDatabase, anonymousDatabase))
             .build();
     final Map<ProviderKey, Optional<IpInformation>> resolve = build.resolve(ipToLookup);
-    Assert.assertEquals(1, resolve.size());
-    Assert.assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
+    assertEquals(1, resolve.size());
+    assertTrue(resolve.containsKey(MaxmindProviderKey.of()));
     final IpInformation expected =
         IpInformation.builder()
             .withCountryCodeAlpha2("PT")
@@ -113,6 +115,6 @@ public class MaxmindNativeDatabaseTestIT {
             .withStartOfRange(ipToLookup)
             .withEndOfRange(ipToLookup)
             .build();
-    Assert.assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
+    assertEquals(Optional.of(expected), resolve.get(MaxmindProviderKey.of()));
   }
 }
