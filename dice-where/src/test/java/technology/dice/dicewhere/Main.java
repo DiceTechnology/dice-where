@@ -37,8 +37,7 @@ public class Main {
     System.out.println(ipv4b.equals(ipv6b));
   }
 
-  public static void main(String[] args)
-      throws IOException, ExecutionException, InterruptedException {
+  public static void main(String[] args) throws IOException {
     InetAddress a;
     System.in.read();
     System.out.println("Started");
@@ -67,8 +66,7 @@ public class Main {
             .withReaderListener(
                 new LineReaderListener() {
                   @Override
-                  public void lineRead(
-                      ProviderKey provider, RawLine rawLine, long elapsedMillis) {
+                  public void lineRead(ProviderKey provider, RawLine rawLine, long elapsedMillis) {
                     if (rawLine.getLineNumber() % 100000 == 0) {
                       System.out.println(
                           Thread.currentThread().getName()
@@ -141,7 +139,7 @@ public class Main {
                         + ""
                         + info.getPostcode()
                         + "]. GeonameId="
-                        + info.getGeonameId()
+                        + info.getCityGeonameId()
                         + "(took "
                         + (afterLookup - beforeLookup) / 1e6
                         + " ms)");

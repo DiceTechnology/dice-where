@@ -37,11 +37,13 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
+    NavigableMapIpDatabase database =
+        dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     assertEquals(18, dbSize);
-    verify(readerListener, times((int) dbSize)).lineRead(eq(MaxmindProviderKey.of()), any(), anyLong());
+    verify(readerListener, times((int) dbSize))
+        .lineRead(eq(MaxmindProviderKey.of()), any(), anyLong());
     verify(builderListener, never()).lineOutOfOrder(any(), any(), any());
     verify(processorListener, never()).parseError(any(), any(), any());
     verifyProcessorListener(dbSize);
@@ -56,7 +58,8 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
+    NavigableMapIpDatabase database =
+        dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     assertEquals(11, dbSize);
@@ -75,7 +78,8 @@ public class MaxmindLineReaderTest {
     Path locationNames = getPath("provider/maxmind/GeoLite2-City-Locations-en.csv.zip");
     MaxmindDbReader dbIpReader = new MaxmindDbReader(locationNames, v4, v6);
 
-    NavigableMapIpDatabase database = dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
+    NavigableMapIpDatabase database =
+        dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
 
     assertEquals(9, dbSize);
@@ -87,7 +91,7 @@ public class MaxmindLineReaderTest {
     verifyBuilderListener(dbSize);
   }
 
-  private Path getPath(String location) throws Exception {
+  private Path getPath(String location) {
     return Paths.get(MaxmindLineReaderTest.class.getClassLoader().getResource(location).getFile());
   }
 
@@ -102,8 +106,10 @@ public class MaxmindLineReaderTest {
 
   private void verifyProcessorListener(long times) {
     verify(processorListener, times(1)).finished(eq(MaxmindProviderKey.of()), eq(times), anyLong());
-    verify(processorListener, times((int) times)).lineProcessed(eq(MaxmindProviderKey.of()), any(), anyLong());
-    verify(processorListener, times((int) times)).lineParsed(eq(MaxmindProviderKey.of()), any(), anyLong());
+    verify(processorListener, times((int) times))
+        .lineProcessed(eq(MaxmindProviderKey.of()), any(), anyLong());
+    verify(processorListener, times((int) times))
+        .lineParsed(eq(MaxmindProviderKey.of()), any(), anyLong());
     verify(processorListener, never()).dequeueError(any(), any(), any());
     verify(processorListener, never()).serializeError(any(), any(), any());
     verify(processorListener, never()).processorInterrupted(any(), any());

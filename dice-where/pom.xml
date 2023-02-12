@@ -79,9 +79,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.maxmind.geoip2</groupId>
-      <artifactId>geoip2</artifactId>
-      <version>${maxmind.geoip2.version}</version>
+      <groupId>com.maxmind.db</groupId>
+      <artifactId>maxmind-db</artifactId>
+      <version>${maxmind.mmdb.version}</version>
     </dependency>
   </dependencies>
 

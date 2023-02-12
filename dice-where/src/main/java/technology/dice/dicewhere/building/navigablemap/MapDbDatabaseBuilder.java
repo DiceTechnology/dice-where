@@ -162,7 +162,7 @@ public class MapDbDatabaseBuilder implements Runnable {
     IPInformationProto.IpInformationProto.Builder messageBuilder =
         IPInformationProto.IpInformationProto.newBuilder()
             .setCity(input.getCity().orElse(""))
-            .setGeonameId(input.getGeonameId().orElse(""))
+            .setCityGeoNameId(input.getCityGeonameId().orElse(""))
             .setCountryCodeAlpha2(input.getCountryCodeAlpha2())
             .setLeastSpecificDivision(input.getLeastSpecificDivision().orElse(""))
             .setMostSpecificDivision(input.getMostSpecificDivision().orElse(""))

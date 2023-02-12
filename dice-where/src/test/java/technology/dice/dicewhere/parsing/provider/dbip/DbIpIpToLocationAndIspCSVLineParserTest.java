@@ -36,7 +36,7 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
             new IP(InetAddresses.forString("1.0.0.255")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("AU")
-                .withGeonameId("2207259")
+                .withCityGeonameId("2207259")
                 .withCity("South Brisbane")
                 .withLeastSpecificDivision("Queensland")
                 .withMostSpecificDivision("Brisbane")
@@ -64,7 +64,7 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
             new IP(InetAddresses.forString("1.0.0.255")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("AU")
-                .withGeonameId("2207259")
+                .withCityGeonameId("2207259")
                 .withCity("South Brisbane")
                 .withLeastSpecificDivision("Queensland")
                 .withMostSpecificDivision("Brisbane")
@@ -91,7 +91,7 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
             new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("MU")
-                .withGeonameId("1106748")
+                .withCityGeonameId("1106748")
                 .withCity("Ebene CyberCity")
                 .withLeastSpecificDivision("Plaines Wilhems")
                 .withStartOfRange(new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")))
@@ -118,7 +118,7 @@ public class DbIpIpToLocationAndIspCSVLineParserTest {
             new IP(InetAddresses.forString("2c0f:fa47:ffff:ffff:ffff:ffff:ffff:ffff")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("MU")
-                .withGeonameId("1106748")
+                .withCityGeonameId("1106748")
                 .withCity("Ebene CyberCity")
                 .withLeastSpecificDivision("Plaines Wilhems")
                 .withStartOfRange(new IP(InetAddresses.forString("2c0f:fa41:0:0:0:0:0:0")))

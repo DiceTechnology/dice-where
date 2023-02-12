@@ -66,7 +66,7 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
               PutObjectRequest.builder()
                   .key(Paths.get(key).getParent().toString() + "/" + LATEST_KEY)
                   .bucket(bucket)
-                  .contentLength(new Long(latestContent.length()))
+                  .contentLength((long) latestContent.length())
                   .storageClass(StorageClass.INTELLIGENT_TIERING)
                   .build();
           client.putObject(

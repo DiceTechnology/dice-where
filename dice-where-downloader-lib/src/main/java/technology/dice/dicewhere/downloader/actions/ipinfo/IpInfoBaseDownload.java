@@ -1,0 +1,33 @@
+package technology.dice.dicewhere.downloader.actions.ipinfo;
+
+import java.net.URI;
+import technology.dice.dicewhere.downloader.Download;
+import technology.dice.dicewhere.downloader.PathUtils;
+
+public abstract class IpInfoBaseDownload extends Download {
+
+  protected final IpInfoDataset dataset;
+
+  protected final IpInfoFormat format;
+
+  public IpInfoBaseDownload(
+      boolean noCheckMd5,
+      boolean overwrite,
+      boolean verbose,
+      IpInfoDataset dataset,
+      IpInfoFormat format) {
+    super(noCheckMd5, overwrite, verbose);
+    this.dataset = dataset;
+    this.format = format;
+  }
+
+  protected URI uriForTarget(String destinationBase, String fileName) {
+    return URI.create(
+        (PathUtils.removeTrailingCharacter(destinationBase, "/") + "/ipinfo/")
+            + dataset.getRemoteName()
+            + "/"
+            + format.getSuffix()
+            + "/"
+            + fileName);
+  }
+}

@@ -25,7 +25,9 @@ public abstract class ProviderKey {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+
+    // TODO GLUIZ
+    if (o == null) {
       return false;
     }
     ProviderKey that = (ProviderKey) o;

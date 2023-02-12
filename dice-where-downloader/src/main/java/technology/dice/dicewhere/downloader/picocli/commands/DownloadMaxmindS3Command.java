@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.picocli.commandssssss;
+package technology.dice.dicewhere.downloader.picocli.commands;
 
 import java.util.Optional;
 import org.slf4j.Logger;

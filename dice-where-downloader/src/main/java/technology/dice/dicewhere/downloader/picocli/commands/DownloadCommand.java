@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.picocli.commandssssss;
+package technology.dice.dicewhere.downloader.picocli.commands;
 
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
@@ -13,13 +13,18 @@ import technology.dice.dicewhere.downloader.picocli.ResourceVersionProvider;
     mixinStandardHelpOptions = true,
     showDefaultValues = true,
     versionProvider = ResourceVersionProvider.class,
-    subcommands = {HelpCommand.class, DownloadMaxmindSiteCommand.class, DownloadMaxmindS3Command.class},
+    subcommands = {
+      HelpCommand.class,
+      DownloadMaxmindSiteCommand.class,
+      DownloadMaxmindS3Command.class,
+      DownloadIpInfoSiteCommand.class
+    },
     synopsisSubcommandLabel = "COMMAND")
 public class DownloadCommand implements Callable<Integer> {
   @Spec CommandSpec spec;
 
   @Override
-  public Integer call() throws Exception {
+  public Integer call() {
     throw new ParameterException(spec.commandLine(), "Missing required command");
   }
 }

@@ -121,7 +121,7 @@ public class IPResolverTest {
     IpInformation expectedBoth =
         IpInformation.builder()
             .withCountryCodeAlpha2("CN")
-            .withGeonameId("1809858")
+            .withCityGeonameId("1809858")
             .withCity("Guangzhou")
             .withLeastSpecificDivision("Guangdong")
             .withStartOfRange(new IP(InetAddresses.forString("1.0.8.0")))
@@ -144,7 +144,7 @@ public class IPResolverTest {
     IpInformation expectedBoth =
         IpInformation.builder()
             .withCountryCodeAlpha2("CN")
-            .withGeonameId("1809858")
+            .withCityGeonameId("1809858")
             .withCity("Guangzhou")
             .withLeastSpecificDivision("Guangdong")
             .withStartOfRange(new IP(InetAddresses.forString("1.0.8.0")))
@@ -174,7 +174,7 @@ public class IPResolverTest {
     IpInformation expectedBoth =
         IpInformation.builder()
             .withCountryCodeAlpha2("JP")
-            .withGeonameId("1861060")
+            .withCityGeonameId("1861060")
             .withStartOfRange(new IP(InetAddresses.forString("2001:200:2::")))
             .withEndOfRange(new IP(InetAddresses.forString("2001:200:3:ffff:ffff:ffff:ffff:ffff")))
             .build();
@@ -281,7 +281,7 @@ public class IPResolverTest {
     IpInformation expectedBoth =
         IpInformation.builder()
             .withCountryCodeAlpha2("AU")
-            .withGeonameId("2065740")
+            .withCityGeonameId("2065740")
             .withCity("Morphett Vale")
             .withLeastSpecificDivision("South Australia")
             .withPostcode("5162")
@@ -302,7 +302,7 @@ public class IPResolverTest {
     IpInformation expectedBoth =
         IpInformation.builder()
             .withCountryCodeAlpha2("IN")
-            .withGeonameId("1269092")
+            .withCityGeonameId("1269092")
             .withCity("Jeypore")
             .withLeastSpecificDivision("Odisha")
             .withMostSpecificDivision("Koraput")
