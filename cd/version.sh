@@ -27,14 +27,6 @@ function getPatchFromGitHash {
   echo "$PATCH"
 }
 
-# Extract branch from Travis CI
-if [[ "$TRAVIS_PULL_REQUEST" = "false" ]]
-then
-  BRANCH=$TRAVIS_BRANCH
-else
-  BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
-fi
-
 # Get MAJOR and MINOR from top level POM
 VERSION_POM=$( mvn help:evaluate -Dexpression=project.version | grep -v '\[.*' | tail -n1 )
 VERSION_POM_BITS=(${VERSION_POM//./ })
@@ -42,13 +34,7 @@ VERSION_POM_BITS=(${VERSION_POM//./ })
 MAJOR=${VERSION_POM_BITS[0]}
 MINOR=${VERSION_POM_BITS[1]}
 
-# Get PATCH depending on branch
-if [[ "$BRANCH" = "master" ]]
-then
-    PATCH=$(getPatchFromGitTag)
-else
-    PATCH=$(getPatchFromGitHash)
-fi
+PATCH=$(getPatchFromGitTag)
 
 # Set the new version in POM
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${MAJOR}.${MINOR}.${PATCH}"
