@@ -26,8 +26,7 @@ public abstract class ProviderKey {
       return true;
     }
 
-    // TODO GLUIZ
-    if (o == null) {
+    if (o == null || !ProviderKey.class.isAssignableFrom(o.getClass())) {
       return false;
     }
     ProviderKey that = (ProviderKey) o;
