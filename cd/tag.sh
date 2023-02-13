@@ -4,9 +4,11 @@
 set -x
 
 function slack {
-  local PAYLOAD="payload={\"text\":\" $1 \"}"
+  local PAYLOAD="{\"text\":\"$1\"}"
   echo Sending message to slack
+  set +x
   curl -o /dev/null -s -w "%{http_code}\n" -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_URL
+  set -x
 }
 
 # Get VERSION from top level POM
