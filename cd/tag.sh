@@ -22,4 +22,4 @@ git config --global user.name "DiceTech CI"
 git tag "${VERSION_POM}" -m "[GH] Released ${VERSION_POM}" 2>/dev/null && \
 git push origin --tags 2>/dev/null && \
 echo "Tagged $ARTIFACT_ID_POM with version $VERSION_POM" && \
-slack "Tagged $ARTIFACT_ID_POM with version $VERSION_POM"
+#slack "Tagged $ARTIFACT_ID_POM with version $VERSION_POM"
