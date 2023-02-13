@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -28,4 +30,4 @@ jobs:
       - uses: codecov/codecov-action@v3
       - name: Deploy
         if: ${{ github.ref == 'refs/heads/master' && github.repository == 'DiceTechnology/dice-where' }}
-        run: bash cd/deploy.sh
+        run: cd/deploy.sh
