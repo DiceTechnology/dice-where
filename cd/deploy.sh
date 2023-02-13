@@ -6,14 +6,7 @@ set -x
 
 ./cd/version.sh
 
-mvn deploy -P publish -DskipTests=true --settings cd/mvnsettings.xml
-cd dice-where
-mvn deploy -P publish -DskipTests=true --settings ../cd/mvnsettings.xml
-cd ../dice-where-downloader-lib
-mvn deploy -P publish -DskipTests=true --settings ../cd/mvnsettings.xml
-cd ../dice-where-downloader
-mvn deploy -P publish -DskipTests=true --settings ../cd/mvnsettings.xml
-cd ..
+mvn -q deploy -P publish -DskipTests=true --settings cd/mvnsettings.xml
 
 ./cd/tag.sh
 

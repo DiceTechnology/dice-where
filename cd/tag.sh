@@ -4,9 +4,9 @@
 set -x
 
 function slack {
-  local PAYLOAD="payload={\"channel\": \"dice-opensource\", \"text\":\" $1 \", \"username\": \"Travis\", \"icon_url\": \"https://fst.slack-edge.com/66f9/img/services/travis_36.png\"}"
+  local PAYLOAD="payload={\"text\":\" $1 \"}"
   echo Sending message to slack
-  curl -o /dev/null -s -w "%{http_code}\n" -X POST --data-urlencode "$PAYLOAD" $encrypted_SLACK_URL
+  curl -o /dev/null -s -w "%{http_code}\n" -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_URL
 }
 
 # Get VERSION from top level POM
