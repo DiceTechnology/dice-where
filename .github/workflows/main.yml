@@ -28,7 +28,7 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots install
       - uses: codecov/codecov-action@v3
-      - name: Deploy
+      - name: Set version and deploy to Maven Central
         if: ${{ github.ref == 'refs/heads/master' && github.repository == 'DiceTechnology/dice-where' }}
         run: cd/deploy.sh
         env:
@@ -36,3 +36,4 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+
