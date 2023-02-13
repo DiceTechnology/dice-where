@@ -15,7 +15,6 @@ import technology.dice.dicewhere.downloader.source.BaseUrlSource;
 
 public class IpInfoSiteSource extends BaseUrlSource {
 
-  private FileInfo fileInfo;
   private static final String PATTERN_FORMAT = "yyyyMMdd";
 
   DateTimeFormatter formatter =
