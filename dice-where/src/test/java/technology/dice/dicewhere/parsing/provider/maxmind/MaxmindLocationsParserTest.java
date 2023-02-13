@@ -6,16 +6,16 @@
 
 package technology.dice.dicewhere.parsing.provider.maxmind;
 
-import org.junit.Assert;
-import org.junit.Test;
-import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
-import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocationsParser;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocation;
+import technology.dice.dicewhere.provider.maxmind.reading.MaxmindLocationsParser;
 
 public class MaxmindLocationsParserTest {
   @Test
@@ -30,12 +30,12 @@ public class MaxmindLocationsParserTest {
     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
     MaxmindLocationsParser parser = new MaxmindLocationsParser();
     Map<String, MaxmindLocation> locations = parser.locations(bufferedReader);
-    Assert.assertEquals(5, locations.keySet().size());
-    Assert.assertEquals(new MaxmindLocation("102358", "SA", "", "", ""), locations.get("102358"));
-    Assert.assertEquals(new MaxmindLocation("130758", "IR", "", "", ""), locations.get("130758"));
-    Assert.assertEquals(new MaxmindLocation("146669", "CY", "", "", ""), locations.get("146669"));
-    Assert.assertEquals(new MaxmindLocation("149590", "TZ", "", "", ""), locations.get("149590"));
-    Assert.assertEquals(new MaxmindLocation("163843", "SY", "", "", ""), locations.get("163843"));
+    assertEquals(5, locations.keySet().size());
+    assertEquals(new MaxmindLocation("102358", "SA", "", "", ""), locations.get("102358"));
+    assertEquals(new MaxmindLocation("130758", "IR", "", "", ""), locations.get("130758"));
+    assertEquals(new MaxmindLocation("146669", "CY", "", "", ""), locations.get("146669"));
+    assertEquals(new MaxmindLocation("149590", "TZ", "", "", ""), locations.get("149590"));
+    assertEquals(new MaxmindLocation("163843", "SY", "", "", ""), locations.get("163843"));
   }
 
   @Test
@@ -50,19 +50,19 @@ public class MaxmindLocationsParserTest {
     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
     MaxmindLocationsParser parser = new MaxmindLocationsParser();
     Map<String, MaxmindLocation> locations = parser.locations(bufferedReader);
-    Assert.assertEquals(5, locations.keySet().size());
-    Assert.assertEquals(
+    assertEquals(5, locations.keySet().size());
+    assertEquals(
         new MaxmindLocation("53654", "SO", "", "Banaadir", "Mogadishu"), locations.get("53654"));
-    Assert.assertEquals(
+    assertEquals(
         new MaxmindLocation("256626", "GR", "Euboea", "Central Greece", "Nea Artaki"),
         locations.get("256626"));
-    Assert.assertEquals(
+    assertEquals(
         new MaxmindLocation("2633465", "GB", "East Sussex", "England", "Wych Cross"),
         locations.get("2633465"));
-    Assert.assertEquals(
+    assertEquals(
         new MaxmindLocation("482390", "RU", "", "Leningradskaya Oblast'", "Tolmachevo"),
         locations.get("482390"));
-    Assert.assertEquals(
+    assertEquals(
         new MaxmindLocation("655081", "FI", "", "Satakunta", "Kaasmarkku"),
         locations.get("655081"));
   }

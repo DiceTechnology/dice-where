@@ -6,11 +6,12 @@
 
 package technology.dice.dicewhere.parsing.provider.dbip;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import technology.dice.dicewhere.building.DatabaseBuilderListener;
 import technology.dice.dicewhere.building.navigablemap.NavigableMapIpDatabase;
@@ -36,7 +37,7 @@ public class DbIpLineReaderTest {
     NavigableMapIpDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
-    Assert.assertEquals(22, dbSize);
+    assertEquals(22, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
         .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times((int) dbSize))
@@ -80,7 +81,7 @@ public class DbIpLineReaderTest {
     NavigableMapIpDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
-    Assert.assertEquals(16, dbSize);
+    assertEquals(16, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
         .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times(20))
@@ -124,7 +125,7 @@ public class DbIpLineReaderTest {
     NavigableMapIpDatabase database =
         dbIpReader.read(false, readerListener, processorListener, builderListener, 4);
     long dbSize = database.size();
-    Assert.assertEquals(3, dbSize);
+    assertEquals(3, dbSize);
     Mockito.verify(readerListener, Mockito.times(1))
         .finished(Mockito.eq(DbIpProviderKey.of()), Mockito.eq(dbSize), Mockito.anyLong());
     Mockito.verify(readerListener, Mockito.times(4))
