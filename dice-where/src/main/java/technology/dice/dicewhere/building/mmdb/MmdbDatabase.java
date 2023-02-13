@@ -21,7 +21,7 @@ public class MmdbDatabase implements IPDatabase, SourceReader {
   private final Optional<AnonymousSource> anonymousSource;
   private final ProviderKey key;
 
-  private MmdbDatabase(
+  public MmdbDatabase(
       String name, LocationSource locationSource, Optional<AnonymousSource> anonymousSource) {
     this.locationSource = locationSource;
     this.anonymousSource = anonymousSource;
