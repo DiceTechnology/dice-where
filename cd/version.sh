@@ -36,5 +36,10 @@ MINOR=${VERSION_POM_BITS[1]}
 
 PATCH=$(getPatchFromGitTag)
 
+VERSION="${MAJOR}.${MINOR}.${PATCH}"
+
+echo "Setting version to ${VERSION}"
+echo "NEW_VERSION=${VERSION}" >> $GITHUB_ENV
+
 # Set the new version in POM
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${MAJOR}.${MINOR}.${PATCH}"
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
