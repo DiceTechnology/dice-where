@@ -17,15 +17,20 @@ public abstract class MmdbLocationSource implements LocationSource {
   private final Reader location;
   protected final MmdbDatabaseType mmdbDatabaseType;
 
-  public MmdbLocationSource(Path path) throws IOException {
-    this.location = new Reader(new File(path.toFile().toURI()), new CHMCache());
-    final String databaseType = location.getMetadata().getDatabaseType();
-    if (supportedCityDatabaseTypes().contains(databaseType)) {
-      this.mmdbDatabaseType = MmdbDatabaseType.CITY;
-    } else if (supportedCountryDatabaseTypes().contains(databaseType)) {
-      this.mmdbDatabaseType = MmdbDatabaseType.COUNTRY;
-    } else {
-      throw new RuntimeException("Database type " + databaseType + " not supported.");
+  public MmdbLocationSource(Path path) {
+    try {
+      this.location = new Reader(new File(path.toFile().toURI()), new CHMCache());
+
+      final String databaseType = location.getMetadata().getDatabaseType();
+      if (supportedCityDatabaseTypes().contains(databaseType)) {
+        this.mmdbDatabaseType = MmdbDatabaseType.CITY;
+      } else if (supportedCountryDatabaseTypes().contains(databaseType)) {
+        this.mmdbDatabaseType = MmdbDatabaseType.COUNTRY;
+      } else {
+        throw new RuntimeException("Database type " + databaseType + " not supported.");
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error accessing file " + path.toFile());
     }
   }
 

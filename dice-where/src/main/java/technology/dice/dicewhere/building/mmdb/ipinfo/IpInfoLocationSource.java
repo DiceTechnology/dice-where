@@ -1,7 +1,6 @@
 package technology.dice.dicewhere.building.mmdb.ipinfo;
 
 import com.google.common.collect.ImmutableSet;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 import technology.dice.dicewhere.building.mmdb.CityResult;
@@ -15,7 +14,7 @@ public class IpInfoLocationSource extends MmdbLocationSource {
    *
    * @param path to the dataset file. ipinfo standard_location.mmdb is supported
    */
-  public IpInfoLocationSource(Path path) throws IOException {
+  public IpInfoLocationSource(Path path) {
     super(path);
   }
 

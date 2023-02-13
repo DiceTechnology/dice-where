@@ -16,7 +16,7 @@ public class MaxmindGeoIp2Source extends MmdbLocationSource {
    * @param path to the dataset file. GeoLite2-City, GeoIP2-City,GeoLite2-Country, GeoIP2-Country
    *     are supported
    */
-  public MaxmindGeoIp2Source(Path path) throws IOException {
+  public MaxmindGeoIp2Source(Path path) {
     super(path);
   }
 
