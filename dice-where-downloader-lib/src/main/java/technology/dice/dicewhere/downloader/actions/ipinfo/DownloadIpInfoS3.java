@@ -1,26 +1,14 @@
 package technology.dice.dicewhere.downloader.actions.ipinfo;
 
-import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import technology.dice.dicewhere.downloader.ObjectMapperInstance;
+import software.amazon.awssdk.utils.Pair;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.actions.S3ClientConfig;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
-import technology.dice.dicewhere.downloader.destination.FileAcceptorFactory;
-import technology.dice.dicewhere.downloader.destination.s3.Latest;
-import technology.dice.dicewhere.downloader.destination.s3.ObjectPath;
-import technology.dice.dicewhere.downloader.exception.DownloaderException;
+import technology.dice.dicewhere.downloader.destination.s3.S3ObjectPath;
+import technology.dice.dicewhere.downloader.destination.s3.S3DownloadSetup;
 import technology.dice.dicewhere.downloader.source.s3.S3Source;
 
 public class DownloadIpInfoS3 extends IpInfoBaseDownload {
@@ -86,52 +74,10 @@ public class DownloadIpInfoS3 extends IpInfoBaseDownload {
 
   @Override
   public DownloadExecutionResult execute() {
-    final ObjectPath objectPath = ObjectPath.of(prefix);
-    S3Client s3Client =
-        this.s3ClientConfig
-            .map(
-                c ->
-                    S3Client.builder()
-                        .credentialsProvider(
-                            StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(c.getAwsKeyId(), c.getAwsSecretKey())))
-                        .region(Region.of(c.getAwsRegion()))
-                        .build())
-            .orElseGet(() -> S3Client.create());
-    Optional<String> optionalKey = latestKeyForDatabase(s3Client, objectPath);
-    if (!optionalKey.isPresent()) {
-      throw new DownloaderException(
-          "Could not find the latest version of the database at the source");
-    }
-
-    String key = optionalKey.get();
-
-    S3Source s3Source = new S3Source(s3Client, objectPath.getBucket(), key);
-
-    FileAcceptor<?> acceptor =
-        FileAcceptorFactory.acceptorFor(
-            URI.create(
-                this.destination
-                    + "/"
-                    + this.ipInfoPath()
-                    + "/"
-                    + s3Source.fileInfo().getFileName()));
-
-    return this.process(acceptor, s3Source);
-  }
-
-  private Optional<String> latestKeyForDatabase(S3Client s3Client, ObjectPath objectPath) {
-    GetObjectRequest getObjectRequest =
-        GetObjectRequest.builder()
-            .bucket(objectPath.getBucket())
-            .key(objectPath.getPrefix() + this.ipInfoPath() + "/latest")
-            .build();
-    try (final ResponseInputStream<GetObjectResponse> object =
-        s3Client.getObject(getObjectRequest); ) {
-      final Latest latest = ObjectMapperInstance.INSTANCE.readValue(object, Latest.class);
-      return Optional.ofNullable(latest.getKey());
-    } catch (IOException | NoSuchKeyException e) {
-      throw new DownloaderException("Latest version information not readable for at the source");
-    }
+    final S3ObjectPath s3ObjectPath = S3ObjectPath.of(prefix);
+    S3DownloadSetup downloader = S3DownloadSetup.of(s3ClientConfig);
+    final Pair<FileAcceptor, S3Source> download =
+        downloader.setupDownload(this.destination, s3ObjectPath, this.ipInfoPath());
+    return this.process(download.left(), download.right());
   }
 }
