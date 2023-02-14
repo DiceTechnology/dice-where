@@ -33,9 +33,7 @@ VERSION_POM_BITS=(${VERSION_POM//./ })
 
 MAJOR=${VERSION_POM_BITS[0]}
 MINOR=${VERSION_POM_BITS[1]}
-
 PATCH=$(getPatchFromGitTag)
-
 VERSION="${MAJOR}.${MINOR}.${PATCH}"
 
 echo "Setting version to ${VERSION}"
