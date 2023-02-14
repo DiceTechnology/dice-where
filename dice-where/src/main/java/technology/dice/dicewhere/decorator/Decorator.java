@@ -40,8 +40,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
     }
     AtomicInteger counter = new AtomicInteger(0);
     this.databaseReaders =
-        databaseReaders
-            .stream()
+        databaseReaders.stream()
             .collect(
                 ImmutableMap.toImmutableMap(e -> counter.getAndIncrement(), Function.identity()));
     this.decorationStrategy = decorationStrategy;
@@ -60,13 +59,11 @@ public abstract class Decorator<T extends DecoratorInformation> {
   public Stream<IpInformation> decorate(IpInformation original) throws UnknownHostException {
     Objects.requireNonNull(original);
     List<List<T>> extraInformation =
-        databaseReaders
-            .entrySet()
-            .stream()
+        databaseReaders.values().stream()
             .map(
-                e ->
-                    e.getValue()
-                        .fetchForRange(original.getStartOfRange(), original.getEndOfRange()))
+                tDecoratorDbReader ->
+                    tDecoratorDbReader.fetchForRange(
+                        original.getStartOfRange(), original.getEndOfRange()))
             .collect(ImmutableList.toImmutableList());
 
     return this.mergeIpInfoWithDecoratorInformation(
@@ -76,8 +73,7 @@ public abstract class Decorator<T extends DecoratorInformation> {
   private List<T> mergeDecorationRanges(Collection<List<T>> found) throws UnknownHostException {
 
     List<T> foundRangesList =
-        found
-            .stream()
+        found.stream()
             .flatMap(Collection::stream)
             .sorted(
                 Comparator.comparing((Function<T, IP>) DecoratorInformation::getRangeStart)

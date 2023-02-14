@@ -29,7 +29,7 @@ import technology.dice.dicewhere.provider.maxmind.decorator.MaxmindVpnDecoratorD
 public class MaxmindVpnDecoratorDbReaderTest {
 
   @Test
-  public void shouldThrowException_rangesOurOfOrders() throws IOException {
+  public void shouldThrowException_rangesOurOfOrders() {
     assertThrows(
         DecoratorDatabaseOutOfOrderException.class,
         () -> {

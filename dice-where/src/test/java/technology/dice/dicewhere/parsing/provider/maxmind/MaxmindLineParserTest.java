@@ -66,7 +66,7 @@ public class MaxmindLineParserTest {
             new IP(InetAddresses.forString("78.29.134.127")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("PT")
-                .withGeonameId("3372745")
+                .withCityGeonameId("3372745")
                 .withCity("Rabo De Peixe")
                 .withLeastSpecificDivision("Azores")
                 .withMostSpecificDivision("")
@@ -92,7 +92,7 @@ public class MaxmindLineParserTest {
             new IP(InetAddresses.forString("78.29.134.127")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("PT")
-                .withGeonameId("3372745")
+                .withCityGeonameId("3372745")
                 .withCity("Rabo De Peixe")
                 .withLeastSpecificDivision("Azores")
                 .withMostSpecificDivision("")
@@ -148,7 +148,7 @@ public class MaxmindLineParserTest {
             new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("GB")
-                .withGeonameId("2634096")
+                .withCityGeonameId("2634096")
                 .withCity("Whitehaven")
                 .withLeastSpecificDivision("England")
                 .withMostSpecificDivision("Cumbria")
@@ -175,7 +175,7 @@ public class MaxmindLineParserTest {
             new IP(InetAddresses.forString("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("ZZ")
-                .withGeonameId("5")
+                .withCityGeonameId("5")
                 .withCity("")
                 .withLeastSpecificDivision("")
                 .withMostSpecificDivision("")
@@ -202,7 +202,7 @@ public class MaxmindLineParserTest {
             new IP(InetAddresses.forString("2a02:c7f:6a03:ffff:ffff:ffff:ffff:ffff")),
             IpInformation.builder()
                 .withCountryCodeAlpha2("GB")
-                .withGeonameId("2634096")
+                .withCityGeonameId("2634096")
                 .withCity("Whitehaven")
                 .withLeastSpecificDivision("England")
                 .withMostSpecificDivision("Cumbria")

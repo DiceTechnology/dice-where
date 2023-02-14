@@ -25,7 +25,8 @@ public abstract class ProviderKey {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+
+    if (o == null || !ProviderKey.class.isAssignableFrom(o.getClass())) {
       return false;
     }
     ProviderKey that = (ProviderKey) o;

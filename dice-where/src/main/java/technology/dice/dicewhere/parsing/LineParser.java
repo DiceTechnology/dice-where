@@ -6,15 +6,13 @@
 
 package technology.dice.dicewhere.parsing;
 
+import java.util.Optional;
+import java.util.stream.Stream;
 import technology.dice.dicewhere.api.api.IpInformation;
 import technology.dice.dicewhere.api.exceptions.LineParsingException;
 import technology.dice.dicewhere.decorator.Decorator;
 import technology.dice.dicewhere.decorator.DecoratorInformation;
 import technology.dice.dicewhere.reading.RawLine;
-
-import java.net.UnknownHostException;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public abstract class LineParser {
 

@@ -1,21 +1,20 @@
-package technology.dice.dicewhere.downloader.picocli.commandssssss;
+package technology.dice.dicewhere.downloader.picocli.commands;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
-import technology.dice.dicewhere.downloader.actions.maxmind.DownloadMaxmindSite;
+import technology.dice.dicewhere.downloader.actions.ipinfo.DownloadIpInfoSite;
 
 @Command(
-    name = "maxmind-site",
-    description = "Downloads the selected Maxmind edition of a database from Maxmind's website")
-public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
-
+    name = "ipinfo-site",
+    description = "Downloads the selected IpInfo dataset from IpInfo's website")
+public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
   @Option(
-      names = {"-k", "--key"},
+      names = {"-t", "--token"},
       required = true,
-      description = "The maxmind download key")
-  String key;
+      description = "The ipinfo download key")
+  String token;
 
   @Parameters(
       index = "0",
@@ -25,8 +24,8 @@ public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-    return new DownloadMaxmindSite(
-            noCheckMd5, overwrite, verbose, edition, database, format, key, destination)
+    return new DownloadIpInfoSite(
+            noCheckMd5, overwrite, verbose, dataset, format, token, destination)
         .execute();
   }
 }

@@ -70,7 +70,7 @@ public class LoaderBenchmark {
         }
       };
 
-  public static void main(String[] args) throws IOException, RunnerException {
+  public static void main(String[] args) throws RunnerException {
 
     Options opt =
         new OptionsBuilder()

@@ -47,7 +47,7 @@ public class IPResolverBenchmark {
 
   private IPResolver resolver;
 
-  public static void main(String[] args) throws IOException, RunnerException {
+  public static void main(String[] args) throws RunnerException {
 
     Options opt =
         new OptionsBuilder()
@@ -70,7 +70,7 @@ public class IPResolverBenchmark {
   public void testIPV4() throws UnknownHostException {
     for (int i = 0; i < 4; ++i) {
       for (int b = 0; b < 255; ++b) {
-        resolver.resolve("192.168." + i + "." + b , MaxmindProviderKey.of());
+        resolver.resolve("192.168." + i + "." + b, MaxmindProviderKey.of());
       }
     }
   }
@@ -96,7 +96,8 @@ public class IPResolverBenchmark {
             Paths.get(MAXMIND_RESOURCES_FOLDER + "/GeoIP2-City-Blocks-IPv4.csv"),
             Paths.get(MAXMIND_RESOURCES_FOLDER + "/GeoIP2-City-Blocks-IPv6.csv"));
 
-    DbIpLineReader dbIpLineReader = new DbIpLocationAndIspLineReader(Paths.get(RESOURCES_FOLDER + "/dbip-full-2018-09.csv"));
+    DbIpLineReader dbIpLineReader =
+        new DbIpLocationAndIspLineReader(Paths.get(RESOURCES_FOLDER + "/dbip-full-2018-09.csv"));
 
     LineReaderListener lineReaderListener =
         new LineReaderListener() {

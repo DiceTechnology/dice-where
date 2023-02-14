@@ -50,7 +50,7 @@ public class MaxmindLocationsParser {
                     StringUtils.removeQuotes(leastSpecificDivision),
                     StringUtils.removeQuotes(city));
               })
-          .collect(Collectors.toMap(MaxmindLocation::getGeonameId, e -> e));
+          .collect(Collectors.toMap(MaxmindLocation::getCityGeonameId, e -> e));
     }
   }
 }

@@ -23,7 +23,7 @@ import technology.dice.dicewhere.reading.LineReaderListener;
 
 public class DbIpLineReaderTest {
   @Test
-  public void clean() throws IOException {
+  public void clean() {
     Path path =
         Paths.get(
             DbIpLineReaderTest.class
@@ -67,7 +67,7 @@ public class DbIpLineReaderTest {
   }
 
   @Test
-  public void invalidLines() throws IOException {
+  public void invalidLines() {
     Path path =
         Paths.get(
             DbIpLineReaderTest.class
@@ -111,7 +111,7 @@ public class DbIpLineReaderTest {
   }
 
   @Test
-  public void outOfOrder() throws IOException {
+  public void outOfOrder(){
     Path path =
         Paths.get(
             DbIpLineReaderTest.class

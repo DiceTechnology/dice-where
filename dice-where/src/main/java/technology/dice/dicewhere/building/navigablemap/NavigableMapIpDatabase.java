@@ -36,7 +36,7 @@ public class NavigableMapIpDatabase implements IPDatabase {
                 IpInformation ipInformation =
                     IpInformation.builder()
                         .withCountryCodeAlpha2(ipInformationProto.getCountryCodeAlpha2())
-                        .withGeonameId(ipInformationProto.getGeonameId())
+                        .withCityGeonameId(ipInformationProto.getCityGeoNameId())
                         .withCity(ipInformationProto.getCity())
                         .withLeastSpecificDivision(ipInformationProto.getLeastSpecificDivision())
                         .withMostSpecificDivision(ipInformationProto.getMostSpecificDivision())

@@ -41,7 +41,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -77,7 +77,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -149,7 +149,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -178,7 +178,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -207,7 +207,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -236,7 +236,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -259,7 +259,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     IpInformation actual = decorator.decorate(target).collect(Collectors.toList()).get(0);
     assertEquals(target, actual);
@@ -274,7 +274,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     IpInformation actual = decorator.decorate(target).collect(Collectors.toList()).get(0);
     IpInformation expected = IpInformation.builder(target).isVpn(true).build();
@@ -291,7 +291,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     IpInformation actual = decorator.decorate(target).collect(Collectors.toList()).get(0);
     assertEquals(target, actual);
@@ -306,7 +306,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -340,7 +340,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -386,7 +386,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-            .withGeonameId("111")
+            .withCityGeonameId("111")
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();

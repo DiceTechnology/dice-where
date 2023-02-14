@@ -1,7 +1,7 @@
 package technology.dice.dicewhere.downloader.main;
 
 import picocli.CommandLine;
-import technology.dice.dicewhere.downloader.picocli.commandssssss.DownloadCommand;
+import technology.dice.dicewhere.downloader.picocli.commands.DownloadCommand;
 import technology.dice.dicewhere.downloader.picocli.PrintExceptionMessageHandler;
 
 /**

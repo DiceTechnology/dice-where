@@ -90,7 +90,7 @@ public class MaxmindLineParser extends LineParser {
 
       return IpInformation.builder()
           .withCountryCodeAlpha2(StringUtils.removeQuotes(loc.getCountryCodeAlpha2()))
-          .withGeonameId(StringUtils.removeQuotes(geonameId))
+          .withCityGeonameId(StringUtils.removeQuotes(geonameId))
           .withCity(StringUtils.removeQuotes(loc.getCity()))
           .withLeastSpecificDivision(StringUtils.removeQuotes(loc.getLeastSpecificDivision()))
           .withMostSpecificDivision(StringUtils.removeQuotes(loc.getMostSpecificDivision()))

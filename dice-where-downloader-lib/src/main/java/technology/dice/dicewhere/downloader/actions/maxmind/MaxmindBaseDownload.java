@@ -1,6 +1,7 @@
 package technology.dice.dicewhere.downloader.actions.maxmind;
 
 import java.net.URI;
+import technology.dice.dicewhere.downloader.Download;
 import technology.dice.dicewhere.downloader.PathUtils;
 
 public abstract class MaxmindBaseDownload extends Download {
@@ -24,15 +25,7 @@ public abstract class MaxmindBaseDownload extends Download {
     this.format = format;
   }
 
-  protected URI uriForTarget(String destinationBase, String fileName) {
-    return URI.create(
-        (PathUtils.removeTrailingCharacter(destinationBase, "/") + "/maxmind/")
-            + edition.name()
-            + "/"
-            + database.name()
-            + "/"
-            + format.name()
-            + "/"
-            + fileName);
+  protected String maxmindPath() {
+    return "maxmind/" + edition.name() + "/" + database.name() + "/" + format.name();
   }
 }

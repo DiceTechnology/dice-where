@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParseResult;
-import technology.dice.dicewhere.downloader.picocli.commandssssss.BaseCommand;
+import technology.dice.dicewhere.downloader.picocli.commands.BaseCommand;
 
 public class PrintExceptionMessageHandler implements IExecutionExceptionHandler {
   private static final Logger LOG = LoggerFactory.getLogger(PrintExceptionMessageHandler.class);

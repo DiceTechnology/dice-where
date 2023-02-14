@@ -18,7 +18,7 @@ import technology.dice.dicewhere.utils.StringUtils;
 public class IpInformation {
   private final String originalLine;
   private final String countryCodeAlpha2;
-  private final String geonameId;
+  private final String cityGeonameId;
   private final String city;
   private final String leastSpecificDivision;
   private final String mostSpecificDivision;
@@ -30,7 +30,7 @@ public class IpInformation {
 
   /**
    * @param countryCodeAlpha2 the country of this location
-   * @param geonameId the geoname identifier of this location (https://www.geonames.org/) This field
+   * @param cityGeonameId the geoname identifier of this city (https://www.geonames.org/) This field
    *     will be Optional.empty() if an empty string is passed
    * @param city the city of this location. This field will be Optional.empty() if an empty string
    *     is passed
@@ -47,7 +47,7 @@ public class IpInformation {
    */
   public IpInformation(
       @Nonnull String countryCodeAlpha2,
-      @Nullable String geonameId,
+      @Nullable String cityGeonameId,
       @Nullable String city,
       @Nullable String leastSpecificDivision,
       @Nullable String mostSpecificDivision,
@@ -58,7 +58,7 @@ public class IpInformation {
       @Nullable Boolean isVpn,
       @Nullable Boolean isHostingProvider) {
     this.countryCodeAlpha2 = Objects.requireNonNull(countryCodeAlpha2);
-    this.geonameId = geonameId;
+    this.cityGeonameId = cityGeonameId;
     this.city = city;
     this.leastSpecificDivision = leastSpecificDivision;
     this.mostSpecificDivision = mostSpecificDivision;
@@ -74,8 +74,8 @@ public class IpInformation {
     return countryCodeAlpha2;
   }
 
-  public Optional<String> getGeonameId() {
-    return StringUtils.nonEmptyString(geonameId);
+  public Optional<String> getCityGeonameId() {
+    return StringUtils.nonEmptyString(cityGeonameId);
   }
 
   public Optional<String> getCity() {
@@ -125,7 +125,7 @@ public class IpInformation {
     IpInformation that = (IpInformation) o;
     return Objects.equals(getOriginalLine(), that.getOriginalLine())
         && Objects.equals(getCountryCodeAlpha2(), that.getCountryCodeAlpha2())
-        && Objects.equals(getGeonameId(), that.getGeonameId())
+        && Objects.equals(getCityGeonameId(), that.getCityGeonameId())
         && Objects.equals(getCity(), that.getCity())
         && Objects.equals(getLeastSpecificDivision(), that.getLeastSpecificDivision())
         && Objects.equals(getMostSpecificDivision(), that.getMostSpecificDivision())
@@ -140,7 +140,7 @@ public class IpInformation {
     return Objects.hash(
         originalLine,
         countryCodeAlpha2,
-        geonameId,
+        cityGeonameId,
         city,
         leastSpecificDivision,
         mostSpecificDivision,
@@ -160,7 +160,7 @@ public class IpInformation {
         + countryCodeAlpha2
         + '\''
         + ", geonameId='"
-        + geonameId
+        + cityGeonameId
         + '\''
         + ", city='"
         + city
@@ -192,7 +192,7 @@ public class IpInformation {
         .withCountryCodeAlpha2(info.getCountryCodeAlpha2())
         .withEndOfRange(info.getEndOfRange())
         .withStartOfRange(info.getStartOfRange())
-        .withGeonameId(info.getGeonameId().orElse(null))
+        .withCityGeonameId(info.getCityGeonameId().orElse(null))
         .withCity(info.getCity().orElse(null))
         .withLeastSpecificDivision(info.getLeastSpecificDivision().orElse(null))
         .withPostcode(info.getPostcode().orElse(null))
@@ -204,7 +204,7 @@ public class IpInformation {
 
   public static class Builder {
     private String countryCodeAlpha2;
-    private String geonameId;
+    private String cityGeonameId;
     private String city;
     private String leastSpecificDivision;
     private String mostSpecificDivision;
@@ -222,8 +222,8 @@ public class IpInformation {
       return this;
     }
 
-    public Builder withGeonameId(String geonameId) {
-      this.geonameId = geonameId;
+    public Builder withCityGeonameId(String geonameId) {
+      this.cityGeonameId = geonameId;
       return this;
     }
 
@@ -285,7 +285,7 @@ public class IpInformation {
     public IpInformation build() {
       return new IpInformation(
           Objects.requireNonNull(countryCodeAlpha2),
-          geonameId,
+          cityGeonameId,
           city,
           leastSpecificDivision,
           mostSpecificDivision,

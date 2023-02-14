@@ -107,7 +107,7 @@ public class DbIpIpToCountryLiteCSVLineParserTest {
   }
 
   @Test
-  public void wrongLineFormat() throws LineParsingException {
+  public void wrongLineFormat() {
     assertThrows(
         LineParsingException.class,
         () -> {

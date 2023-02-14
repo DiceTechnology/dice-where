@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.picocli.commandssssss;
+package technology.dice.dicewhere.downloader.picocli.commands;
 
 import ch.qos.logback.classic.Level;
 import java.util.concurrent.Callable;

@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.picocli.commandssssss;
+package technology.dice.dicewhere.downloader.picocli.commands;
 
 import picocli.CommandLine.Option;
 import technology.dice.dicewhere.downloader.actions.maxmind.MaxmindDatabase;

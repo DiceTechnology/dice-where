@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.actions.maxmind;
+package technology.dice.dicewhere.downloader;
 
 import java.util.Optional;
 import org.slf4j.Logger;

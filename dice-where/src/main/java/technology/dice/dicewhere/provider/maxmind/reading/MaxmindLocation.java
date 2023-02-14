@@ -11,27 +11,27 @@ import java.util.Objects;
 public class MaxmindLocation {
   public static final MaxmindLocation UNKNOWN = new MaxmindLocation("", "ZZ", "", "", "");
 
-  private final String geonameId;
+  private final String cityGeonameId;
   private final String countryCodeAlpha2;
   private final String mostSpecificDivision;
   private final String leastSpecificDivision;
   private final String city;
 
   public MaxmindLocation(
-      String geonameId,
+      String cityGeonameId,
       String countryCodeAlpha2,
       String mostSpecificDivision,
       String leastSpecificDivision,
       String city) {
-    this.geonameId = geonameId;
+    this.cityGeonameId = cityGeonameId;
     this.countryCodeAlpha2 = countryCodeAlpha2;
     this.mostSpecificDivision = mostSpecificDivision;
     this.leastSpecificDivision = leastSpecificDivision;
     this.city = city;
   }
 
-  public String getGeonameId() {
-    return geonameId;
+  public String getCityGeonameId() {
+    return cityGeonameId;
   }
 
   public String getCountryCodeAlpha2() {
@@ -59,7 +59,7 @@ public class MaxmindLocation {
       return false;
     }
     MaxmindLocation that = (MaxmindLocation) o;
-    return Objects.equals(geonameId, that.geonameId)
+    return Objects.equals(cityGeonameId, that.cityGeonameId)
         && Objects.equals(countryCodeAlpha2, that.countryCodeAlpha2)
         && Objects.equals(mostSpecificDivision, that.mostSpecificDivision)
         && Objects.equals(leastSpecificDivision, that.leastSpecificDivision)
@@ -70,6 +70,6 @@ public class MaxmindLocation {
   public int hashCode() {
 
     return Objects.hash(
-        geonameId, countryCodeAlpha2, mostSpecificDivision, leastSpecificDivision, city);
+        cityGeonameId, countryCodeAlpha2, mostSpecificDivision, leastSpecificDivision, city);
   }
 }

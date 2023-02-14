@@ -74,7 +74,7 @@ public class DbIpIpToLocationAndIspCSVLineParser extends LineParser {
       IP endIp = new IP(e);
       return IpInformation.builder()
           .withCountryCodeAlpha2(StringUtils.removeQuotes(countryCode))
-          .withGeonameId(StringUtils.removeQuotes(geoname))
+          .withCityGeonameId(StringUtils.removeQuotes(geoname))
           .withCity(StringUtils.removeQuotes(city))
           .withLeastSpecificDivision(StringUtils.removeQuotes(leastSpecificDivision))
           .withMostSpecificDivision(StringUtils.removeQuotes(mostSpecificDivision))
