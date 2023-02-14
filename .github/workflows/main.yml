@@ -32,6 +32,12 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Login to Docker Hub
+        if: ${{ github.ref == 'refs/heads/master' && github.repository == 'DiceTechnology/dice-where' }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Set version, sign artifacts and deploy to Maven Central/Docker Hub
         if: ${{ github.ref == 'refs/heads/master' && github.repository == 'DiceTechnology/dice-where' }}
         run: cd/deploy.sh
@@ -40,6 +46,4 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           SLACK_URL: ${{ secrets.SLACK_URL }}
