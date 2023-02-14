@@ -17,7 +17,8 @@ import technology.dice.dicewhere.downloader.picocli.ResourceVersionProvider;
       HelpCommand.class,
       DownloadMaxmindSiteCommand.class,
       DownloadMaxmindS3Command.class,
-      DownloadIpInfoSiteCommand.class
+      DownloadIpInfoSiteCommand.class,
+      DownloadIpInfoS3Command.class
     },
     synopsisSubcommandLabel = "COMMAND")
 public class DownloadCommand implements Callable<Integer> {

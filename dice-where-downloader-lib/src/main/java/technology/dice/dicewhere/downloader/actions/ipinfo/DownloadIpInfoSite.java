@@ -1,6 +1,7 @@
 package technology.dice.dicewhere.downloader.actions.ipinfo;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
@@ -32,7 +33,12 @@ public class DownloadIpInfoSite extends IpInfoBaseDownload {
 
     FileAcceptor<?> acceptor =
         FileAcceptorFactory.acceptorFor(
-            this.uriForTarget(this.destination, ipInfoSiteSource.fileInfo().getFileName()));
+            URI.create(
+                this.destination
+                    + "/"
+                    + this.ipInfoPath()
+                    + "/"
+                    + ipInfoSiteSource.fileInfo().getFileName()));
 
     return this.process(acceptor, ipInfoSiteSource);
   }

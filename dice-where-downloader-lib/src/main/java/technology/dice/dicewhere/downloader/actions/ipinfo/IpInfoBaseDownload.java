@@ -21,13 +21,7 @@ public abstract class IpInfoBaseDownload extends Download {
     this.format = format;
   }
 
-  protected URI uriForTarget(String destinationBase, String fileName) {
-    return URI.create(
-        (PathUtils.removeTrailingCharacter(destinationBase, "/") + "/ipinfo/")
-            + dataset.getRemoteName()
-            + "/"
-            + format.getSuffix()
-            + "/"
-            + fileName);
+  protected String ipInfoPath() {
+    return "ipinfo/" + dataset.getRemoteName() + "/" + format.getSuffix();
   }
 }

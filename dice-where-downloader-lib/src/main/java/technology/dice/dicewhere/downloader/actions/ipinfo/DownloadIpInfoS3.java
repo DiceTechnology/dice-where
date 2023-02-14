@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.actions.maxmind;
+package technology.dice.dicewhere.downloader.actions.ipinfo;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,7 +15,6 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import technology.dice.dicewhere.downloader.ObjectMapperInstance;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
-import technology.dice.dicewhere.downloader.PathUtils;
 import technology.dice.dicewhere.downloader.actions.S3ClientConfig;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
 import technology.dice.dicewhere.downloader.destination.FileAcceptorFactory;
@@ -24,37 +23,35 @@ import technology.dice.dicewhere.downloader.destination.s3.ObjectPath;
 import technology.dice.dicewhere.downloader.exception.DownloaderException;
 import technology.dice.dicewhere.downloader.source.s3.S3Source;
 
-public class DownloadMaxmindS3 extends MaxmindBaseDownload {
-  private static final Logger LOG = LoggerFactory.getLogger(DownloadMaxmindS3.class);
+public class DownloadIpInfoS3 extends IpInfoBaseDownload {
+  private static final Logger LOG = LoggerFactory.getLogger(DownloadIpInfoS3.class);
   private final Optional<S3ClientConfig> s3ClientConfig;
 
   private final String prefix;
   private final String destination;
 
-  private DownloadMaxmindS3(
+  private DownloadIpInfoS3(
       Optional<S3ClientConfig> s3ClientConfig,
       boolean noCheckMd5,
       boolean overwrite,
       boolean verbose,
-      MaxmindEdition edition,
-      MaxmindDatabase database,
-      MaxmindFormat format,
+      IpInfoDataset dataset,
+      IpInfoFormat format,
       String s3BucketPrefix,
       String destination) {
-    super(noCheckMd5, overwrite, verbose, edition, database, format);
+    super(noCheckMd5, overwrite, verbose, dataset, format);
     this.prefix = s3BucketPrefix;
     this.destination = destination;
     this.s3ClientConfig = s3ClientConfig;
   }
 
-  public DownloadMaxmindS3(
+  public DownloadIpInfoS3(
       S3ClientConfig s3ClientConfig,
       boolean noCheckMd5,
       boolean overwrite,
       boolean verbose,
-      MaxmindEdition edition,
-      MaxmindDatabase database,
-      MaxmindFormat format,
+      IpInfoDataset dataset,
+      IpInfoFormat format,
       String s3BucketPrefix,
       String destination) {
     this(
@@ -62,20 +59,18 @@ public class DownloadMaxmindS3 extends MaxmindBaseDownload {
         noCheckMd5,
         overwrite,
         verbose,
-        edition,
-        database,
+        dataset,
         format,
         s3BucketPrefix,
         destination);
   }
 
-  public DownloadMaxmindS3(
+  public DownloadIpInfoS3(
       boolean noCheckMd5,
       boolean overwrite,
       boolean verbose,
-      MaxmindEdition edition,
-      MaxmindDatabase database,
-      MaxmindFormat format,
+      IpInfoDataset dataset,
+      IpInfoFormat format,
       String s3BucketPrefix,
       String destination) {
     this(
@@ -83,8 +78,7 @@ public class DownloadMaxmindS3 extends MaxmindBaseDownload {
         noCheckMd5,
         overwrite,
         verbose,
-        edition,
-        database,
+        dataset,
         format,
         s3BucketPrefix,
         destination);
@@ -119,7 +113,7 @@ public class DownloadMaxmindS3 extends MaxmindBaseDownload {
             URI.create(
                 this.destination
                     + "/"
-                    + this.maxmindPath()
+                    + this.ipInfoPath()
                     + "/"
                     + s3Source.fileInfo().getFileName()));
 
@@ -130,22 +124,14 @@ public class DownloadMaxmindS3 extends MaxmindBaseDownload {
     GetObjectRequest getObjectRequest =
         GetObjectRequest.builder()
             .bucket(objectPath.getBucket())
-            .key(objectPath.getPrefix() + this.maxmindPath() + "/latest")
+            .key(objectPath.getPrefix() + this.ipInfoPath() + "/latest")
             .build();
     try (final ResponseInputStream<GetObjectResponse> object =
         s3Client.getObject(getObjectRequest); ) {
       final Latest latest = ObjectMapperInstance.INSTANCE.readValue(object, Latest.class);
       return Optional.ofNullable(latest.getKey());
     } catch (IOException | NoSuchKeyException e) {
-      throw new DownloaderException(
-          "Latest version information not readable for "
-              + edition
-              + " - "
-              + database.name()
-              + " in "
-              + format.name()
-              + " format.",
-          e);
+      throw new DownloaderException("Latest version information not readable for at the source");
     }
   }
 }

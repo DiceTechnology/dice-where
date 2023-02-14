@@ -77,11 +77,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-<<<<<<< HEAD
             .withCityGeonameId("111")
-=======
-            .withGeonameId("111")
->>>>>>> origin/master
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();
@@ -153,11 +149,7 @@ public class VpnDecoratorTest {
             .withStartOfRange(new IP(inputAddress.getLower().getBytes()))
             .withEndOfRange(new IP(inputAddress.toMaxHost().getBytes()))
             .withCountryCodeAlpha2("BG")
-<<<<<<< HEAD
             .withCityGeonameId("111")
-=======
-            .withGeonameId("111")
->>>>>>> origin/master
             .build();
     List<IpInformation> actual = decorator.decorate(target).collect(Collectors.toList());
     List<IpInformation> expected = new ArrayList<>();

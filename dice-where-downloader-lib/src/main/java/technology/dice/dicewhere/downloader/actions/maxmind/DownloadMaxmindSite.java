@@ -1,6 +1,7 @@
 package technology.dice.dicewhere.downloader.actions.maxmind;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
@@ -8,8 +9,7 @@ import technology.dice.dicewhere.downloader.destination.FileAcceptorFactory;
 import technology.dice.dicewhere.downloader.exception.DownloaderException;
 import technology.dice.dicewhere.downloader.source.maxmindsite.MaxmindSiteSource;
 
-public class DownloadMaxmindSite extends
-    MaxmindBaseDownload {
+public class DownloadMaxmindSite extends MaxmindBaseDownload {
 
   protected final String key;
   protected final String destination;
@@ -35,7 +35,12 @@ public class DownloadMaxmindSite extends
 
     FileAcceptor<?> acceptor =
         FileAcceptorFactory.acceptorFor(
-            this.uriForTarget(this.destination, maxmindSource.fileInfo().getFileName()));
+            URI.create(
+                this.destination
+                    + "/"
+                    + this.maxmindPath()
+                    + "/"
+                    + maxmindSource.fileInfo().getFileName()));
 
     return this.process(acceptor, maxmindSource);
   }
