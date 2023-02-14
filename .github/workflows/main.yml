@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Git repo (with tags)
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Cache Maven packages
@@ -27,8 +28,11 @@ jobs:
           distribution: 'temurin'
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots install
-      - uses: codecov/codecov-action@v3
-      - name: Set version and deploy to Maven Central
+      - name: Run Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Set version, sign artifacts and deploy to Maven Central/Docker Hub
         if: ${{ github.ref == 'refs/heads/master' && github.repository == 'DiceTechnology/dice-where' }}
         run: cd/deploy.sh
         env:
@@ -39,4 +43,3 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           SLACK_URL: ${{ secrets.SLACK_URL }}
-

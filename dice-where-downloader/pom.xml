@@ -41,8 +41,8 @@
           </execution>
         </executions>
         <configuration>
-          <username>${DOCKER_USER}</username>
-          <password>${DOCKER_PASSWORD}</password>
+          <username>${env.DOCKER_USER}</username>
+          <password>${env.DOCKER_PASSWORD}</password>
           <repository>dicetechnology/dice-where-downloader</repository>
           <tag>${project.version}</tag>
           <buildArgs>
