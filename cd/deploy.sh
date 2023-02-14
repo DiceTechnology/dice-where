@@ -1,29 +1,11 @@
 #!/usr/bin/env bash
-set -x 
-if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
-  gpg --batch --fast-import gpg.asc
 
-  ./cd/version.sh
+set +x
+echo $GPG_KEY | base64 --decode | gpg --batch --fast-import
+set -x
 
-  cd dice-where
-  cp ../cd/version.sh .
-  ./version.sh
-  cd ../dice-where-downloader-lib
-  cp ../cd/version.sh .
-  ./version.sh
-  cd ../dice-where-downloader
-  cp ../cd/version.sh .
-  ./version.sh
-  cd ..
+./cd/version.sh && \
+./cd/tag.sh && \
+mvn deploy -P publish -DskipTests=true --settings cd/mvnsettings.xml
 
-  mvn deploy -P publish -DskipTests=true --settings cd/mvnsettings.xml
-  cd dice-where
-  mvn deploy -P publish -DskipTests=true --settings cd/mvnsettings.xml
-  cd ../dice-where-downloader-lib
-  mvn deploy -P publish -DskipTests=true --settings cd/mvnsettings.xml
-  cd ../dice-where-downloader
-  mvn deploy -P publish -DskipTests=true --settings cd/mvnsettings.xml
-  cd ..
 
-  ./cd/tag.sh
-fi

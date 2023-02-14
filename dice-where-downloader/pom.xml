@@ -41,14 +41,11 @@
           </execution>
         </executions>
         <configuration>
-          <username>${DOCKER_USER}</username>
-          <password>${DOCKER_PASSWORD}</password>
           <repository>dicetechnology/dice-where-downloader</repository>
           <tag>${project.version}</tag>
           <buildArgs>
             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
           </buildArgs>
-          <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
         </configuration>
       </plugin>
       <plugin>
