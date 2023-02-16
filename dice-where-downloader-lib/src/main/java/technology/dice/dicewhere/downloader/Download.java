@@ -29,13 +29,16 @@ public abstract class Download {
     LOG.debug("Writable path: " + pathWritable);
     boolean fileExists = acceptor.destinationExists();
     LOG.debug("Existing file: " + fileExists);
+    final DownloadExecutionResult result;
     if (fileExists) {
       LOG.info("File exists in " + acceptor.getUri().toString());
-      return processFileExists(acceptor, fileSource, pathWritable);
+      result = processFileExists(acceptor, fileSource, pathWritable);
     } else {
       LOG.info("File not found in destination " + acceptor.getUri().toString());
-      return processFileDoesNotExist(acceptor, fileSource, pathWritable);
+      result = processFileDoesNotExist(acceptor, fileSource, pathWritable);
     }
+    LOG.info("A new file was" + (result.isNewFileDownloaded() ? "" : " not") + " downloaded");
+    return result;
   }
 
   private DownloadExecutionResult processFileDoesNotExist(
@@ -87,7 +90,7 @@ public abstract class Download {
           LOG.info("MD5 matches that of the remote file");
         }
         return new DownloadExecutionResult(
-            true,
+            false,
             existingMd5.map(unused -> checksumMatches).orElse(null),
             existingMd5.orElse(null),
             acceptor.getUri(),
