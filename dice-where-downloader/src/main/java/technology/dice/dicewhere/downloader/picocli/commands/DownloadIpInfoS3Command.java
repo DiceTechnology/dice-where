@@ -9,7 +9,6 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.actions.ipinfo.DownloadIpInfoS3;
-import technology.dice.dicewhere.downloader.actions.maxmind.DownloadMaxmindS3;
 
 @Command(
     name = "ipinfo-s3",
