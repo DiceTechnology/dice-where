@@ -7,8 +7,8 @@ import software.amazon.awssdk.utils.Pair;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.actions.S3ClientConfig;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
-import technology.dice.dicewhere.downloader.destination.s3.S3ObjectPath;
 import technology.dice.dicewhere.downloader.destination.s3.S3DownloadSetup;
+import technology.dice.dicewhere.downloader.destination.s3.S3ObjectPath;
 import technology.dice.dicewhere.downloader.source.s3.S3Source;
 
 public class DownloadIpInfoS3 extends IpInfoBaseDownload {

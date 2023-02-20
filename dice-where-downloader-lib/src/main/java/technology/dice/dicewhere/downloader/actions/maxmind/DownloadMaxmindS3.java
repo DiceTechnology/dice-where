@@ -1,28 +1,14 @@
 package technology.dice.dicewhere.downloader.actions.maxmind;
 
-import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.utils.Pair;
-import technology.dice.dicewhere.downloader.ObjectMapperInstance;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.actions.S3ClientConfig;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
-import technology.dice.dicewhere.downloader.destination.FileAcceptorFactory;
-import technology.dice.dicewhere.downloader.destination.s3.Latest;
 import technology.dice.dicewhere.downloader.destination.s3.S3DownloadSetup;
 import technology.dice.dicewhere.downloader.destination.s3.S3ObjectPath;
-import technology.dice.dicewhere.downloader.exception.DownloaderException;
 import technology.dice.dicewhere.downloader.source.s3.S3Source;
 
 public class DownloadMaxmindS3 extends MaxmindBaseDownload {

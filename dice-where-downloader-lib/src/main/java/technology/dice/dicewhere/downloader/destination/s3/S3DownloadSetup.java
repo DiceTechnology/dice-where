@@ -3,11 +3,13 @@ package technology.dice.dicewhere.downloader.destination.s3;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
+import java.util.function.Consumer;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -43,13 +45,18 @@ public class S3DownloadSetup {
     S3Client s3Client =
         this.s3ClientConfig
             .map(
-                c ->
-                    S3Client.builder()
-                        .credentialsProvider(
-                            StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(c.getAwsKeyId(), c.getAwsSecretKey())))
-                        .region(Region.of(c.getAwsRegion()))
-                        .build())
+                c -> {
+                  final S3ClientBuilder clientBuilder =
+                      S3Client.builder()
+                          .credentialsProvider(
+                              StaticCredentialsProvider.create(
+                                  AwsBasicCredentials.create(c.getAwsKeyId(), c.getAwsSecretKey())))
+                          .region(Region.of(c.getAwsRegion()));
+                  c.getEndpoint()
+                      .ifPresent(endpoint -> clientBuilder.endpointOverride(URI.create(endpoint)));
+
+                  return clientBuilder.build();
+                })
             .orElseGet(() -> S3Client.create());
 
     Optional<String> optionalKey = latestKeyForDatabase(s3Client, pathInfix, s3ObjectPath);
