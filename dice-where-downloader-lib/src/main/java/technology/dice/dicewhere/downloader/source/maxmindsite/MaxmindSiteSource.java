@@ -16,8 +16,8 @@ import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 import technology.dice.dicewhere.downloader.source.BaseUrlSource;
 
 public class MaxmindSiteSource extends BaseUrlSource {
+
   private final URL md5FileLocation;
-  private FileInfo fileInfo;
 
   public MaxmindSiteSource(URL dataFileLocation, URL md5FileLocation) {
     super(dataFileLocation);
