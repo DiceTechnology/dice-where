@@ -14,7 +14,7 @@
 
   <properties>
     <picolli.version>4.1.4</picolli.version>
-    <logback.version>1.2.3</logback.version>
+    <logback.version>1.3.12</logback.version>
     <dockerfile.maven.version>1.4.13</dockerfile.maven.version>
   </properties>
 
