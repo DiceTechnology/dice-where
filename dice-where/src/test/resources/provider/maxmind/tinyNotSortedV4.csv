@@ -1,6 +1,6 @@
-network,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider,postal_code,latitude,longitude,accuracy_radius
-1.0.0.0/26,2065740,2077456,,0,0,5162,-35.1333,138.5167,500
-1.0.0.64/26,2152558,2077456,,0,0,3072,-37.7500,145.0167,500
-1.0.0.128/25,2065740,2077456,,0,0,5162,-35.1333,138.5167,500
-0.0.0.0/24,1810821,1814991,,0,0,,26.0614,119.3061,50
-1.0.2.0/24,1810821,1814991,,0,0,,26.0614,119.3061,50
+network,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider,postal_code,latitude,longitude,accuracy_radius,is_anycast
+1.0.0.0/26,2065740,2077456,,0,0,5162,-35.1333,138.5167,500,
+1.0.0.64/26,2152558,2077456,,0,0,3072,-37.7500,145.0167,500,
+1.0.0.128/25,2065740,2077456,,0,0,5162,-35.1333,138.5167,500,
+0.0.0.0/24,1810821,1814991,,0,0,,26.0614,119.3061,50,
+1.0.2.0/24,1810821,1814991,,0,0,,26.0614,119.3061,50,1
