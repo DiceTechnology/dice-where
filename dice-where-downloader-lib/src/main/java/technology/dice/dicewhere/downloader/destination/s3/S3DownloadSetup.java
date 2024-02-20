@@ -51,7 +51,8 @@ public class S3DownloadSetup {
                           .credentialsProvider(
                               StaticCredentialsProvider.create(
                                   AwsBasicCredentials.create(c.getAwsKeyId(), c.getAwsSecretKey())))
-                          .region(Region.of(c.getAwsRegion()));
+                          .region(Region.of(c.getAwsRegion()))
+                          .forcePathStyle(true);
                   c.getEndpoint()
                       .ifPresent(endpoint -> clientBuilder.endpointOverride(URI.create(endpoint)));
 
