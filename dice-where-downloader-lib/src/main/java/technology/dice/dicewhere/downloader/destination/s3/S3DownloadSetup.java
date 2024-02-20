@@ -3,7 +3,6 @@ package technology.dice.dicewhere.downloader.destination.s3;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
-import java.util.function.Consumer;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -51,10 +50,10 @@ public class S3DownloadSetup {
                           .credentialsProvider(
                               StaticCredentialsProvider.create(
                                   AwsBasicCredentials.create(c.getAwsKeyId(), c.getAwsSecretKey())))
-                          .region(Region.of(c.getAwsRegion()))
-                          .forcePathStyle(true);
-                  c.getEndpoint()
-                      .ifPresent(endpoint -> clientBuilder.endpointOverride(URI.create(endpoint)));
+                          .region(Region.of(c.getAwsRegion()));
+                  c.getEndpoint().ifPresent(
+                      endpoint -> clientBuilder.endpointOverride(URI.create(endpoint))
+                          .forcePathStyle(true));
 
                   return clientBuilder.build();
                 })
