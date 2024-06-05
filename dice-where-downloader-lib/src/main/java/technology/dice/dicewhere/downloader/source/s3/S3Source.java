@@ -22,6 +22,7 @@ import technology.dice.dicewhere.downloader.source.FileSource;
 import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 
 public class S3Source implements FileSource {
+
   private static Logger LOG = LoggerFactory.getLogger(S3Source.class);
   public static final String MD5_METADATA_KEY = "md5";
   public static final String TIMESTAMP_METADATA_KEY = "ts";
@@ -67,12 +68,12 @@ public class S3Source implements FileSource {
   }
 
   @Override
-  public MD5Checksum produce(FileAcceptor consumer) {
+  public MD5Checksum produce(FileAcceptor consumer, boolean noMd5Check) {
     GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(bucket).key(key).build();
     try (final ResponseInputStream<GetObjectResponse> object = client.getObject(getObjectRequest);
         StreamWithMD5Decorator is = StreamWithMD5Decorator.of(object)) {
       consumer
-          .getStreamConsumer(fileInfo.getMd5Checksum(), fileInfo.getTimestamp())
+          .getStreamConsumer(fileInfo.getMd5Checksum(), fileInfo.getTimestamp(), noMd5Check)
           .consume(is, fileInfo.getSize());
       return is.md5();
     } catch (IOException | NoSuchAlgorithmException e) {

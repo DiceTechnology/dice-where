@@ -2,14 +2,18 @@ package technology.dice.dicewhere.downloader.destination.s3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -17,11 +21,13 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.StorageClass;
 import software.amazon.awssdk.utils.StringInputStream;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
+import technology.dice.dicewhere.downloader.destination.local.LocalFileAcceptor;
 import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 import technology.dice.dicewhere.downloader.stream.StreamConsumer;
 
 public class S3FileAcceptor implements FileAcceptor<Void> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(S3FileAcceptor.class);
   private static final String LATEST_KEY = "latest";
   public static final String MD5_METADATA_KEY = "md5";
   public static final String TIMESTAMP_METADATA_KEY = "ts";
@@ -42,7 +48,7 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
 
   @Override
   public StreamConsumer<Void> getStreamConsumer(
-      MD5Checksum originalFileMd5, Instant originalFileTimestamp) {
+      MD5Checksum originalFileMd5, Instant originalFileTimestamp, boolean noMd5Check) {
     return (StreamConsumer)
         (stream, size) -> {
           Map<String, String> objectMetadata = new HashMap<>();
@@ -60,18 +66,26 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
           Latest latest = new Latest(clock.instant(), key);
           String latestContent = mapper.writeValueAsString(latest);
 
-          PutObjectRequest putLatest =
-              PutObjectRequest.builder()
-                  .key(Paths.get(key).getParent().toString() + "/" + LATEST_KEY)
-                  .bucket(bucket)
-                  .contentLength((long) latestContent.length())
-                  .storageClass(StorageClass.INTELLIGENT_TIERING)
-                  .build();
-          client.putObject(
-              putLatest,
-              RequestBody.fromInputStream(
-                  new StringInputStream(latestContent), latestContent.length()));
+          if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
+            LOG.error("MD5 mismatch. Deleting destination file");
+            client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build());
+          } else {
 
+            PutObjectRequest putLatest =
+                PutObjectRequest.builder()
+                    .key(Paths.get(key).getParent().toString() + "/" + LATEST_KEY)
+                    .bucket(bucket)
+                    .contentLength((long) latestContent.length())
+                    .storageClass(StorageClass.INTELLIGENT_TIERING)
+                    .build();
+            client.putObject(
+                putLatest,
+                RequestBody.fromInputStream(
+                    new StringInputStream(latestContent), latestContent.length()));
+          }
           return null;
         };
   }

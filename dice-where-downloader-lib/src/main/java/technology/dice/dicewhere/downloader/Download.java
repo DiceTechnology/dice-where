@@ -47,7 +47,7 @@ public abstract class Download {
       FileAcceptor<?> acceptor, FileSource fileSource, boolean pathWritable) {
 
     if (pathWritable) {
-      final MD5Checksum md5Checksum = fileSource.produce(acceptor);
+      final MD5Checksum md5Checksum = fileSource.produce(acceptor, noCheckMd5);
       LOG.info("File transferred");
       if (!noCheckMd5) {
         boolean checksumMatches = md5Checksum.matches(fileSource.fileInfo().getMd5Checksum());
