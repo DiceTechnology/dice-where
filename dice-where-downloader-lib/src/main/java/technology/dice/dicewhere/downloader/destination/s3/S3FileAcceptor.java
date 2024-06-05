@@ -46,7 +46,6 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
     return (StreamConsumer)
         (stream, size) -> {
           Map<String, String> objectMetadata = new HashMap<>();
-          objectMetadata.put(MD5_METADATA_KEY, originalFileMd5.stringFormat());
           objectMetadata.put(
               TIMESTAMP_METADATA_KEY, String.valueOf(originalFileTimestamp.toEpochMilli()));
           PutObjectRequest putObjectRequest =
@@ -58,7 +57,6 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
                   .storageClass(StorageClass.INTELLIGENT_TIERING)
                   .build();
           client.putObject(putObjectRequest, RequestBody.fromInputStream(stream, size));
-
           Latest latest = new Latest(clock.instant(), key);
           String latestContent = mapper.writeValueAsString(latest);
 
@@ -104,7 +102,7 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
     try {
       final HeadObjectResponse headObjectResponse = client.headObject(headObjectRequest);
       final Map<String, String> metadata = headObjectResponse.metadata();
-      return Optional.ofNullable(metadata.get(MD5_METADATA_KEY)).map(m -> MD5Checksum.of(m));
+      return Optional.ofNullable(headObjectResponse.eTag()).map(m -> MD5Checksum.of(m));
     } catch (NoSuchKeyException e) {
       return Optional.empty();
     }
