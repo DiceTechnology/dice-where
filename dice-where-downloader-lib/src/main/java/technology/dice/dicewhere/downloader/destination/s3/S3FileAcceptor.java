@@ -2,7 +2,6 @@ package technology.dice.dicewhere.downloader.destination.s3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.Instant;
@@ -21,7 +20,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.StorageClass;
 import software.amazon.awssdk.utils.StringInputStream;
 import technology.dice.dicewhere.downloader.destination.FileAcceptor;
-import technology.dice.dicewhere.downloader.destination.local.LocalFileAcceptor;
 import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 import technology.dice.dicewhere.downloader.stream.StreamConsumer;
 
@@ -115,7 +113,6 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
 
     try {
       final HeadObjectResponse headObjectResponse = client.headObject(headObjectRequest);
-      final Map<String, String> metadata = headObjectResponse.metadata();
       return Optional.ofNullable(headObjectResponse.eTag()).map(m -> MD5Checksum.of(m));
     } catch (NoSuchKeyException e) {
       return Optional.empty();
