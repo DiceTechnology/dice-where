@@ -39,6 +39,7 @@ public abstract class Download {
       result = processFileDoesNotExist(acceptor, fileSource, pathWritable);
     }
     LOG.info("A new file was" + (result.isNewFileDownloaded() ? "" : " not") + " downloaded");
+    LOG.info("Download is " + (!result.isSuccessful() ? "un" : "" + "successful"));
     return result;
   }
 
@@ -47,11 +48,11 @@ public abstract class Download {
 
     if (pathWritable) {
       final MD5Checksum md5Checksum = fileSource.produce(acceptor);
-      LOG.info("File successfully transferred");
+      LOG.info("File transferred");
       if (!noCheckMd5) {
         boolean checksumMatches = md5Checksum.matches(fileSource.fileInfo().getMd5Checksum());
         if (!checksumMatches) {
-          LOG.warn(
+          LOG.error(
               "Local and remote files' MD5 do not match: "
                   + md5Checksum.stringFormat()
                   + " Vs. "
