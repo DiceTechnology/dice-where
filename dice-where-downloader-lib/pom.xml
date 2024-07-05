@@ -15,6 +15,8 @@
     <slf4j.version>1.7.30</slf4j.version>
     <jackson.version>2.14.2</jackson.version>
     <javax-bind.version>2.3.1</javax-bind.version>
+    <test-containers.version>1.19.8</test-containers.version>
+    <wiremock.version>3.0.1</wiremock.version>
   </properties>
 
   <dependencies>
@@ -58,6 +60,37 @@
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
       <version>${javax-bind.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${test-containers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${test-containers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>localstack</artifactId>
+      <version>${test-containers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>nginx</artifactId>
+      <version>${test-containers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock</artifactId>
+      <version>${wiremock.version}</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

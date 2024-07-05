@@ -78,7 +78,7 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
         return Optional.of(md5Is.md5());
       } catch (IOException | NoSuchAlgorithmException e) {
         throw new RuntimeException(
-            "Could not obtain md5 of the file existing at the target: " + destination.toString(),
+            "Could not obtain md5 of the file existing at the target: " + destination,
             e);
       }
     }

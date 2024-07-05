@@ -27,7 +27,6 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
 
   private static final Logger LOG = LoggerFactory.getLogger(S3FileAcceptor.class);
   private static final String LATEST_KEY = "latest";
-  public static final String MD5_METADATA_KEY = "md5";
   public static final String TIMESTAMP_METADATA_KEY = "ts";
   private final S3Client client;
   private final String bucket;

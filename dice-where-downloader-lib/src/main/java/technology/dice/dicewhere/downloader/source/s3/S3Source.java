@@ -24,7 +24,6 @@ import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 public class S3Source implements FileSource {
 
   private static Logger LOG = LoggerFactory.getLogger(S3Source.class);
-  public static final String MD5_METADATA_KEY = "md5";
   public static final String TIMESTAMP_METADATA_KEY = "ts";
   private final S3Client client;
   private final String bucket;
@@ -44,11 +43,11 @@ public class S3Source implements FileSource {
           HeadObjectRequest.builder().key(key).bucket(bucket).build();
 
       final HeadObjectResponse headObjectResponse = client.headObject(headObjectRequest);
-      final Map<String, String> metadata = headObjectResponse.metadata();
-      if (!metadata.containsKey(MD5_METADATA_KEY)) {
+      if (headObjectResponse.eTag() == null) {
         throw new DownloaderException(
             "Remote file does not have md5 information. Please delete the file and re-upload");
       }
+      final Map<String, String> metadata = headObjectResponse.metadata();
       if (!metadata.containsKey(TIMESTAMP_METADATA_KEY)) {
         LOG.warn("Timestamp not available at source. Using now as timestamp.");
       }
@@ -60,7 +59,7 @@ public class S3Source implements FileSource {
               Optional.ofNullable(metadata.get(TIMESTAMP_METADATA_KEY))
                   .map(m -> Instant.ofEpochMilli(Long.valueOf(m)))
                   .orElse(Instant.now()),
-              MD5Checksum.of(metadata.get(MD5_METADATA_KEY)),
+              MD5Checksum.of(headObjectResponse.eTag()),
               size);
     }
 
