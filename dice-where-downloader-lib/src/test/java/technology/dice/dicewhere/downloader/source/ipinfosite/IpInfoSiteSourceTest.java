@@ -50,7 +50,7 @@ public class IpInfoSiteSourceTest extends TestCase {
   private static final int TEST_FILE_SIZE = 1024 * 1024;
   public static final String TEST_BUCKET = "test-bucket";
   public static final String TEST_KEY = "downloads/test-file";
-  
+
   @ClassRule
   static WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
   @ClassRule
@@ -135,8 +135,7 @@ public class IpInfoSiteSourceTest extends TestCase {
     final Path tempFile = Files.createTempFile("dice-where", "downloader");
     Files.write(tempFile, contents);
     MessageDigest md = MessageDigest.getInstance("MD5");
-    byte[] theMD5digest = md.digest(contents);
-    String hex = (new HexBinaryAdapter()).marshal(theMD5digest);
+    String hex = (new HexBinaryAdapter()).marshal(md.digest(contents));
     return Pair.of(tempFile, hex);
   }
 }
