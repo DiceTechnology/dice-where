@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.source.s3;
+package technology.dice.dicewhere.downloader.source.ipinfosite;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -43,11 +43,9 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import technology.dice.dicewhere.downloader.ObjectMapperInstance;
 import technology.dice.dicewhere.downloader.destination.s3.S3FileAcceptor;
 import technology.dice.dicewhere.downloader.files.FileInfo;
-import technology.dice.dicewhere.downloader.source.ipinfosite.IpInfoSiteSource;
-
 
 @RunWith(JUnit4ClassRunner.class)
-public class S3SourceTest extends TestCase {
+public class IpInfoSiteSourceTest extends TestCase {
 
   private static final int TEST_FILE_SIZE = 1024 * 1024;
   public static final String TEST_BUCKET = "test-bucket";
