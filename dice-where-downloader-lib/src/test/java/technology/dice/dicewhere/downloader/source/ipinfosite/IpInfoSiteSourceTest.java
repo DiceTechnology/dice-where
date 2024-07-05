@@ -50,16 +50,7 @@ public class IpInfoSiteSourceTest extends TestCase {
   private static final int TEST_FILE_SIZE = 1024 * 1024;
   public static final String TEST_BUCKET = "test-bucket";
   public static final String TEST_KEY = "downloads/test-file";
-  private static Path tempDirectory;
-
-  static {
-    try {
-      tempDirectory = Files.createTempFile("dice-where", "tests");
-    } catch (IOException e) {
-      fail("Could not create temp directory");
-    }
-  }
-
+  
   @ClassRule
   static WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
   @ClassRule
