@@ -16,11 +16,16 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
+import java.time.Instant;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -29,17 +34,27 @@ import org.junit.runner.RunWith;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import org.testcontainers.shaded.org.apache.commons.lang3.tuple.Pair;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.Delete;
+import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.utils.StringInputStream;
 import technology.dice.dicewhere.downloader.ObjectMapperInstance;
 import technology.dice.dicewhere.downloader.destination.s3.S3FileAcceptor;
 import technology.dice.dicewhere.downloader.files.FileInfo;
@@ -73,9 +88,20 @@ public class IpInfoSiteSourceTest extends TestCase {
 
   }
 
+  @Before
+  public void before() {
+    S3_CLIENT.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
+  }
+
+  @After
+  public void after() {
+    emptyBucket(TEST_BUCKET);
+    S3_CLIENT.deleteBucket(DeleteBucketRequest.builder().bucket(TEST_BUCKET).build());
+  }
+
   @Test
-  public void corruptedFile() throws IOException, NoSuchAlgorithmException {
-    final Pair<Path, String> tempFile = generateTempFile();
+  public void corruptedFileEmptyPreexistingSet() throws IOException, NoSuchAlgorithmException {
+    Pair<Path, String> tempFile = generateTempFile();
     IpInfoSiteSource ipInfoSiteSource = new IpInfoSiteSource(
         new URL("http://localhost:" + wireMockRule.port() + "/data/file.mdb"));
     wireMockRule.stubFor(WireMock.head(UrlPattern.ANY).willReturn(
@@ -87,7 +113,7 @@ public class IpInfoSiteSourceTest extends TestCase {
         .willReturn(aResponse().withBody(
             IOUtils.toByteArray(new FileInputStream(tempFile.getLeft().toFile())))));
 
-    final FileInfo fileInfo = ipInfoSiteSource.fileInfo();
+    FileInfo fileInfo = ipInfoSiteSource.fileInfo();
     ipInfoSiteSource.produce(
         new S3FileAcceptor(S3_CLIENT, TEST_BUCKET, TEST_KEY, ObjectMapperInstance.INSTANCE,
             Clock.systemUTC()), false);
@@ -97,11 +123,67 @@ public class IpInfoSiteSourceTest extends TestCase {
             .bucket(TEST_BUCKET)
             .key(TEST_KEY)
             .build()));
+    assertThrows(NoSuchKeyException.class, () -> S3_CLIENT.getObject(
+        GetObjectRequest.builder()
+            .bucket(TEST_BUCKET)
+            .key("downloads/latest")
+            .build()));
   }
 
   @Test
-  public void goodFile() throws IOException, NoSuchAlgorithmException {
-    final Pair<Path, String> tempFile = generateTempFile();
+  public void corruptedFilePreexistingSet() throws IOException, NoSuchAlgorithmException {
+    Pair<Path, String> preexistingFile = generateTempFile();
+    S3_CLIENT.putObject(PutObjectRequest.builder()
+        .bucket(TEST_BUCKET)
+        .key("downloads/existingFile.zip")
+        .build(), preexistingFile.getLeft());
+    final Instant originalFileUploadedAt = Instant.now();
+    ImmutableMap<String, Object> existingLatest = ImmutableMap.of("key",
+        "downloads/existingFile.zip", "uploadedAt", originalFileUploadedAt);
+    String existingLatestString = ObjectMapperInstance.INSTANCE.writeValueAsString(existingLatest);
+    S3_CLIENT.putObject(PutObjectRequest.builder()
+        .bucket(TEST_BUCKET)
+        .key("downloads/latest")
+        .build(), RequestBody.fromInputStream(new StringInputStream(existingLatestString),
+        existingLatestString.length()));
+
+    Pair<Path, String> tempFile = generateTempFile();
+    IpInfoSiteSource ipInfoSiteSource = new IpInfoSiteSource(
+        new URL("http://localhost:" + wireMockRule.port() + "/data/file.mdb"));
+    wireMockRule.stubFor(WireMock.head(UrlPattern.ANY).willReturn(
+        aResponse().withStatus(HttpStatus.SC_OK)
+            .withHeader("Etag", "bbb")
+            .withHeader("Content-Length", Long.toString(TEST_FILE_SIZE))
+            .withHeader("Last-Modified", "Thu, 01 Dec 1994 16:00:00 GMT")));
+    wireMockRule.stubFor(WireMock.get(UrlPattern.ANY)
+        .willReturn(aResponse().withBody(
+            IOUtils.toByteArray(new FileInputStream(tempFile.getLeft().toFile())))));
+
+    FileInfo fileInfo = ipInfoSiteSource.fileInfo();
+    ipInfoSiteSource.produce(
+        new S3FileAcceptor(S3_CLIENT, TEST_BUCKET, TEST_KEY, ObjectMapperInstance.INSTANCE,
+            Clock.systemUTC()), false);
+    assertNotEquals(tempFile.getRight(), fileInfo.getMd5Checksum().stringFormat());
+    assertThrows(NoSuchKeyException.class, () -> S3_CLIENT.getObject(
+        GetObjectRequest.builder()
+            .bucket(TEST_BUCKET)
+            .key(TEST_KEY)
+            .build()));
+    ResponseInputStream<GetObjectResponse> latest = S3_CLIENT.getObject(
+        GetObjectRequest.builder()
+            .bucket(TEST_BUCKET)
+            .key("downloads/latest")
+            .build());
+    Map<String, String> latestInformation = ObjectMapperInstance.INSTANCE.readValue(latest,
+        Map.class);
+
+    assertEquals(latestInformation.get("key"), "downloads/existingFile.zip");
+    assertEquals(Instant.parse(latestInformation.get("uploadedAt")), originalFileUploadedAt);
+  }
+
+  @Test
+  public void goodFileEmptyPreexistingSet() throws IOException, NoSuchAlgorithmException {
+    Pair<Path, String> tempFile = generateTempFile();
     IpInfoSiteSource ipInfoSiteSource = new IpInfoSiteSource(
         new URL("http://localhost:" + wireMockRule.port() + "/data/file.mdb"));
     wireMockRule.stubFor(WireMock.head(UrlPattern.ANY).willReturn(
@@ -113,29 +195,115 @@ public class IpInfoSiteSourceTest extends TestCase {
         .willReturn(aResponse().withBody(
             IOUtils.toByteArray(new FileInputStream(tempFile.getLeft().toFile())))));
 
-    final FileInfo fileInfo = ipInfoSiteSource.fileInfo();
+    FileInfo fileInfo = ipInfoSiteSource.fileInfo();
     ipInfoSiteSource.produce(
         new S3FileAcceptor(S3_CLIENT, TEST_BUCKET, TEST_KEY, ObjectMapperInstance.INSTANCE,
             Clock.systemUTC()), false);
     assertEquals(fileInfo.getMd5Checksum().stringFormat().toLowerCase(),
         tempFile.getRight().toLowerCase());
-    final ResponseInputStream<GetObjectResponse> object = S3_CLIENT.getObject(
+    ResponseInputStream<GetObjectResponse> uploadedFile = S3_CLIENT.getObject(
         GetObjectRequest.builder()
             .bucket(TEST_BUCKET)
             .key(TEST_KEY)
             .build());
-    assertEquals(TEST_FILE_SIZE, object.response().contentLength().intValue());
+    ResponseInputStream<GetObjectResponse> latest = S3_CLIENT.getObject(
+        GetObjectRequest.builder()
+            .bucket(TEST_BUCKET)
+            .key("downloads/latest")
+            .build());
+    Map<String, String> latestInformation = ObjectMapperInstance.INSTANCE.readValue(latest,
+        Map.class);
+
+    assertEquals(TEST_FILE_SIZE, uploadedFile.response().contentLength().intValue());
     assertEquals(tempFile.getRight().toLowerCase(),
-        object.response().eTag().toLowerCase().replace("\"", ""));
+        uploadedFile.response().eTag().toLowerCase().replace("\"", ""));
+    assertEquals(latestInformation.get("key"), "downloads/test-file");
+  }
+
+  @Test
+  public void goodFilePreexistingSet() throws IOException, NoSuchAlgorithmException {
+    Pair<Path, String> preexistingFile = generateTempFile();
+    S3_CLIENT.putObject(PutObjectRequest.builder()
+        .bucket(TEST_BUCKET)
+        .key("downloads/existingFile.zip")
+        .build(), preexistingFile.getLeft());
+    final Instant originalFileUploadedAt = Instant.now();
+    ImmutableMap<String, Object> existingLatest = ImmutableMap.of("key",
+        "downloads/existingFile.zip", "uploadedAt", originalFileUploadedAt);
+    String existingLatestString = ObjectMapperInstance.INSTANCE.writeValueAsString(existingLatest);
+    S3_CLIENT.putObject(PutObjectRequest.builder()
+        .bucket(TEST_BUCKET)
+        .key("downloads/latest")
+        .build(), RequestBody.fromInputStream(new StringInputStream(existingLatestString),
+        existingLatestString.length()));
+
+    Pair<Path, String> tempFile = generateTempFile();
+    IpInfoSiteSource ipInfoSiteSource = new IpInfoSiteSource(
+        new URL("http://localhost:" + wireMockRule.port() + "/data/file.mdb"));
+    wireMockRule.stubFor(WireMock.head(UrlPattern.ANY).willReturn(
+        aResponse().withStatus(HttpStatus.SC_OK)
+            .withHeader("Etag", tempFile.getRight())
+            .withHeader("Content-Length", Long.toString(TEST_FILE_SIZE))
+            .withHeader("Last-Modified", "Thu, 01 Dec 1994 16:00:00 GMT")));
+    wireMockRule.stubFor(WireMock.get(UrlPattern.ANY)
+        .willReturn(aResponse().withBody(
+            IOUtils.toByteArray(new FileInputStream(tempFile.getLeft().toFile())))));
+
+    FileInfo fileInfo = ipInfoSiteSource.fileInfo();
+    ipInfoSiteSource.produce(
+        new S3FileAcceptor(S3_CLIENT, TEST_BUCKET, TEST_KEY, ObjectMapperInstance.INSTANCE,
+            Clock.systemUTC()), false);
+    assertEquals(fileInfo.getMd5Checksum().stringFormat().toLowerCase(),
+        tempFile.getRight().toLowerCase());
+    ResponseInputStream<GetObjectResponse> uploadedFile = S3_CLIENT.getObject(
+        GetObjectRequest.builder()
+            .bucket(TEST_BUCKET)
+            .key(TEST_KEY)
+            .build());
+    ResponseInputStream<GetObjectResponse> latest = S3_CLIENT.getObject(
+        GetObjectRequest.builder()
+            .bucket(TEST_BUCKET)
+            .key("downloads/latest")
+            .build());
+    Map<String, Object> latestInformation = ObjectMapperInstance.INSTANCE.readValue(latest,
+        Map.class);
+
+    assertEquals(TEST_FILE_SIZE, uploadedFile.response().contentLength().intValue());
+    assertEquals(tempFile.getRight().toLowerCase(),
+        uploadedFile.response().eTag().toLowerCase().replace("\"", ""));
+    assertEquals(latestInformation.get("key"), "downloads/test-file");
+    assertNotEquals(latestInformation.get("uploadedAt"), originalFileUploadedAt);
   }
 
   private Pair<Path, String> generateTempFile() throws IOException, NoSuchAlgorithmException {
     byte[] contents = new byte[TEST_FILE_SIZE];
     new Random().nextBytes(contents);
-    final Path tempFile = Files.createTempFile("dice-where", "downloader");
+    Path tempFile = Files.createTempFile("dice-where", "downloader");
     Files.write(tempFile, contents);
     MessageDigest md = MessageDigest.getInstance("MD5");
     String hex = (new HexBinaryAdapter()).marshal(md.digest(contents));
     return Pair.of(tempFile, hex);
+  }
+
+  public static void emptyBucket(String bucketName) {
+    ListObjectsResponse listObjectsResponse = S3_CLIENT.listObjects(
+        ListObjectsRequest.builder()
+            .bucket(bucketName)
+            .build());
+
+    if (listObjectsResponse.contents().size() > 0) {
+      Delete del = Delete.builder()
+          .objects(listObjectsResponse.contents().stream()
+              .map(o -> ObjectIdentifier.builder().key(o.key()).build())
+              .collect(Collectors.toList()))
+          .build();
+
+      DeleteObjectsRequest multiObjectDeleteRequest = DeleteObjectsRequest.builder()
+          .bucket(bucketName)
+          .delete(del)
+          .build();
+
+      S3_CLIENT.deleteObjects(multiObjectDeleteRequest);
+    }
   }
 }
