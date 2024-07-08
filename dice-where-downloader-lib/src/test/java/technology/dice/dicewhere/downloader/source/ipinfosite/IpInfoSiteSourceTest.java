@@ -5,6 +5,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
@@ -34,12 +35,15 @@ import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.utils.StringInputStream;
 import technology.dice.dicewhere.downloader.ObjectMapperInstance;
 import technology.dice.dicewhere.downloader.destination.s3.S3FileAcceptor;
 import technology.dice.dicewhere.downloader.files.FileInfo;
@@ -48,8 +52,14 @@ import technology.dice.dicewhere.downloader.files.FileInfo;
 public class IpInfoSiteSourceTest extends TestCase {
 
   private static final int TEST_FILE_SIZE = 1024 * 1024;
-  public static final String TEST_BUCKET = "test-bucket";
-  public static final String TEST_KEY = "downloads/test-file";
+  private static final String TEST_BUCKET = "test-bucket";
+  private static final String TEST_KEY = "downloads/test-file";
+  private static final String LATEST_KEY = "downloads/latest";
+
+  private static final String MOCK_LATEST =
+          "{\"uploadedAt\":\"2024-07-08T14:04:39.047489Z\",\"key\":\"downloads/mock-latest\"}";
+
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   @ClassRule
   static WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
@@ -70,7 +80,16 @@ public class IpInfoSiteSourceTest extends TestCase {
                 AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey())))
         .region(Region.of(localStack.getRegion())).build();
     S3_CLIENT.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
-
+    PutObjectRequest putLatest =
+            PutObjectRequest.builder()
+                    .key(LATEST_KEY)
+                    .bucket(TEST_BUCKET)
+                    .contentLength((long) MOCK_LATEST.length())
+                    .build();
+    S3_CLIENT.putObject(
+            putLatest,
+            RequestBody.fromInputStream(
+                    new StringInputStream(MOCK_LATEST), MOCK_LATEST.length()));
   }
 
   @Test
@@ -91,12 +110,20 @@ public class IpInfoSiteSourceTest extends TestCase {
     ipInfoSiteSource.produce(
         new S3FileAcceptor(S3_CLIENT, TEST_BUCKET, TEST_KEY, ObjectMapperInstance.INSTANCE,
             Clock.systemUTC()), false);
+    // verify no s3 file
     assertNotEquals(tempFile.getRight(), fileInfo.getMd5Checksum().stringFormat());
     assertThrows(NoSuchKeyException.class, () -> S3_CLIENT.getObject(
         GetObjectRequest.builder()
             .bucket(TEST_BUCKET)
             .key(TEST_KEY)
             .build()));
+    // verify latest contents did not change
+    String latest = S3_CLIENT.getObjectAsBytes(
+            GetObjectRequest.builder()
+                    .bucket(TEST_BUCKET)
+                    .key(LATEST_KEY)
+                    .build()).asUtf8String();
+    assertEquals(latest, MOCK_LATEST);
   }
 
   @Test
@@ -124,9 +151,17 @@ public class IpInfoSiteSourceTest extends TestCase {
             .bucket(TEST_BUCKET)
             .key(TEST_KEY)
             .build());
+    // verify s3 file
     assertEquals(TEST_FILE_SIZE, object.response().contentLength().intValue());
     assertEquals(tempFile.getRight().toLowerCase(),
         object.response().eTag().toLowerCase().replace("\"", ""));
+    // verify latest contents changed
+    String latest = S3_CLIENT.getObjectAsBytes(
+            GetObjectRequest.builder()
+                    .bucket(TEST_BUCKET)
+                    .key(LATEST_KEY)
+                    .build()).asUtf8String();
+    assertEquals(OBJECT_MAPPER.readTree(latest).get("key").asText(), TEST_KEY);
   }
 
   private Pair<Path, String> generateTempFile() throws IOException, NoSuchAlgorithmException {
