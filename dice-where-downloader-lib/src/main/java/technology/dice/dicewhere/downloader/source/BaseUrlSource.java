@@ -11,6 +11,7 @@ import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 
 public abstract class BaseUrlSource implements FileSource {
+
   protected FileInfo fileInfo;
   protected final URL dataFileLocation;
 
@@ -19,14 +20,14 @@ public abstract class BaseUrlSource implements FileSource {
   }
 
   @Override
-  public MD5Checksum produce(FileAcceptor acceptor) {
+  public MD5Checksum produce(FileAcceptor acceptor, boolean noMd5Check) {
     try {
       HttpURLConnection httpConnection = (HttpURLConnection) this.dataFileLocation.openConnection();
       httpConnection.setRequestMethod("GET");
 
       try (StreamWithMD5Decorator is = StreamWithMD5Decorator.of(httpConnection.getInputStream())) {
         acceptor
-            .getStreamConsumer(fileInfo.getMd5Checksum(), fileInfo.getTimestamp())
+            .getStreamConsumer(fileInfo.getMd5Checksum(), fileInfo.getTimestamp(), noMd5Check)
             .consume(is, fileInfo.getSize());
         return is.md5();
       }

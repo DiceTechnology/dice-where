@@ -1,8 +1,6 @@
 package technology.dice.dicewhere.downloader.actions.ipinfo;
 
-import java.net.URI;
 import technology.dice.dicewhere.downloader.Download;
-import technology.dice.dicewhere.downloader.PathUtils;
 
 public abstract class IpInfoBaseDownload extends Download {
 

@@ -10,6 +10,7 @@ import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 import technology.dice.dicewhere.downloader.source.FileSource;
 
 public abstract class Download {
+
   private static final Logger LOG = LoggerFactory.getLogger(Download.class);
 
   protected final boolean noCheckMd5;
@@ -38,6 +39,7 @@ public abstract class Download {
       result = processFileDoesNotExist(acceptor, fileSource, pathWritable);
     }
     LOG.info("A new file was" + (result.isNewFileDownloaded() ? "" : " not") + " downloaded");
+    LOG.info("Download is " + (!result.isSuccessful() ? "un" : "" + "successful"));
     return result;
   }
 
@@ -45,18 +47,21 @@ public abstract class Download {
       FileAcceptor<?> acceptor, FileSource fileSource, boolean pathWritable) {
 
     if (pathWritable) {
-      final MD5Checksum md5Checksum = fileSource.produce(acceptor);
-      LOG.info("File successfully transferred");
+      final MD5Checksum md5Checksum = fileSource.produce(acceptor, noCheckMd5);
+      LOG.info("File transferred");
       if (!noCheckMd5) {
         boolean checksumMatches = md5Checksum.matches(fileSource.fileInfo().getMd5Checksum());
         if (!checksumMatches) {
-          LOG.warn(
+          LOG.error(
               "Local and remote files' MD5 do not match: "
                   + md5Checksum.stringFormat()
                   + " Vs. "
                   + fileSource.fileInfo().getMd5Checksum().stringFormat());
         } else {
-          LOG.info("MD5 matches that of the remote file");
+          LOG.info("MD5 matches that of the remote file: "
+              + md5Checksum.stringFormat()
+              + " Vs. "
+              + fileSource.fileInfo().getMd5Checksum().stringFormat());
         }
         return new DownloadExecutionResult(
             true, checksumMatches, md5Checksum, acceptor.getUri(), checksumMatches);
@@ -87,7 +92,10 @@ public abstract class Download {
                   + " Vs. "
                   + fileSource.fileInfo().getMd5Checksum().stringFormat());
         } else {
-          LOG.info("MD5 matches that of the remote file");
+          LOG.info("MD5 matches that of the remote file: "
+              + existingMd5.map(md5 -> md5.stringFormat()).orElse("?")
+              + " Vs. "
+              + fileSource.fileInfo().getMd5Checksum().stringFormat());
         }
         return new DownloadExecutionResult(
             false,
@@ -106,7 +114,8 @@ public abstract class Download {
 
   protected abstract DownloadExecutionResult execute();
 
-  protected void checkNecessaryEnvironmentVariables() {}
+  protected void checkNecessaryEnvironmentVariables() {
+  }
 
   public boolean isVerbose() {
     return verbose;
