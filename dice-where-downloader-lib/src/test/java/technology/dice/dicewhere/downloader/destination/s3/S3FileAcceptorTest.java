@@ -1,4 +1,4 @@
-package technology.dice.dicewhere.downloader.source.ipinfosite;
+package technology.dice.dicewhere.downloader.destination.s3;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -56,11 +56,11 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.utils.StringInputStream;
 import technology.dice.dicewhere.downloader.ObjectMapperInstance;
-import technology.dice.dicewhere.downloader.destination.s3.S3FileAcceptor;
 import technology.dice.dicewhere.downloader.files.FileInfo;
+import technology.dice.dicewhere.downloader.source.ipinfosite.IpInfoSiteSource;
 
 @RunWith(JUnit4ClassRunner.class)
-public class IpInfoSiteSourceTest extends TestCase {
+public class S3FileAcceptorTest extends TestCase {
 
   private static final int TEST_FILE_SIZE = 1024 * 1024;
   public static final String TEST_BUCKET = "test-bucket";
@@ -117,7 +117,7 @@ public class IpInfoSiteSourceTest extends TestCase {
     ipInfoSiteSource.produce(
         new S3FileAcceptor(S3_CLIENT, TEST_BUCKET, TEST_KEY, ObjectMapperInstance.INSTANCE,
             Clock.systemUTC()), false);
-    assertNotEquals(tempFile.getRight(), fileInfo.getMd5Checksum().stringFormat());
+    assertNotEquals(tempFile.getRight().toLowerCase(), fileInfo.getMd5Checksum().stringFormat());
     assertThrows(NoSuchKeyException.class, () -> S3_CLIENT.getObject(
         GetObjectRequest.builder()
             .bucket(TEST_BUCKET)
@@ -163,7 +163,7 @@ public class IpInfoSiteSourceTest extends TestCase {
     ipInfoSiteSource.produce(
         new S3FileAcceptor(S3_CLIENT, TEST_BUCKET, TEST_KEY, ObjectMapperInstance.INSTANCE,
             Clock.systemUTC()), false);
-    assertNotEquals(tempFile.getRight(), fileInfo.getMd5Checksum().stringFormat());
+    assertNotEquals(tempFile.getRight().toLowerCase(), fileInfo.getMd5Checksum().stringFormat());
     assertThrows(NoSuchKeyException.class, () -> S3_CLIENT.getObject(
         GetObjectRequest.builder()
             .bucket(TEST_BUCKET)
