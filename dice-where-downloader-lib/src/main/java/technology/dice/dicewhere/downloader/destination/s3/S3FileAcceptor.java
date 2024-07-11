@@ -112,7 +112,8 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
 
     try {
       final HeadObjectResponse headObjectResponse = client.headObject(headObjectRequest);
-      return Optional.ofNullable(headObjectResponse.eTag()).map(m -> MD5Checksum.of(m));
+      return Optional.ofNullable(headObjectResponse.eTag())
+          .map(m -> MD5Checksum.of(m.replaceAll("\"", "")));
     } catch (NoSuchKeyException e) {
       return Optional.empty();
     }
