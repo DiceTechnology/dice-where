@@ -59,7 +59,7 @@ public class S3Source implements FileSource {
               Optional.ofNullable(metadata.get(TIMESTAMP_METADATA_KEY))
                   .map(m -> Instant.ofEpochMilli(Long.valueOf(m)))
                   .orElse(Instant.now()),
-              MD5Checksum.of(headObjectResponse.eTag().replaceAll("\"", "")),
+              MD5Checksum.of(headObjectResponse.eTag()),
               size);
     }
 

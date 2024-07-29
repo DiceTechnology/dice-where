@@ -39,7 +39,7 @@ public abstract class Download {
       result = processFileDoesNotExist(acceptor, fileSource, pathWritable);
     }
     LOG.info("A new file was" + (result.isNewFileDownloaded() ? "" : " not") + " downloaded");
-    LOG.info("Download is " + (!result.isSuccessful() ? "un" : "") + "successful");
+    LOG.info("Download is " + (!result.isSuccessful() ? "un" : "" + "successful"));
     return result;
   }
 
