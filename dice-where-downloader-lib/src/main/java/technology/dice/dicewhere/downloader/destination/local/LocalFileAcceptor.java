@@ -19,7 +19,6 @@ import technology.dice.dicewhere.downloader.stream.StreamConsumer;
 import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 
 public class LocalFileAcceptor implements FileAcceptor<Void> {
-
   private static final Logger LOG = LoggerFactory.getLogger(LocalFileAcceptor.class);
   public static final int BUFFER = 8192;
 
@@ -31,7 +30,7 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
 
   @Override
   public StreamConsumer<Void> getStreamConsumer(
-      MD5Checksum originalFileMd5, Instant originalFileTimestamp, boolean noMd5Check) {
+      MD5Checksum originalFileMd5, Instant originalFileTimestamp) {
     return (stream, size) -> {
       try {
         Files.createDirectories(destination);
@@ -40,10 +39,6 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
         LOG.debug("Destination directory already exists");
       }
       Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
-      if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
-        LOG.error("MD5 mismatch. Deleting destination file");
-        Files.delete(destination);
-      }
       return null;
     };
   }
@@ -73,12 +68,11 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
           BufferedInputStream bis = new BufferedInputStream(is);
           StreamWithMD5Decorator md5Is = StreamWithMD5Decorator.of(bis)) {
         byte[] buffer = new byte[BUFFER];
-        while ((md5Is.read(buffer)) != -1) {
-        }
+        while ((md5Is.read(buffer)) != -1) {}
         return Optional.of(md5Is.md5());
       } catch (IOException | NoSuchAlgorithmException e) {
         throw new RuntimeException(
-            "Could not obtain md5 of the file existing at the target: " + destination,
+            "Could not obtain md5 of the file existing at the target: " + destination.toString(),
             e);
       }
     }
