@@ -5,5 +5,5 @@ import java.io.InputStream;
 
 @FunctionalInterface
 public interface StreamConsumer<T> {
-  T consume(StreamWithMD5Decorator stream, long size) throws IOException;
+  T consume(InputStream stream, long size) throws IOException;
 }
