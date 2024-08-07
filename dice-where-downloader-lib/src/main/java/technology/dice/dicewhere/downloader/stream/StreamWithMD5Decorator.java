@@ -10,13 +10,15 @@ import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 
 public class StreamWithMD5Decorator extends InputStream {
 
+  private final DigestInputStream inputStream;
   private final MessageDigest md5;
-  DigestInputStream inputStream;
 
   private StreamWithMD5Decorator(DigestInputStream inputStream, MessageDigest md5) {
     this.inputStream = inputStream;
     this.md5 = md5;
+    inputStream.on(false);
   }
+
 
   public static StreamWithMD5Decorator of(InputStream inputStream) throws NoSuchAlgorithmException {
     MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -25,17 +27,17 @@ public class StreamWithMD5Decorator extends InputStream {
   }
 
   public MD5Checksum md5() {
-    String hex = (new HexBinaryAdapter()).marshal(this.md5.digest());
+    String hex = (new HexBinaryAdapter()).marshal(md5.digest());
     return MD5Checksum.of(hex);
   }
 
   @Override
   public int read() throws IOException {
-    return this.inputStream.read();
+    return inputStream.read();
   }
 
   @Override
   public void close() throws IOException {
-    this.inputStream.close();
+    inputStream.close();
   }
 }

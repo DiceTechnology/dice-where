@@ -21,7 +21,7 @@ import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 public class LocalFileAcceptor implements FileAcceptor<Void> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LocalFileAcceptor.class);
-  public static final int BUFFER = 8192;
+  private static final int BUFFER = 8192;
 
   private final Path destination;
 
