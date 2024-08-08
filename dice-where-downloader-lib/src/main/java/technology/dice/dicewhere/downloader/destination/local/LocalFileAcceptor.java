@@ -39,7 +39,7 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
       } catch (FileAlreadyExistsException e) {
         LOG.debug("Destination directory already exists");
       }
-      Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(stream.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
       if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
         LOG.error("MD5 mismatch. Deleting destination file");
         Files.delete(destination);
@@ -72,9 +72,6 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
       try (InputStream is = Files.newInputStream(this.destination);
           BufferedInputStream bis = new BufferedInputStream(is);
           StreamWithMD5Decorator md5Is = StreamWithMD5Decorator.of(bis)) {
-        byte[] buffer = new byte[BUFFER];
-        while ((md5Is.read(buffer)) != -1) {
-        }
         return Optional.of(md5Is.md5());
       } catch (IOException | NoSuchAlgorithmException e) {
         throw new RuntimeException(

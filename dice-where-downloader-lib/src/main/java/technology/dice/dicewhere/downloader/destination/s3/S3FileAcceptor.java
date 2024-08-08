@@ -59,7 +59,7 @@ public class S3FileAcceptor implements FileAcceptor<Void> {
                   .contentLength(size)
                   .storageClass(StorageClass.INTELLIGENT_TIERING)
                   .build();
-          client.putObject(putObjectRequest, RequestBody.fromInputStream(stream, size));
+          client.putObject(putObjectRequest, RequestBody.fromInputStream(stream.getInputStream(), size));
           Latest latest = new Latest(clock.instant(), key);
           String latestContent = mapper.writeValueAsString(latest);
 
