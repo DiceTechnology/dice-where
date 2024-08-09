@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 
@@ -12,6 +13,7 @@ public class StreamWithMD5Decorator extends InputStream {
 
   private final MessageDigest md5;
   DigestInputStream inputStream;
+  private Optional<MD5Checksum> badjoras = Optional.empty();
 
   private StreamWithMD5Decorator(DigestInputStream inputStream, MessageDigest md5) {
     this.inputStream = inputStream;
@@ -25,8 +27,12 @@ public class StreamWithMD5Decorator extends InputStream {
   }
 
   public MD5Checksum md5() {
-    String hex = (new HexBinaryAdapter()).marshal(this.md5.digest());
-    return MD5Checksum.of(hex);
+    return badjoras.orElseGet(
+        () -> {
+          String hex = (new HexBinaryAdapter()).marshal(this.md5.digest());
+          badjoras = Optional.of(MD5Checksum.of(hex));
+          return badjoras.get();
+        });
   }
 
   @Override
@@ -35,7 +41,13 @@ public class StreamWithMD5Decorator extends InputStream {
   }
 
   @Override
+  public int read(byte[] b, int off, int len) throws IOException {
+    return this.inputStream.read(b, off, len);
+  }
+
+  @Override
   public void close() throws IOException {
-    this.inputStream.close();
+    duplicatedStream.close();
+    originalStream.close();
   }
 }
