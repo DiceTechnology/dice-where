@@ -18,9 +18,8 @@ public class StreamWithMD5Decorator extends InputStream {
 
   private final MessageDigest md5;
   private final DigestInputStream originalStream;
-  private final ByteArrayOutputStream duplicatedStream = new ByteArrayOutputStream();
 
-  private boolean consumed = false;
+  private Optional<InputStream> duplicatedStream = Optional.empty();
   private Optional<MD5Checksum> md5Checksum = Optional.empty();
 
   private StreamWithMD5Decorator(DigestInputStream originalStream, MessageDigest md5)
@@ -38,16 +37,17 @@ public class StreamWithMD5Decorator extends InputStream {
   }
 
   private void consumeStream() throws IOException {
+    ByteArrayOutputStream tempBufferStream = new ByteArrayOutputStream();
     byte[] data = new byte[BUFFER_SIZE];
     int bytesRead;
     while ((bytesRead = originalStream.read(data)) != -1) {
-      duplicatedStream.write(data, 0, bytesRead);
+      tempBufferStream.write(data, 0, bytesRead);
     }
-    consumed = true;
+    duplicatedStream = Optional.of(new ByteArrayInputStream(tempBufferStream.toByteArray()));
   }
 
   public MD5Checksum md5() {
-    if (!consumed) {
+    if (duplicatedStream.isEmpty()) {
       throw new IllegalStateException("Stream not fully consumed yet.");
     }
     return md5Checksum.orElseGet(
@@ -59,23 +59,18 @@ public class StreamWithMD5Decorator extends InputStream {
         });
   }
 
-  public InputStream inputStream() {
-    return new ByteArrayInputStream(duplicatedStream.toByteArray());
+  private InputStream inputStream() {
+    return duplicatedStream.orElseThrow(
+        () -> new IllegalStateException("Stream not fully consumed yet."));
   }
 
   @Override
   public int read() throws IOException {
-    if (!consumed) {
-      throw new IllegalStateException("Stream not fully consumed yet.");
-    }
     return inputStream().read();
   }
 
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
-    if (!consumed) {
-      throw new IllegalStateException("Stream not fully consumed yet.");
-    }
     return inputStream().read(b, off, len);
   }
 

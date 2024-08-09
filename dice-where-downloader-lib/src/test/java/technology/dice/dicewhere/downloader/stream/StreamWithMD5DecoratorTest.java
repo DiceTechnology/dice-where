@@ -42,7 +42,7 @@ public class StreamWithMD5DecoratorTest extends TestCase {
 
     String first = is.md5().stringFormat();
     // Read from the stream
-    IOUtils.toString(is.inputStream(), Charset.defaultCharset());
+    IOUtils.toString(is, Charset.defaultCharset());
 
     // Assert the Stream Hash before and after
     assertEquals(first, is.md5().stringFormat());
@@ -66,7 +66,7 @@ public class StreamWithMD5DecoratorTest extends TestCase {
 
     String first = is.md5().stringFormat();
     // Read from the stream
-    IOUtils.toString(is.inputStream(), Charset.defaultCharset());
+    IOUtils.toString(is, Charset.defaultCharset());
 
     // Assert the Stream Hash before and after
     assertEquals(first, is.md5().stringFormat());
