@@ -13,15 +13,19 @@ import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 
 public class StreamWithMD5Decorator extends InputStream {
 
-  private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+  private static final int BUFFER_SIZE = 8192;
+  private static final HexBinaryAdapter HEX_BINARY_ADAPTER = new HexBinaryAdapter();
+
   private final MessageDigest md5;
-  DigestInputStream inputStream;
+  private final DigestInputStream originalStream;
+  private final ByteArrayOutputStream duplicatedStream = new ByteArrayOutputStream();
+
   private boolean consumed = false;
   private Optional<MD5Checksum> md5Checksum = Optional.empty();
 
-  private StreamWithMD5Decorator(DigestInputStream inputStream, MessageDigest md5)
+  private StreamWithMD5Decorator(DigestInputStream originalStream, MessageDigest md5)
       throws IOException {
-    this.inputStream = inputStream;
+    this.originalStream = originalStream;
     this.md5 = md5;
     consumeStream();
   }
@@ -34,10 +38,10 @@ public class StreamWithMD5Decorator extends InputStream {
   }
 
   private void consumeStream() throws IOException {
-    byte[] data = new byte[8192];
+    byte[] data = new byte[BUFFER_SIZE];
     int bytesRead;
-    while ((bytesRead = inputStream.read(data)) != -1) {
-      buffer.write(data, 0, bytesRead);
+    while ((bytesRead = originalStream.read(data)) != -1) {
+      duplicatedStream.write(data, 0, bytesRead);
     }
     consumed = true;
   }
@@ -48,15 +52,15 @@ public class StreamWithMD5Decorator extends InputStream {
     }
     return md5Checksum.orElseGet(
         () -> {
-          String hex = (new HexBinaryAdapter()).marshal(md5.digest());
+          String hex = HEX_BINARY_ADAPTER.marshal(md5.digest());
           MD5Checksum checksum = MD5Checksum.of(hex);
           md5Checksum = Optional.of(checksum);
           return checksum;
         });
   }
 
-  public InputStream getInputStream() {
-    return new ByteArrayInputStream(buffer.toByteArray());
+  public InputStream inputStream() {
+    return new ByteArrayInputStream(duplicatedStream.toByteArray());
   }
 
   @Override
@@ -64,7 +68,7 @@ public class StreamWithMD5Decorator extends InputStream {
     if (!consumed) {
       throw new IllegalStateException("Stream not fully consumed yet.");
     }
-    return getInputStream().read();
+    return inputStream().read();
   }
 
   @Override
@@ -72,44 +76,12 @@ public class StreamWithMD5Decorator extends InputStream {
     if (!consumed) {
       throw new IllegalStateException("Stream not fully consumed yet.");
     }
-    return getInputStream().read(b, off, len);
+    return inputStream().read(b, off, len);
   }
 
   @Override
   public void close() throws IOException {
-    getInputStream().close();
-    inputStream.close();
+    inputStream().close();
+    originalStream.close();
   }
-  /*
-  public static String of1(InputStream inputStream) throws NoSuchAlgorithmException {
-    return bytesToHex(checksum(inputStream));
-  }
-
-  private static byte[] checksum(InputStream is) {
-
-    MessageDigest md;
-    try {
-      md = MessageDigest.getInstance("MD5");
-    } catch (NoSuchAlgorithmException e) {
-      throw new IllegalArgumentException(e);
-    }
-
-    try (DigestInputStream dis = new DigestInputStream(is, md)) {
-      while (dis.read() != -1)
-        ; // empty loop to clear the data
-      md = dis.getMessageDigest();
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
-    }
-    return md.digest();
-  }
-
-  private static String bytesToHex(byte[] bytes) {
-    StringBuilder sb = new StringBuilder();
-    for (byte b : bytes) {
-      sb.append(String.format("%02x", b));
-    }
-    return sb.toString();
-  }
-  */
 }

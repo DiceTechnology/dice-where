@@ -21,7 +21,6 @@ import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 public class LocalFileAcceptor implements FileAcceptor<Void> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LocalFileAcceptor.class);
-  private static final int BUFFER = 8192;
 
   private final Path destination;
 
@@ -39,7 +38,7 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
       } catch (FileAlreadyExistsException e) {
         LOG.debug("Destination directory already exists");
       }
-      Files.copy(stream.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(stream.inputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
       if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
         LOG.error("MD5 mismatch. Deleting destination file");
         Files.delete(destination);
