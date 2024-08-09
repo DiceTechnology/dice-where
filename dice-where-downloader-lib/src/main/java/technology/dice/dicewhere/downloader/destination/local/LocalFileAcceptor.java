@@ -21,7 +21,6 @@ import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 public class LocalFileAcceptor implements FileAcceptor<Void> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LocalFileAcceptor.class);
-  public static final int BUFFER = 8192;
 
   private final Path destination;
 
@@ -72,9 +71,6 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
       try (InputStream is = Files.newInputStream(this.destination);
           BufferedInputStream bis = new BufferedInputStream(is);
           StreamWithMD5Decorator md5Is = StreamWithMD5Decorator.of(bis)) {
-        byte[] buffer = new byte[BUFFER];
-        while ((md5Is.read(buffer)) != -1) {
-        }
         return Optional.of(md5Is.md5());
       } catch (IOException | NoSuchAlgorithmException e) {
         throw new RuntimeException(
