@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 
@@ -18,15 +17,16 @@ public class StreamWithMD5Decorator extends InputStream {
 
   private final MessageDigest md5;
   private final DigestInputStream originalStream;
+  private final MD5Checksum md5Checksum;
 
-  private Optional<InputStream> duplicatedStream = Optional.empty();
-  private Optional<MD5Checksum> md5Checksum = Optional.empty();
+  private InputStream duplicatedStream;
 
   private StreamWithMD5Decorator(DigestInputStream originalStream, MessageDigest md5)
       throws IOException {
     this.originalStream = originalStream;
     this.md5 = md5;
     consumeStream();
+    md5Checksum = generateMd5();
   }
 
   public static StreamWithMD5Decorator of(InputStream inputStream)
@@ -43,40 +43,31 @@ public class StreamWithMD5Decorator extends InputStream {
     while ((bytesRead = originalStream.read(data)) != -1) {
       tempBufferStream.write(data, 0, bytesRead);
     }
-    duplicatedStream = Optional.of(new ByteArrayInputStream(tempBufferStream.toByteArray()));
+    duplicatedStream = new ByteArrayInputStream(tempBufferStream.toByteArray());
+  }
+
+  private MD5Checksum generateMd5() {
+    String hex = HEX_BINARY_ADAPTER.marshal(md5.digest());
+    return MD5Checksum.of(hex);
   }
 
   public MD5Checksum md5() {
-    if (duplicatedStream.isEmpty()) {
-      throw new IllegalStateException("Stream not fully consumed yet.");
-    }
-    return md5Checksum.orElseGet(
-        () -> {
-          String hex = HEX_BINARY_ADAPTER.marshal(md5.digest());
-          MD5Checksum checksum = MD5Checksum.of(hex);
-          md5Checksum = Optional.of(checksum);
-          return checksum;
-        });
-  }
-
-  private InputStream inputStream() {
-    return duplicatedStream.orElseThrow(
-        () -> new IllegalStateException("Stream not fully consumed yet."));
+    return md5Checksum;
   }
 
   @Override
   public int read() throws IOException {
-    return inputStream().read();
+    return duplicatedStream.read();
   }
 
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
-    return inputStream().read(b, off, len);
+    return duplicatedStream.read(b, off, len);
   }
 
   @Override
   public void close() throws IOException {
-    inputStream().close();
+    duplicatedStream.close();
     originalStream.close();
   }
 }
