@@ -1,7 +1,5 @@
 package technology.dice.dicewhere.downloader;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +8,6 @@ import technology.dice.dicewhere.downloader.destination.FileAcceptor;
 import technology.dice.dicewhere.downloader.exception.DownloaderException;
 import technology.dice.dicewhere.downloader.md5.MD5Checksum;
 import technology.dice.dicewhere.downloader.source.FileSource;
-import technology.dice.dicewhere.downloader.stream.StreamWithMD5Decorator;
 
 public abstract class Download {
 
