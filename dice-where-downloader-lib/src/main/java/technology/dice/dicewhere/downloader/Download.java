@@ -84,10 +84,6 @@ public abstract class Download {
     if (!overwrite) {
       if (!noCheckMd5) {
         Optional<MD5Checksum> existingMd5 = acceptor.existingFileMd5();
-        byte[] bytes = Files.readAllBytes(acceptor.getUri().getPath());
-        StreamWithMD5Decorator is = StreamWithMD5Decorator.of(null);
-        acceptor.getStreamConsumer().consume()
-        //TODO acceptor ( Consumer ) has not yet been consumed! THis won't return a proper MD5 at this point
         boolean checksumMatches =
             existingMd5
                 .map(md5 -> md5.matches(fileSource.fileInfo().getMd5Checksum()))

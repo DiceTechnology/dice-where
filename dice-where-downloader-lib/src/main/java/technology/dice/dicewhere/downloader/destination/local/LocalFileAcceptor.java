@@ -40,13 +40,6 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
         LOG.debug("Destination directory already exists");
       }
       Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
-      /*try (OutputStream os = Files.newOutputStream(destination)) {
-        byte[] buffer = new byte[8192];
-        int bytesRead;
-        while ((bytesRead = stream.read(buffer)) != -1) {
-          os.write(buffer, 0, bytesRead);
-        }
-      }*/
       if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
         LOG.error("MD5 mismatch. Deleting destination file");
         Files.delete(destination);
@@ -56,22 +49,7 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
   }
 
   @Override
-  public StreamConsumer<Void> getStreamConsumer() {
-    return (stream, size) -> {
-      byte[] buffer = new byte[8192];
-      while ((stream.read(buffer)) != -1) {}
-      return null;
-    };
-  }
-
-  @Override
   public boolean destinationExists() {
-    // TODO if true, this would be a good place to consume the stream
-    /*
-    *           byte[] buffer = new byte[8192];
-          while ((stream.read(buffer)) != -1) {
-          }
-    * */
     return Files.exists(this.destination);
   }
 
@@ -95,8 +73,7 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
           BufferedInputStream bis = new BufferedInputStream(is);
           StreamWithMD5Decorator md5Is = StreamWithMD5Decorator.of(bis)) {
         byte[] buffer = new byte[BUFFER];
-        while ((md5Is.read(buffer)) != -1) {
-        }
+        while ((md5Is.read(buffer)) != -1) {}
         return Optional.of(md5Is.md5());
       } catch (IOException | NoSuchAlgorithmException e) {
         throw new RuntimeException(

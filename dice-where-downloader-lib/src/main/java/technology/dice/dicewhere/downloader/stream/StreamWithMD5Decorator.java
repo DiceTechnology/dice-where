@@ -13,7 +13,7 @@ public class StreamWithMD5Decorator extends InputStream {
 
   private final MessageDigest md5;
   DigestInputStream inputStream;
-  private Optional<MD5Checksum> badjoras = Optional.empty();
+  private Optional<MD5Checksum> checksum = Optional.empty();
 
   private StreamWithMD5Decorator(DigestInputStream inputStream, MessageDigest md5) {
     this.inputStream = inputStream;
@@ -27,27 +27,26 @@ public class StreamWithMD5Decorator extends InputStream {
   }
 
   public MD5Checksum md5() {
-    return badjoras.orElseGet(
+    return checksum.orElseGet(
         () -> {
           String hex = (new HexBinaryAdapter()).marshal(this.md5.digest());
-          badjoras = Optional.of(MD5Checksum.of(hex));
-          return badjoras.get();
+          checksum = Optional.of(MD5Checksum.of(hex));
+          return checksum.get();
         });
   }
 
   @Override
   public int read() throws IOException {
-    return this.inputStream.read();
+    return inputStream.read();
   }
 
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
-    return this.inputStream.read(b, off, len);
+    return inputStream.read(b, off, len);
   }
 
   @Override
   public void close() throws IOException {
-    duplicatedStream.close();
-    originalStream.close();
+    inputStream.close();
   }
 }
