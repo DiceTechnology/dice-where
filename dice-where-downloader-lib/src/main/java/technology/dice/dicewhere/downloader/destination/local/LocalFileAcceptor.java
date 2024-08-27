@@ -73,13 +73,11 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
           BufferedInputStream bis = new BufferedInputStream(is);
           StreamWithMD5Decorator md5Is = StreamWithMD5Decorator.of(bis)) {
         byte[] buffer = new byte[BUFFER];
-        while ((md5Is.read(buffer)) != -1) {
-        }
+        while ((md5Is.read(buffer)) != -1) {}
         return Optional.of(md5Is.md5());
       } catch (IOException | NoSuchAlgorithmException e) {
         throw new RuntimeException(
-            "Could not obtain md5 of the file existing at the target: " + destination,
-            e);
+            "Could not obtain md5 of the file existing at the target: " + destination, e);
       }
     }
     return Optional.empty();

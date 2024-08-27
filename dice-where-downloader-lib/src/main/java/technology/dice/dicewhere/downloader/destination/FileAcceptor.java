@@ -8,8 +8,8 @@ import technology.dice.dicewhere.downloader.stream.StreamConsumer;
 
 public interface FileAcceptor<T> {
 
-  StreamConsumer<T> getStreamConsumer(MD5Checksum originalFileMd5, Instant originalFileTimestamp,
-      boolean noMd5Check);
+  StreamConsumer<T> getStreamConsumer(
+      MD5Checksum originalFileMd5, Instant originalFileTimestamp, boolean noMd5Check);
 
   boolean destinationExists();
 
