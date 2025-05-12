@@ -16,7 +16,7 @@
     <jackson.version>2.14.2</jackson.version>
     <javax-bind.version>2.3.1</javax-bind.version>
     <test-containers.version>1.19.8</test-containers.version>
-    <wiremock.version>3.0.1</wiremock.version>
+    <wiremock.version>3.0.3</wiremock.version>
   </properties>
 
   <build>
