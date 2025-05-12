@@ -60,7 +60,20 @@
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
       <version>${protobuf.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>com.maxmind.db</groupId>
+      <artifactId>maxmind-db</artifactId>
+      <version>${maxmind.mmdb.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>${jsr305.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
@@ -78,11 +91,6 @@
       <artifactId>jmh-generator-annprocess</artifactId>
       <version>${jmh.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.maxmind.db</groupId>
-      <artifactId>maxmind-db</artifactId>
-      <version>${maxmind.mmdb.version}</version>
     </dependency>
   </dependencies>
 </project>
