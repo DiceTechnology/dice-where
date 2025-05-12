@@ -92,6 +92,7 @@
     <jacoco.version>0.8.8</jacoco.version>
     <jmh.version>1.21</jmh.version>
     <maxmind.mmdb.version>3.0.0</maxmind.mmdb.version>
+    <jsr305.version>3.0.2</jsr305.version>
   </properties>
 
   <build>
