@@ -13,7 +13,7 @@
 
   <properties>
     <slf4j.version>1.7.30</slf4j.version>
-    <jackson.version>2.14.2</jackson.version>
+    <jackson.version>2.15.0</jackson.version>
     <javax-bind.version>2.3.1</javax-bind.version>
     <test-containers.version>1.19.8</test-containers.version>
     <wiremock.version>3.0.1</wiremock.version>
