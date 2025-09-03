@@ -6,15 +6,23 @@ import picocli.CommandLine.Parameters;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.actions.ipinfo.DownloadIpInfoSite;
 
+import java.util.Optional;
+
 @Command(
     name = "ipinfo-site",
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
   @Option(
       names = {"-t", "--token"},
-      required = true,
+      required = false,
       description = "The ipinfo download key")
   String token;
+
+  @Option(names = {"-k", "--api-key"},
+          required = false,
+          defaultValue = "${env:API_KEY}",
+          description = "API key")
+  private String apiKey;
 
   @Parameters(
       index = "0",
@@ -24,8 +32,12 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
+    String secretToken = Optional.of(apiKey)
+            .or(() -> Optional.of(token))
+            .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
+
     return new DownloadIpInfoSite(
-            noCheckMd5, overwrite, verbose, dataset, format, token, destination)
-        .execute();
+            noCheckMd5, overwrite, verbose, dataset, format, secretToken, destination)
+            .execute();
   }
 }
