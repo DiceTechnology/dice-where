@@ -18,10 +18,10 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
       description = "The ipinfo download key")
   String token;
 
-  @Option(names = {"-k", "--api-key"},
+  @Option(names = {"-ak", "--api-key"},
           required = false,
           defaultValue = "${env:API_KEY}",
-          description = "API key")
+          description = "The ipinfo download key (env var)")
   private String apiKey;
 
   @Parameters(
