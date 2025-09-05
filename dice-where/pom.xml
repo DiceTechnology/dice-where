@@ -11,6 +11,7 @@
   </parent>
 
   <artifactId>dice-where</artifactId>
+  <name>dice-where: IP to Location lookup library</name>
 
   <build>
     <plugins>

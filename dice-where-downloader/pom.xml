@@ -11,6 +11,7 @@
   </parent>
 
   <artifactId>dice-where-downloader</artifactId>
+  <name>dice-where: IP database download helper utility</name>
 
   <properties>
     <picolli.version>4.1.4</picolli.version>
