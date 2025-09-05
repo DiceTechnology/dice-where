@@ -28,9 +28,9 @@ import technology.dice.dicewhere.provider.ProviderKey;
 public class IpInfoMmdbTestIT {
   private static final Path cityDatabase =
       Paths.get(
-          "/Users/gluiz/Downloads/ipinfo/standard_location/mmdb/standard_location-20230210.mmdb");
+          "/Users/gluiz/Downloads/ipinfo_static/standard_location/mmdb/standard_location-20230210.mmdb");
   private static final Path anonymousDatabase =
-      Paths.get("/Users/gluiz/Downloads/ipinfo/privacy/mmdb/privacy_detection_sample.mmdb");
+      Paths.get("/Users/gluiz/Downloads/ipinfo_static/privacy/mmdb/privacy-20230209.mmdb");
 
   @Test
   public void lookupWithCityDatabase() throws IOException {
@@ -58,7 +58,7 @@ public class IpInfoMmdbTestIT {
   }
 
   @Test
-  public void lookupWithCityDatabaseAndAnonymous() throws IOException {
+  public void lookupWithCityDatabaseAndAnonymousEmptyServiceName() throws IOException {
     final IP ipToLookup = new IP(InetAddress.getByName("110.142.177.68"));
     final IPResolver build =
         new Builder()
@@ -75,12 +75,41 @@ public class IpInfoMmdbTestIT {
     final IpInformation expected =
         IpInformation.builder()
             .withCountryCodeAlpha2("AU")
-            .isVpn(true)
+            .isVpn(false)
             .withPostcode("3061")
             .withCityGeonameId("2158177")
             .withCity("Melbourne")
             .withLeastSpecificDivision("Victoria")
             .withMostSpecificDivision("Victoria")
+            .withStartOfRange(ipToLookup)
+            .withEndOfRange(ipToLookup)
+            .build();
+    assertEquals(Optional.of(expected), resolve.get(new ProviderKey("custom") {}));
+  }
+
+  @Test
+  public void lookupWithCityDatabaseAndAnonymousWithServiceName() throws IOException {
+    final IP ipToLookup = new IP(InetAddress.getByName("31.171.154.78"));
+    final IPResolver build =
+        new Builder()
+            .withProvider(
+                new MmdbDatabase(
+                    "custom",
+                    new IpInfoLocationSource(cityDatabase),
+                    new IpInfoAnonymousSource(anonymousDatabase)))
+            .build();
+
+    final Map<ProviderKey, Optional<IpInformation>> resolve = build.resolve(ipToLookup);
+    assertEquals(1, resolve.size());
+    assertTrue(resolve.containsKey(new ProviderKey("custom") {}));
+    final IpInformation expected =
+        IpInformation.builder()
+            .withCountryCodeAlpha2("AL")
+            .isVpn(true)
+            .withCityGeonameId("3183875")
+            .withCity("Tirana")
+            .withLeastSpecificDivision("Tirana")
+            .withMostSpecificDivision("Tirana")
             .withStartOfRange(ipToLookup)
             .withEndOfRange(ipToLookup)
             .build();

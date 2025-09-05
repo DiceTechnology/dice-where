@@ -11,6 +11,7 @@ public class IpInfoAnonymousResult implements AnonymousResult {
   private final boolean hostingProvider;
   private final boolean proxy;
   private final boolean relay;
+  private final String service;
 
   @MaxMindDbConstructor
   public IpInfoAnonymousResult(
@@ -18,12 +19,14 @@ public class IpInfoAnonymousResult implements AnonymousResult {
       @MaxMindDbParameter(name = "tor") String torExitNode,
       @MaxMindDbParameter(name = "relay") String relay,
       @MaxMindDbParameter(name = "proxy") String proxy,
-      @MaxMindDbParameter(name = "hosting") String hostingProvider) {
+      @MaxMindDbParameter(name = "hosting") String hostingProvider,
+      @MaxMindDbParameter(name = "service") String service) {
     this.vpn = Boolean.parseBoolean(vpn);
     this.torExitNode = Boolean.parseBoolean(torExitNode);
     this.relay = Boolean.parseBoolean(relay);
     this.proxy = Boolean.parseBoolean(proxy);
     this.hostingProvider = Boolean.parseBoolean(hostingProvider);
+    this.service = service;
   }
 
   @Override
@@ -33,7 +36,7 @@ public class IpInfoAnonymousResult implements AnonymousResult {
 
   @Override
   public boolean vpn() {
-    return vpn;
+    return vpn && (service != null && !service.isBlank());
   }
 
   @Override

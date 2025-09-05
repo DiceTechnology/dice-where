@@ -85,7 +85,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <guava.version>21.0</guava.version>
     <ipaddress.version>4.2.0</ipaddress.version>
-    <mapdb.version>3.0.7</mapdb.version>
+    <mapdb.version>3.0.10</mapdb.version>
     <protobuf.version>3.21.12</protobuf.version>
     <junit.version>5.9.2</junit.version>
     <mockito.version>5.1.1</mockito.version>
