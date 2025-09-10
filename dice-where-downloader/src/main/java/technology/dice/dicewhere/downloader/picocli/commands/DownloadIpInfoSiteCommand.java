@@ -12,7 +12,7 @@ import technology.dice.dicewhere.downloader.actions.ipinfo.DownloadIpInfoSite;
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
   @Option(
       names = {"-t", "--token"},
-      required = true,
+      required = false,
       defaultValue = "${env:IPINFO_API_KEY}",
       description = "The ipinfo download key")
   String token;
