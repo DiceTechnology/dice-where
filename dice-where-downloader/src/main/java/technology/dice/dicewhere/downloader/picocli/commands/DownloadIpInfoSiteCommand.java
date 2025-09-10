@@ -16,17 +16,13 @@ import java.util.Optional;
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
   private static final Logger LOG = LoggerFactory.getLogger(DownloadIpInfoSiteCommand.class);
+
+  private static final String ENV_VAR_API_KEY = "IPINFO_API_KEY";
   @Option(
       names = {"-t", "--token"},
       required = false,
       description = "The ipinfo download key")
   String token;
-
-  @Option(names = {"-ak", "--api-key"},
-          required = false,
-          defaultValue = "${env:IPINFO_API_KEY}",
-          description = "The ipinfo download key (env var)")
-  private String apiKey;
 
   @Parameters(
       index = "0",
@@ -36,15 +32,12 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-    String secretToken = Optional.of(apiKey)
+    String secretToken = Optional.of(System.getenv(ENV_VAR_API_KEY))
             .map(v -> {
               LOG.info("-ak param used");
               return v;
             })
-            .or(() -> {
-              LOG.info("-t param used");
-                return Optional.of(token);
-            })
+            .or(() -> Optional.of(token))
             .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
 
     return new DownloadIpInfoSite(
