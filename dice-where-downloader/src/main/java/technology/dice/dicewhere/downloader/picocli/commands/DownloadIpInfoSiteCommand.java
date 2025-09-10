@@ -13,6 +13,7 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
   @Option(
       names = {"-t", "--token"},
       required = true,
+      defaultValue = "${env:IPINFO_API_KEY}",
       description = "The ipinfo download key")
   String token;
 
