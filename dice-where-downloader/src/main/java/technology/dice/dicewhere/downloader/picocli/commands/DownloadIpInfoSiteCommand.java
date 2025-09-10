@@ -1,5 +1,7 @@
 package technology.dice.dicewhere.downloader.picocli.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -12,6 +14,8 @@ import java.util.Optional;
     name = "ipinfo-site",
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DownloadIpInfoSiteCommand.class);
   @Option(
       names = {"-t", "--token"},
       required = false,
@@ -33,7 +37,14 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
   @Override
   public DownloadExecutionResult execute() {
     String secretToken = Optional.of(apiKey)
-            .or(() -> Optional.of(token))
+            .map(v -> {
+              LOG.info("-ak param used");
+              return v;
+            })
+            .or(() -> {
+              LOG.info("-t param used");
+                return Optional.of(token);
+            })
             .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
 
     return new DownloadIpInfoSite(
