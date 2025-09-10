@@ -20,7 +20,7 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
   @Option(names = {"-ak", "--api-key"},
           required = false,
-          defaultValue = "${env:API_KEY}",
+          defaultValue = "${env:IPINFO_API_KEY}",
           description = "The ipinfo download key (env var)")
   private String apiKey;
 

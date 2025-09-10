@@ -21,7 +21,7 @@ public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
   @Option(names = {"-ak", "--api-key"},
           required = false,
-          defaultValue = "${env:API_KEY}",
+          defaultValue = "${env:MAXMIND_API_KEY}",
           description = "The maxmind download key (env var)")
   private String apiKey;
 
