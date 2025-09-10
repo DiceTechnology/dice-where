@@ -38,7 +38,7 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
               return v;
             })
             .or(() -> Optional.of(token))
-            .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
+            .orElseThrow(() -> new IllegalStateException("Token param or api key env var should be provided"));
 
     return new DownloadIpInfoSite(
             noCheckMd5, overwrite, verbose, dataset, format, secretToken, destination)
