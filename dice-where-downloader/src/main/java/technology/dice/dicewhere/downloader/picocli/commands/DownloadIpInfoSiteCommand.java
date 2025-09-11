@@ -1,7 +1,5 @@
 package technology.dice.dicewhere.downloader.picocli.commands;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -15,14 +13,16 @@ import java.util.Optional;
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DownloadIpInfoSiteCommand.class);
-
-  private static final String ENV_VAR_API_KEY = "IPINFO_API_KEY";
   @Option(
       names = {"-t", "--token"},
       required = false,
       description = "The ipinfo download key")
   String token;
+
+    @Option(names = "--token:env",
+            required = false,
+            description = "The ipinfo download key env variable")
+    private String tokenEnvVariable;
 
   @Parameters(
       index = "0",
@@ -32,13 +32,9 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-    String secretToken = Optional.of(System.getenv(ENV_VAR_API_KEY))
-            .map(v -> {
-              LOG.info("-ak param used");
-              return v;
-            })
-            .or(() -> Optional.of(token))
-            .orElseThrow(() -> new IllegalStateException("Token param or api key env var should be provided"));
+      var secretToken = Optional.ofNullable(token)
+              .or(() -> Optional.ofNullable(System.getenv(tokenEnvVariable)))
+              .orElseThrow(() -> new IllegalStateException("Token param or api key env var should be provided"));
 
     return new DownloadIpInfoSite(
             noCheckMd5, overwrite, verbose, dataset, format, secretToken, destination)

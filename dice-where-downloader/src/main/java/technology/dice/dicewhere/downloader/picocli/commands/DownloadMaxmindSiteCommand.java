@@ -13,13 +13,16 @@ import java.util.Optional;
     description = "Downloads the selected Maxmind edition of a database from Maxmind's website")
 public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
-  private static final String ENV_VAR_API_KEY = "MAXMIND_API_KEY";
-
   @Option(
-      names = {"-k", "--key"},
-      required = false,
-      description = "The maxmind download key")
+          names = {"-k", "--key"},
+          required = false,
+          description = "The maxmind download key")
   String key;
+
+  @Option(names = "--key:env",
+          required = false,
+          description = "The maxmind download key env variable")
+  String keyEnvVariable;
 
   @Parameters(
       index = "0",
@@ -29,9 +32,9 @@ public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-    String secretToken = Optional.of(System.getenv(ENV_VAR_API_KEY))
-            .or(() -> Optional.of(key))
-            .orElseThrow(() -> new IllegalStateException("Token param or api key env var should be provided"));
+    var secretToken = Optional.ofNullable(key)
+            .or(() -> Optional.ofNullable(System.getenv(keyEnvVariable)))
+            .orElseThrow(() -> new IllegalStateException("Key param or api key env var should be provided"));
 
     return new DownloadMaxmindSite(
             noCheckMd5, overwrite, verbose, edition, database, format, secretToken, destination)
