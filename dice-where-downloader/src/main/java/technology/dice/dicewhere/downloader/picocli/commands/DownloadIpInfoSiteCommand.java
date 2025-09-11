@@ -19,10 +19,11 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
       description = "The ipinfo download key")
   String token;
 
-    @Option(names = "--token:env",
-            required = false,
-            description = "The ipinfo download key env variable")
-    private String tokenEnvVariable;
+  @Option(names = {"-ak", "--api-key"},
+          required = false,
+          defaultValue = "${env:API_KEY}",
+          description = "The ipinfo download key (env var)")
+  private String apiKey;
 
   @Parameters(
       index = "0",
@@ -32,9 +33,9 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-      var secretToken = Optional.ofNullable(token)
-              .or(() -> Optional.ofNullable(System.getenv(tokenEnvVariable)))
-              .orElseThrow(() -> new IllegalStateException("Token param or api key env var should be provided"));
+    String secretToken = Optional.of(apiKey)
+            .or(() -> Optional.of(token))
+            .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
 
     return new DownloadIpInfoSite(
             noCheckMd5, overwrite, verbose, dataset, format, secretToken, destination)

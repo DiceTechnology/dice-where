@@ -19,10 +19,11 @@ public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
           description = "The maxmind download key")
   String key;
 
-  @Option(names = "--key:env",
+  @Option(names = {"-ak", "--api-key"},
           required = false,
-          description = "The maxmind download key env variable")
-  String keyEnvVariable;
+          defaultValue = "${env:API_KEY}",
+          description = "The maxmind download key (env var)")
+  private String apiKey;
 
   @Parameters(
       index = "0",
@@ -32,9 +33,9 @@ public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-    var secretToken = Optional.ofNullable(key)
-            .or(() -> Optional.ofNullable(System.getenv(keyEnvVariable)))
-            .orElseThrow(() -> new IllegalStateException("Key param or api key env var should be provided"));
+    String secretToken = Optional.of(apiKey)
+            .or(() -> Optional.of(key))
+            .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
 
     return new DownloadMaxmindSite(
             noCheckMd5, overwrite, verbose, edition, database, format, secretToken, destination)
