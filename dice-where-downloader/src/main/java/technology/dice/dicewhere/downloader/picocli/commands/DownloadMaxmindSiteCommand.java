@@ -1,5 +1,7 @@
 package technology.dice.dicewhere.downloader.picocli.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -13,17 +15,14 @@ import java.util.Optional;
     description = "Downloads the selected Maxmind edition of a database from Maxmind's website")
 public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
-  @Option(
-          names = {"-k", "--key"},
-          required = false,
-          description = "The maxmind download key")
-  String key;
+  private static final Logger LOG = LoggerFactory.getLogger(DownloadMaxmindSiteCommand.class);
 
-  @Option(names = {"-ak", "--api-key"},
-          required = false,
-          defaultValue = "${env:API_KEY}",
-          description = "The maxmind download key (env var)")
-  private String apiKey;
+  @Option(
+        names = {"-k", "--key"},
+        required = false,
+        defaultValue = "${env:MAXMIND_API_KEY}",
+        description = "The maxmind download key")
+  String key;
 
   @Parameters(
       index = "0",
@@ -33,12 +32,8 @@ public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-    String secretToken = Optional.of(apiKey)
-            .or(() -> Optional.of(key))
-            .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
-
     return new DownloadMaxmindSite(
-            noCheckMd5, overwrite, verbose, edition, database, format, secretToken, destination)
+            noCheckMd5, overwrite, verbose, edition, database, format, key, destination)
         .execute();
   }
 }

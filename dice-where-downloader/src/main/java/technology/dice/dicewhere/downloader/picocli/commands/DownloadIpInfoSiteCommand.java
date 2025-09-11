@@ -1,5 +1,7 @@
 package technology.dice.dicewhere.downloader.picocli.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -12,18 +14,14 @@ import java.util.Optional;
     name = "ipinfo-site",
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
+  private static final Logger LOG = LoggerFactory.getLogger(DownloadIpInfoSiteCommand.class);
 
   @Option(
-      names = {"-t", "--token"},
-      required = false,
-      description = "The ipinfo download key")
+    names = {"-t", "--token"},
+    required = false,
+    defaultValue = "${env:IPINFO_API_KEY}",
+    description = "The ipinfo download key")
   String token;
-
-  @Option(names = {"-ak", "--api-key"},
-          required = false,
-          defaultValue = "${env:API_KEY}",
-          description = "The ipinfo download key (env var)")
-  private String apiKey;
 
   @Parameters(
       index = "0",
@@ -33,12 +31,8 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
 
   @Override
   public DownloadExecutionResult execute() {
-    String secretToken = Optional.of(apiKey)
-            .or(() -> Optional.of(token))
-            .orElseThrow(() -> new IllegalStateException("Token or api key parameters should be provided"));
-
     return new DownloadIpInfoSite(
-            noCheckMd5, overwrite, verbose, dataset, format, secretToken, destination)
+            noCheckMd5, overwrite, verbose, dataset, format, token, destination)
             .execute();
   }
 }

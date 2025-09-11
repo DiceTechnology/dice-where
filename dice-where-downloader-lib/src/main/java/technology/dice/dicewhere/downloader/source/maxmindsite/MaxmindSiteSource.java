@@ -33,7 +33,7 @@ public class MaxmindSiteSource extends BaseUrlSource {
         dataConnection.setRequestMethod("HEAD");
 
         if (dataConnection.getResponseCode() > 299 || dataConnection.getResponseCode() < 200) {
-          throw new DownloaderException("Could not find remote file");
+          throw new DownloaderException("Could not find remote file " + dataConnection.getResponseCode());
         }
 
         long fileSize = dataConnection.getContentLengthLong();
