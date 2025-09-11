@@ -14,9 +14,11 @@ import java.util.Optional;
     name = "ipinfo-site",
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
-  private static final Logger LOG = LoggerFactory.getLogger(DownloadIpInfoSiteCommand.class);
+    static {
+        LoggerFactory.getLogger(DownloadIpInfoSiteCommand.class);
+    }
 
-  @Option(
+    @Option(
     names = {"-t", "--token"},
     required = false,
     defaultValue = "${env:IPINFO_API_KEY}",
