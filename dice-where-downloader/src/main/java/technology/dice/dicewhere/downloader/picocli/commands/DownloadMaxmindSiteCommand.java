@@ -1,6 +1,5 @@
 package technology.dice.dicewhere.downloader.picocli.commands;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -15,9 +14,11 @@ import java.util.Optional;
     description = "Downloads the selected Maxmind edition of a database from Maxmind's website")
 public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DownloadMaxmindSiteCommand.class);
+    static {
+        LoggerFactory.getLogger(DownloadMaxmindSiteCommand.class);
+    }
 
-  @Option(
+    @Option(
         names = {"-k", "--key"},
         required = false,
         defaultValue = "${env:MAXMIND_API_KEY}",
