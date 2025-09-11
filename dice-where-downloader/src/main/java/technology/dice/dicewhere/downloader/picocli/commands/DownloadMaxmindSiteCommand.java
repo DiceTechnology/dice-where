@@ -7,8 +7,6 @@ import picocli.CommandLine.Parameters;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.actions.maxmind.DownloadMaxmindSite;
 
-import java.util.Optional;
-
 @Command(
     name = "maxmind-site",
     description = "Downloads the selected Maxmind edition of a database from Maxmind's website")

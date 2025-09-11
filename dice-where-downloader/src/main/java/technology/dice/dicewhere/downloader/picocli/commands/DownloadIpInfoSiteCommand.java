@@ -7,8 +7,6 @@ import picocli.CommandLine.Parameters;
 import technology.dice.dicewhere.downloader.actions.DownloadExecutionResult;
 import technology.dice.dicewhere.downloader.actions.ipinfo.DownloadIpInfoSite;
 
-import java.util.Optional;
-
 @Command(
     name = "ipinfo-site",
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
