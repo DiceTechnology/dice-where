@@ -1,6 +1,5 @@
 package technology.dice.dicewhere.downloader.picocli.commands;
 
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -11,9 +10,6 @@ import technology.dice.dicewhere.downloader.actions.ipinfo.DownloadIpInfoSite;
     name = "ipinfo-site",
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
-    static {
-        LoggerFactory.getLogger(DownloadIpInfoSiteCommand.class);
-    }
 
     @Option(
     names = {"-t", "--token"},
