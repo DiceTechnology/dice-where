@@ -10,10 +10,12 @@ import technology.dice.dicewhere.downloader.actions.ipinfo.DownloadIpInfoSite;
     name = "ipinfo-site",
     description = "Downloads the selected IpInfo dataset from IpInfo's website")
 public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
-  @Option(
-      names = {"-t", "--token"},
-      required = true,
-      description = "The ipinfo download key")
+
+    @Option(
+    names = {"-t", "--token"},
+    required = false,
+    defaultValue = "${env:IPINFO_API_KEY}",
+    description = "The ipinfo download key")
   String token;
 
   @Parameters(
@@ -26,6 +28,6 @@ public class DownloadIpInfoSiteCommand extends IpInfoBaseCommand {
   public DownloadExecutionResult execute() {
     return new DownloadIpInfoSite(
             noCheckMd5, overwrite, verbose, dataset, format, token, destination)
-        .execute();
+            .execute();
   }
 }

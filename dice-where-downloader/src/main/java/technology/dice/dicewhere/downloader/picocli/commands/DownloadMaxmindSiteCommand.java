@@ -11,10 +11,11 @@ import technology.dice.dicewhere.downloader.actions.maxmind.DownloadMaxmindSite;
     description = "Downloads the selected Maxmind edition of a database from Maxmind's website")
 public class DownloadMaxmindSiteCommand extends MaxmindBaseCommand {
 
-  @Option(
-      names = {"-k", "--key"},
-      required = true,
-      description = "The maxmind download key")
+    @Option(
+        names = {"-k", "--key"},
+        required = false,
+        defaultValue = "${env:MAXMIND_API_KEY}",
+        description = "The maxmind download key")
   String key;
 
   @Parameters(
