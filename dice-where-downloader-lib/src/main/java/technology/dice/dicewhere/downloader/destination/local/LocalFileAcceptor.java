@@ -31,7 +31,7 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
 
   @Override
   public StreamConsumer<Void> getStreamConsumer(
-      MD5Checksum originalFileMd5, Instant originalFileTimestamp, boolean noMd5Check) {
+          MD5Checksum originalFileMd5, Instant originalFileTimestamp, boolean noMd5Check) {
     return (stream, size) -> {
       try {
         Files.createDirectories(destination);
@@ -39,8 +39,8 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
       } catch (FileAlreadyExistsException e) {
         LOG.debug("Destination directory already exists");
       }
-      try (stream) {
-        Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
+      try (InputStream in = stream) {
+        Files.copy(in, destination, StandardCopyOption.REPLACE_EXISTING);
         if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
           LOG.error("MD5 mismatch. Deleting destination file");
           Files.delete(destination);
