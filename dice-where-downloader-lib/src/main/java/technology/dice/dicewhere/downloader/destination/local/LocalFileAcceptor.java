@@ -39,10 +39,12 @@ public class LocalFileAcceptor implements FileAcceptor<Void> {
       } catch (FileAlreadyExistsException e) {
         LOG.debug("Destination directory already exists");
       }
-      Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
-      if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
-        LOG.error("MD5 mismatch. Deleting destination file");
-        Files.delete(destination);
+      try (stream) {
+        Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
+        if ((!noMd5Check) && (!originalFileMd5.matches(stream.md5()))) {
+          LOG.error("MD5 mismatch. Deleting destination file");
+          Files.delete(destination);
+        }
       }
       return null;
     };
